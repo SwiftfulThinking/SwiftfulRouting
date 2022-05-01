@@ -35,7 +35,7 @@ public struct RouterView<T:View>: View {
     
 }
 
-struct SwiftUIView_Previews: PreviewProvider {
+struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
         RouterView {
             Text("Hi")
