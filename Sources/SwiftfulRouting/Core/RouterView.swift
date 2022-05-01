@@ -52,7 +52,7 @@ extension View {
             if #available(iOS 14.0, *) {
                 modifier(FullScreenCoverViewModifier(item: item))
             } else {
-                modifier(SheetViewModifier(item: item))
+                self
             }
         } else {
             modifier(NavigationLinkViewModifier(item: item))
