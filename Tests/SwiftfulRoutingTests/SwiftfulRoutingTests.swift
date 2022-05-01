@@ -6,6 +6,6 @@ final class SwiftfulRoutingTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(SwiftfulRouting().text, "Hello, World!")
+//        XCTAssertEqual(SwiftfulRouting().text, "Hello, World!")
     }
 }
