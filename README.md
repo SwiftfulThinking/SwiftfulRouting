@@ -1,12 +1,14 @@
-# SwiftfulRouting
+# SwiftfulRouting  🕊
 
-> Native, declarative routing for SwiftUI applications 🥳
+Native, declarative routing for SwiftUI applications
 
-## Overview
+**Setup time:** 1 minute
+
+## Overview 🤓
 
 SwiftUI is a declarative framework, and therefore, a SwiftUI router should be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution is to declare all modifiers to support the routing in advance by adding a new set of modifiers at the root of each segue's destination. This maintains a declarive view heirarchy while allowing the developer to determine the destination at the time of execution.
 
-## Setup
+## Setup ☕️
 
 Add the package your your xcode
 
@@ -72,7 +74,7 @@ struct SecondView: View {
 }
 ```
 
-## Segues
+## Segues ⏩
 
 Router supports native SwiftUI segues, including .push (NavigationLink), .sheet, and .fullScreenCover.
 
@@ -83,7 +85,7 @@ router.showScreen(.fullScreenCover, destination: () -> View)
 router.dismissScreen()
 ```
 
-## Alerts
+## Alerts 🚨
 
 Router supports native SwiftUI alerts, including .alert and .confirmationDialog.
 
@@ -93,7 +95,7 @@ router.showAlert(.confirmationDialog, title: String, alert: () -> View)
 router.dismissAlert()
 ```
 
-## Modals
+## Modals 🪧
 
 Router also supports any modal transition, which displays above the current content.
 
