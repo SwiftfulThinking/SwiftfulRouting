@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Each Router can support 1 active segue, 1 active modal, and 1 active alert.
 public class Router: ObservableObject {
         
     var presentationMode: Binding<PresentationMode>? = nil

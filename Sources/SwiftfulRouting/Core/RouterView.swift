@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Create a top-level RouterView
 ///
-/// The content will be wrapped in a NavigationView. The developer modify the nav bars using the native SwiftUI modifiers.
+/// There should only be 1 RouterView per view heirarchy. The content will be wrapped in a NavigationView.
 public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
@@ -27,17 +27,17 @@ public struct RouterView<T:View>: View {
     }
 }
 
-public struct SubRouterView<T:View>: View {
+struct SubRouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var router = Router()
     let content: () -> T
 
-    public init(@ViewBuilder content: @escaping () -> T) {
+    init(@ViewBuilder content: @escaping () -> T) {
         self.content = content
     }
     
-    public var body: some View {
+    var body: some View {
         content()
             .onAppear(perform: {
                 router.configure(presentationMode: presentationMode)
