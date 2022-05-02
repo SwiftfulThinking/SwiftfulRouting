@@ -47,6 +47,11 @@ public class Router: ObservableObject {
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, @ViewBuilder alert: @escaping () -> T) {
+        guard self.alert == nil else {
+            dismissAlert()
+            return
+        }
+        
         self.alertOption = option
         self.alert = AnyAlert(title: title, buttons: alert())
     }
@@ -56,15 +61,20 @@ public class Router: ObservableObject {
     }
     
     public func showModal<T:View>(
-            transition: AnyTransition = .move(edge: .bottom),
-            animation: Animation = .easeInOut,
-            alignment: Alignment = .center,
-            backgroundColor: Color? = nil,
-            useDeviceBounds: Bool = true,
-            @ViewBuilder destination: @escaping () -> T) {
-        self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
-        self.modal = AnyDestination(destination())
-    }
+        transition: AnyTransition = .move(edge: .bottom),
+        animation: Animation = .easeInOut,
+        alignment: Alignment = .center,
+        backgroundColor: Color? = nil,
+        useDeviceBounds: Bool = true,
+        @ViewBuilder destination: @escaping () -> T) {
+            guard self.modal == nil else {
+                dismissModal()
+                return
+            }
+            
+            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
+            self.modal = AnyDestination(destination())
+        }
     
     public func dismissModal() {
         self.modal = nil
