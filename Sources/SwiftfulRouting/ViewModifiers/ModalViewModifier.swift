@@ -30,7 +30,7 @@ struct ModalViewModifier: ViewModifier {
 
                         view
                             .frame(configuration: configuration)
-                            .edgesIgnoringSafeArea(.all)
+//                            .edgesIgnoringSafeArea(.all)
                             .transition(configuration.transition)
                             .zIndex(2)
                     }
