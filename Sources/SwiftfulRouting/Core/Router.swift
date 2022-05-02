@@ -42,9 +42,8 @@ public class Router: ObservableObject {
         }
     }
     
-    /// Dismiss screen / segue.
     public func dismissScreen() {
-        presentationMode?.wrappedValue.dismiss()
+        self.presentationMode?.wrappedValue.dismiss()
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, @ViewBuilder alert: @escaping () -> T) {

@@ -18,9 +18,6 @@ struct SheetViewModifier: ViewModifier {
                 NavigationView {
                     if let view = item.wrappedValue?.destination {
                         view
-                            .onAppear {
-                                print("NEW NAV ADDED")
-                            }
                     }
                 }
             }
