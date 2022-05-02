@@ -28,7 +28,7 @@ Add a `RouterView`
 struct ContentView: View {
     var body: some View {
         RouterView {
-            SecondView()
+            MyView()
         }
     }
 }
@@ -38,7 +38,7 @@ The `Router` will be available as an `EnvironmentObject` of all child views of `
 
 
 ```swift
-struct SecondView: View {
+struct MyView: View {
 
     @EnvironmentObject private var router: Router
     
