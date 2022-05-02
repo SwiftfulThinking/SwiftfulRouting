@@ -20,9 +20,13 @@ struct NavigationViewIfNeeded<T:View>: View {
     var body: some View {
         if viewIsPresented {
             content()
+                
         } else {
             NavigationView {
                 content()
+                    .onAppear {
+                        print("NEW NAV NEEDED")
+                    }
             }
         }
     }
