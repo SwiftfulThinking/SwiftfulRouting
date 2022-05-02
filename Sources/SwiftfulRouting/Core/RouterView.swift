@@ -21,19 +21,34 @@ public struct RouterView<T:View>: View {
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(presentationMode: presentationMode) {
-            content()
-                .onAppear(perform: {
-                    router.configure(presentationMode: presentationMode)
-                    print(presentationMode.wrappedValue.isPresented)
-                })
-                .showingAlert(option: router.alertOption, item: $router.alert)
-                .showingScreen(option: router.segueOption, item: $router.screen)
-                .showingModal(configuration: router.modalConfiguration, item: $router.modal)
-                .environmentObject(router)
+        NavigationView {
+            SubRouterView(content: content)
         }
     }
 }
+
+public struct SubRouterView<T:View>: View {
+    
+    @Environment(\.presentationMode) var presentationMode
+    @StateObject private var router = Router()
+    let content: () -> T
+
+    public init(@ViewBuilder content: @escaping () -> T) {
+        self.content = content
+    }
+    
+    public var body: some View {
+        content()
+            .onAppear(perform: {
+                router.configure(presentationMode: presentationMode)
+            })
+            .showingAlert(option: router.alertOption, item: $router.alert)
+            .showingScreen(option: router.segueOption, item: $router.screen)
+            .showingModal(configuration: router.modalConfiguration, item: $router.modal)
+            .environmentObject(router)
+    }
+}
+
 
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
