@@ -6,7 +6,7 @@ Native, declarative routing for SwiftUI applications
 
 ## Overview 🤓
 
-SwiftUI is a declarative framework, and therefore, a SwiftUI router should be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution is to declare all modifiers to support the routing in advance by adding a new set of modifiers at the root of each segue's destination where the destination is an optional, type-erased view. This maintains a declarive view heirarchy while allowing the developer to determine the destination at the time of execution.
+SwiftUI is a declarative framework, and therefore, a SwiftUI router should be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution is to declare all modifiers to support the routing in advance by adding a new set of modifiers at the root of each segue's destination where the destination is an optional, type-erased view. This maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution.
 
 ## Setup ☕️
 
