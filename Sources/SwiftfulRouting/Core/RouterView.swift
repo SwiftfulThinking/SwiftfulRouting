@@ -25,6 +25,7 @@ public struct RouterView<T:View>: View {
             content()
                 .onAppear(perform: {
                     router.configure(presentationMode: presentationMode)
+                    print(presentationMode.wrappedValue.isPresented)
                 })
                 .showingAlert(option: router.alertOption, item: $router.alert)
                 .showingScreen(option: router.segueOption, item: $router.screen)
@@ -32,7 +33,6 @@ public struct RouterView<T:View>: View {
                 .environmentObject(router)
         }
     }
-    
 }
 
 struct RouterView_Previews: PreviewProvider {
