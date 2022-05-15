@@ -24,7 +24,7 @@ Import the package
 import SwiftfulRouting
 ```
 
-Add a `RouterView`
+Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a NavigationView and add modifiers to support all potential segues. If you're already inside a NavigationView, use `SubRouterView` instead.
 
 ```swift
 struct ContentView: View {
