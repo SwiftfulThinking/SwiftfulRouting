@@ -27,17 +27,17 @@ public struct RouterView<T:View>: View {
     }
 }
 
-struct SubRouterView<T:View>: View {
+public struct SubRouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var router = Router()
     let content: () -> T
 
-    init(@ViewBuilder content: @escaping () -> T) {
+    public init(@ViewBuilder content: @escaping () -> T) {
         self.content = content
     }
     
-    var body: some View {
+    public var body: some View {
         content()
             .onAppear(perform: {
                 router.configure(presentationMode: presentationMode)
