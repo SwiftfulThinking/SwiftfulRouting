@@ -12,7 +12,7 @@ SwiftUI is a declarative framework, and therefore, a SwiftUI router should be de
 
 ## Setup ☕️
 
-Add the package your your xcode
+Add the package to your xcode project
 
 ```
 https://github.com/SwiftfulThinking/SwiftfulRouting.git
