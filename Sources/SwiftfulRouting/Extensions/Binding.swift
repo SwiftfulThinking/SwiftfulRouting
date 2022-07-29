@@ -18,3 +18,14 @@ extension Binding where Value == Bool {
         }
     }
 }
+
+extension Binding where Value == AnyDestination? {
+    
+    init(if selected: SegueOption, is option: SegueOption, value: Binding<AnyDestination?>) {
+        self.init {
+            selected == option ? value.wrappedValue : nil
+        } set: { newValue in
+            value.wrappedValue = newValue
+        }
+    }
+}

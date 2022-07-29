@@ -7,6 +7,6 @@
 
 import Foundation
 
-public enum SegueOption {
+public enum SegueOption: Equatable {
     case push, sheet, fullScreenCover
 }

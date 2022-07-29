@@ -61,16 +61,15 @@ struct RouterView_Previews: PreviewProvider {
 extension View {
     
     @ViewBuilder func showingScreen(option: SegueOption, item: Binding<AnyDestination?>) -> some View {
-        if option == .sheet {
-            modifier(SheetViewModifier(item: item))
-        } else if option == .fullScreenCover {
-            if #available(iOS 14.0, *) {
-                modifier(FullScreenCoverViewModifier(item: item))
-            } else {
-                self
-            }
+        if #available(iOS 14, *) {
+            self
+                .modifier(NavigationLinkViewModifier(option: option, item: item))
+                .modifier(SheetViewModifier(option: option, item: item))
+                .modifier(FullScreenCoverViewModifier(option: option, item: item))
         } else {
-            modifier(NavigationLinkViewModifier(item: item))
+            self
+                .modifier(NavigationLinkViewModifier(option: option, item: item))
+                .modifier(SheetViewModifier(option: option, item: item))
         }
     }
 

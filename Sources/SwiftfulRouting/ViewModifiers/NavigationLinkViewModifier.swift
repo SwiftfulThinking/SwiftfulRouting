@@ -10,13 +10,14 @@ import SwiftUI
 
 struct NavigationLinkViewModifier: ViewModifier {
     
+    let option: SegueOption
     let item: Binding<AnyDestination?>
 
     func body(content: Content) -> some View {
         content
             .background(
                 ZStack {
-                    NavigationLink(isActive: Binding(ifNotNil: item)) {
+                    NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
                         ZStack {
                             if let view = item.wrappedValue?.destination {
                                 view
