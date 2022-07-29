@@ -62,8 +62,16 @@ extension View {
     
     @ViewBuilder func showingScreen(option: SegueOption, item: Binding<AnyDestination?>) -> some View {
         self
-            .modifier(NavigationLinkViewModifier(item: item))
-            .modifier(SheetViewModifier(item: item))
+            .modifier(NavigationLinkViewModifier(item: Binding(get: {
+                option == .push ? item.wrappedValue : nil
+            }, set: { newValue in
+                item.wrappedValue = newValue
+            })))
+            .modifier(SheetViewModifier(item: Binding(get: {
+                option == .sheet ? item.wrappedValue : nil
+            }, set: { newValue in
+                item.wrappedValue = newValue
+            })))
 //        if option == .sheet {
 //            modifier(SheetViewModifier(item: item))
 //        } else if option == .fullScreenCover {
