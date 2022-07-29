@@ -10,6 +10,7 @@ import SwiftUI
 
 struct NavigationLinkViewModifier: ViewModifier {
     
+    let option: SegueOption
     let item: Binding<AnyDestination?>
 
     func body(content: Content) -> some View {

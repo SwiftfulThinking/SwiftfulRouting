@@ -62,11 +62,7 @@ extension View {
     
     @ViewBuilder func showingScreen(option: SegueOption, item: Binding<AnyDestination?>) -> some View {
         self
-            .modifier(NavigationLinkViewModifier(item: Binding(get: {
-                option == .push ? item.wrappedValue : nil
-            }, set: { newValue in
-                item.wrappedValue = newValue
-            })))
+            .modifier(NavigationLinkViewModifier(option: option, item: Binding(if: option, is: .push, value: item)))
             .modifier(SheetViewModifier(item: Binding(get: {
                 option == .sheet ? item.wrappedValue : nil
             }, set: { newValue in
