@@ -17,7 +17,7 @@ struct NavigationLinkViewModifier: ViewModifier {
         content
             .background(
                 ZStack {
-                    NavigationLink(isActive: Binding(ifNotNil: item)) {
+                    NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
                         ZStack {
                             if let view = item.wrappedValue?.destination {
                                 view

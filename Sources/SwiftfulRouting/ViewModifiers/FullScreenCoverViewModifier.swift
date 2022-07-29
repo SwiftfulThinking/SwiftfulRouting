@@ -11,11 +11,12 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct FullScreenCoverViewModifier: ViewModifier {
     
+    let option: SegueOption
     let item: Binding<AnyDestination?>
 
     func body(content: Content) -> some View {
         content
-            .fullScreenCover(item: item, onDismiss: nil) { destination in
+            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: item), onDismiss: nil) { destination in
                 NavigationView {
                     if let view = item.wrappedValue?.destination {
                         view
