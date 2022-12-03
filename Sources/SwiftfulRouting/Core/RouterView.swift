@@ -46,6 +46,7 @@ public struct SubRouterView<T:View>: View {
             .showingScreen(option: router.segueOption, item: $router.screen)
             .showingModal(configuration: router.modalConfiguration, item: $router.modal)
             .environmentObject(router)
+            .environmentObject(TopRouter(router: router))
     }
 }
 
