@@ -38,7 +38,7 @@ public class Router: ObservableObject {
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             await MainActor.run(body: {
-                self.screen = AnyDestination(SubRouterView(content: { destination() }))
+                self.screen = AnyDestination(destination())
             })
         }
     }
