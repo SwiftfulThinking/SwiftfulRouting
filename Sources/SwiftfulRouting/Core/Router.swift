@@ -12,7 +12,7 @@ public class TopRouter: ObservableObject {
     
     public let router: Router
     
-    init(router: Router) {
+    public init(router: Router) {
         self.router = router
     }
     
