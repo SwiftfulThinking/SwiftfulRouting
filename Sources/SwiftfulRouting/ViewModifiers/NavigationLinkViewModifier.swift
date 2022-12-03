@@ -12,17 +12,15 @@ struct NavigationLinkViewModifier: ViewModifier {
     
     let option: SegueOption
     let item: Binding<AnyDestination?>
-    @EnvironmentObject private var topRouter: TopRouter
 
     func body(content: Content) -> some View {
         content
             .background(
                 ZStack {
                     NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
-                        SubRouterView {
+                        SubRouterView(isTopRouter: true) {
                             if let view = item.wrappedValue?.destination {
                                 view
-                                    .environmentObject(topRouter)
                             }
                         }
                     } label: {
