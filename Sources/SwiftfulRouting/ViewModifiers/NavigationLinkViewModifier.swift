@@ -12,6 +12,7 @@ struct NavigationLinkViewModifier: ViewModifier {
     
     let option: SegueOption
     let item: Binding<AnyDestination?>
+    @EnvironmentObject private var topRouter: TopRouter
 
     func body(content: Content) -> some View {
         content
@@ -21,6 +22,7 @@ struct NavigationLinkViewModifier: ViewModifier {
                         SubRouterView {
                             if let view = item.wrappedValue?.destination {
                                 view
+                                    .environmentObject(topRouter)
                             }
                         }
                     } label: {
