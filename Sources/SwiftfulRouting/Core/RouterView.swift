@@ -13,7 +13,6 @@ import SwiftUI
 public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var router = Router()
     let content: () -> T
 
     public init(@ViewBuilder content: @escaping () -> T) {
@@ -22,8 +21,7 @@ public struct RouterView<T:View>: View {
     
     public var body: some View {
         NavigationView {
-            SubRouterView(content: content)
-                .environmentObject(TopRouter(router: router))
+            SubRouterView(isTopRouter: true, content: content)
         }
     }
 }
@@ -32,9 +30,11 @@ public struct SubRouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var router = Router()
+    let isTopRouter: Bool
     let content: () -> T
 
-    public init(@ViewBuilder content: @escaping () -> T) {
+    public init(isTopRouter: Bool = false, @ViewBuilder content: @escaping () -> T) {
+        self.isTopRouter = isTopRouter
         self.content = content
     }
     
@@ -47,7 +47,21 @@ public struct SubRouterView<T:View>: View {
             .showingScreen(option: router.segueOption, item: $router.screen)
             .showingModal(configuration: router.modalConfiguration, item: $router.modal)
             .environmentObject(router)
+            .environmentObject(if: isTopRouter, TopRouter(router: router))
     }
+}
+
+extension View {
+    
+    
+    @ViewBuilder func environmentObject(if isActive: Bool, _ object: some ObservableObject) -> some View {
+        if isActive {
+            self.environmentObject(object)
+        } else {
+            self
+        }
+    }
+    
 }
 
 
