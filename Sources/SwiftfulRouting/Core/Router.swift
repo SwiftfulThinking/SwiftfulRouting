@@ -10,7 +10,7 @@ import SwiftUI
 /// Contains an instance of Router. Created as a seperate class so that it can exist in the environment alongside the default routers.
 public class TopRouter: ObservableObject {
     
-    let router: Router
+    public let router: Router
     
     init(router: Router) {
         self.router = router
