@@ -56,11 +56,11 @@ public class Router: ObservableObject {
             await MainActor.run(body: {
                 switch option {
                 case .push, .fullScreenCover:
-                    self.screen = AnyDestination(RouterView { router in
+                    self.screen = AnyDestination(SubRouterView { router in
                         destination(router)
                     })
                 case .sheet:
-                    self.screen = AnyDestination(SubRouterView { router in
+                    self.screen = AnyDestination(RouterView { router in
                         destination(router)
                     })
                 }
