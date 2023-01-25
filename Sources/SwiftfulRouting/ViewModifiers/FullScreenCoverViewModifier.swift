@@ -16,8 +16,8 @@ struct FullScreenCoverViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: item), onDismiss: nil) { destination in
-                RouterView {
+            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: item), onDismiss: nil) { _ in
+                ZStack {
                     if let view = item.wrappedValue?.destination {
                         view
                     }

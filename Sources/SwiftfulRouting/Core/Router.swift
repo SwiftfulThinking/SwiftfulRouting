@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+// remove top router
+// remove environment objects
+// remove RouterView, only have SubRouter view? NavigationView is for user to add? no?
+
 /// Contains an instance of Router. Created as a seperate class so that it can exist in the environment alongside the default routers.
 public class TopRouter: ObservableObject {
     
@@ -19,6 +23,7 @@ public class TopRouter: ObservableObject {
 }
 
 /// Each Router can support 1 active segue, 1 active modal, and 1 active alert.
+@MainActor
 public class Router: ObservableObject {
         
     var presentationMode: Binding<PresentationMode>? = nil
@@ -37,19 +42,28 @@ public class Router: ObservableObject {
         self.presentationMode = presentationMode
     }
         
-    public func showScreen<T:View>(_ option: SegueOption, @ViewBuilder destination: @escaping () -> T) {
+    public func showScreen<T:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (Router) -> T) {
         guard self.screen == nil else {
             print("Cannot segue because a destination has already been set in this router.")
             return
         }
         self.segueOption = option
 
-        // To do: Must wait 0.01 seconds between updating screenType and screen or segue will not execute.
+        // To do: Must wait 0.01 seconds between updating segueOption and screen or segue will not execute.
         // Need to figure out why that is and hopefully remove any delay / sleep.
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             await MainActor.run(body: {
-                self.screen = AnyDestination(destination())
+                switch option {
+                case .push, .fullScreenCover:
+                    self.screen = AnyDestination(RouterView { router in
+                        destination(router)
+                    })
+                case .sheet:
+                    self.screen = AnyDestination(SubRouterView { router in
+                        destination(router)
+                    })
+                }
             })
         }
     }

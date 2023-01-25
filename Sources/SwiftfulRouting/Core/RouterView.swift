@@ -70,7 +70,7 @@ struct RouterView_Previews: PreviewProvider {
         RouterView { router in
             Text("Hi")
                 .onTapGesture {
-                    router.showScreen(.push) {
+                    router.showScreen(.push) { router in
                         Text("Hello, world")
                     }
                 }
