@@ -55,11 +55,11 @@ public class Router: ObservableObject {
             try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             await MainActor.run(body: {
                 switch option {
-                case .push, .fullScreenCover:
+                case .sheet, .fullScreenCover:
                     self.screen = AnyDestination(SubRouterView { router in
                         destination(router)
                     })
-                case .sheet:
+                case .push:
                     self.screen = AnyDestination(RouterView { router in
                         destination(router)
                     })
