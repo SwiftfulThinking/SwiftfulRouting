@@ -28,6 +28,19 @@ extension Binding where Value == AnyDestination? {
             value.wrappedValue = newValue
         }
     }
+    
+}
+
+extension Binding where Value == Array<AnyDestination> {
+    
+    init(if selected: SegueOption, is option: SegueOption, value: Binding<[AnyDestination]>) {
+        self.init {
+            selected == option ? value.wrappedValue : []
+        } set: { newValue in
+            value.wrappedValue = newValue
+        }
+    }
+    
 }
 
 func bindingToFirstElement<T>(in array: Binding<[T]>) -> Binding<T?> {

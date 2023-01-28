@@ -43,11 +43,12 @@ struct OptionalNavigationView<Content:View>: View {
         if addNavigationView {
             if #available(iOS 16.0, *) {
                 // TODO: Make this an extension in Binding.swift?
-                let path = Binding(get: {
+                let bindingToScreens = Binding(get: {
                     router.screens
                 }, set: { newValue, _ in
                     router.screens = newValue
                 })
+                let path = Binding(if: router.segueOption, is: .push, value: bindingToScreens)
                 
                 NavigationStack(path: path) {
                     content
