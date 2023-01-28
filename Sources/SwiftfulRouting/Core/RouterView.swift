@@ -12,6 +12,9 @@ public protocol Router {
         _ option: SegueOption,
         @ViewBuilder destination: @escaping (AnyRouter) -> V)
     
+    @available(iOS 16, *)
+    func pushStack(_ option: SegueOption, destinations: [(AnyRouter) -> AnyView])
+
     func dismissScreen()
     
     func showAlert<V:View>(
@@ -38,6 +41,11 @@ public struct AnyRouter: Router {
     
     public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
         object.showScreen(option, destination: destination)
+    }
+    
+    @available(iOS 16, *)
+    public func pushStack(_ option: SegueOption, destinations: [(AnyRouter) -> AnyView]) {
+        object.pushStack(option, destinations: destinations)
     }
     
     public func dismissScreen() {
@@ -72,18 +80,22 @@ public struct RouterView<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
     let addNavigationView: Bool
+    let content: (AnyRouter) -> T
 
+    // Segues
     @State private var segueOption: SegueOption = .push
     @State private var screens: [AnyDestination] = []
-    @Binding private var screenStack: [AnyDestination] // Binding to view stack from previous RouterViews
+    
+    // Binding to view stack from previous RouterViews
+    @Binding private var screenStack: [AnyDestination]
 
+    // Alerts
     @State private var alertOption: AlertOption = .alert
     @State private var alert: AnyAlert? = nil
-
+    
+    // Modals
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
-    
-    let content: (AnyRouter) -> T
     
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
@@ -117,24 +129,33 @@ public struct RouterView<T:View>: View, Router {
             if screenStack.isEmpty {
                 // Start view stack
                 self.screens.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
-                print("NEW STACK!")
             } else {
                 // Increment view stack
                 self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screenStack, content: destination)))
-                print("INCREMENTING!")
+            }
+        }
+    }
+    
+    @available(iOS 16, *)
+    public func pushStack(_ option: SegueOption, destinations: [(AnyRouter) -> AnyView]) {
+        self.segueOption = option
+        
+        var localStack: [AnyDestination] = []
+        
+        for destination in destinations {
+            if screenStack.isEmpty && localStack.isEmpty {
+                let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: $screens, content: destination))
+                localStack.append(view)
+            } else {
+                localStack.append(AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: $screenStack, content: destination)))
             }
         }
         
-        
-        //
-//        guard self.screens.isEmpty else {
-//            print("Cannot segue because a destination has already been set in this router.")
-//            return
-//        }
-//
-//        self.screens = [
-//            AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination))
-//        ]
+        if screenStack.isEmpty {
+            self.screens.append(contentsOf: localStack)
+        } else {
+            self.screenStack.append(contentsOf: localStack)
+        }
     }
     
     public func dismissScreen() {
