@@ -10,7 +10,7 @@ import SwiftUI
 public protocol Router {
     func showScreen<T:View>(
         _ option: SegueOption,
-        @ViewBuilder destination: @escaping (Router) -> T)
+        @ViewBuilder destination: @escaping (AnyRouter) -> T)
     func dismissScreen()
     
     func showAlert<T:View>(
@@ -30,9 +30,38 @@ public protocol Router {
     func dismissModal()
 }
 
-/// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
-public struct RouterView<T:View>: View, Router {
+public struct AnyRouter: Router {
+    let object: any Router
     
+    public func showScreen<T>(_ option: SegueOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        object.showScreen(option, destination: destination)
+    }
+    
+    public func dismissScreen() {
+        object.dismissScreen()
+    }
+    
+    public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String?, alert: @escaping () -> T) where T : View {
+        object.showAlert(option, title: title, subtitle: subtitle, alert: alert)
+    }
+    
+    public func dismissAlert() {
+        object.dismissAlert()
+    }
+    
+    public func showModal<T>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, useDeviceBounds: Bool, destination: @escaping () -> T) where T : View {
+        object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds, destination: destination)
+    }
+    
+    public func dismissModal() {
+        object.dismissModal()
+    }
+}
+
+/// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
+public struct RouterView: View, Router {
+    public typealias Content = View
+
     @Environment(\.presentationMode) var presentationMode
     let addNavigationView: Bool
 
@@ -45,23 +74,23 @@ public struct RouterView<T:View>: View, Router {
     @State private(set) var modalConfiguration: ModalConfiguration = .default
     @State var modal: AnyDestination? = nil
     
-    let content: (RouterView) -> T
+    let content: (AnyRouter) -> any Content
     
-    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (Router) -> T) {
+    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (AnyRouter) -> any Content) {
         self.addNavigationView = addNavigationView
         self.content = content
     }
     
     public var body: some View {
         OptionalNavigationView(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
-            content(self)
+            AnyView(content(AnyRouter(object: self)))
                 .showingScreen(option: segueOption, items: $screens)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
-    public func showScreen<T:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (Router) -> T) {
+    public func showScreen(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> some View) {
         guard self.screens.isEmpty else {
             print("Cannot segue because a destination has already been set in this router.")
             return
@@ -72,10 +101,9 @@ public struct RouterView<T:View>: View, Router {
         // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
         let shouldAddNavigationView = option != .push
         self.screens = [
-            AnyDestination(destination(self))
+            AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))
         ]
     }
-
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
