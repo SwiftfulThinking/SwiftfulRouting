@@ -15,8 +15,12 @@ struct AlertViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .alert(item.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: item), presenting: item.wrappedValue, actions: { alert in
-                alert.buttons
-            })
+            .alert(item.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: item)) {
+                item.wrappedValue?.buttons
+            } message: {
+                if let subtitle = item.wrappedValue?.subtitle {
+                    Text(subtitle)
+                }
+            }
     }
 }

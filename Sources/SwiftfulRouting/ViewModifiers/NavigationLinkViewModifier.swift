@@ -18,7 +18,7 @@ struct NavigationLinkViewModifier: ViewModifier {
             .background(
                 ZStack {
                     NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
-                        SubRouterView(isTopRouter: true) {
+                        ZStack {
                             if let view = item.wrappedValue?.destination {
                                 view
                             }

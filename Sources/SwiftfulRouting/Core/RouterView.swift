@@ -13,9 +13,9 @@ import SwiftUI
 public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
-    let content: () -> T
+    let content: (Router) -> T
 
-    public init(@ViewBuilder content: @escaping () -> T) {
+    public init(@ViewBuilder content: @escaping (Router) -> T) {
         self.content = content
     }
     
@@ -31,15 +31,15 @@ public struct SubRouterView<T:View>: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var router = Router()
     let isTopRouter: Bool
-    let content: () -> T
+    let content: (Router) -> T
 
-    public init(isTopRouter: Bool = false, @ViewBuilder content: @escaping () -> T) {
+    public init(isTopRouter: Bool = false, @ViewBuilder content: @escaping (Router) -> T) {
         self.isTopRouter = isTopRouter
         self.content = content
     }
     
     public var body: some View {
-        content()
+        content(router)
             .onAppear(perform: {
                 router.configure(presentationMode: presentationMode)
             })
@@ -67,8 +67,13 @@ extension View {
 
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
-        RouterView {
+        RouterView { router in
             Text("Hi")
+                .onTapGesture {
+                    router.showScreen(.push) { router in
+                        Text("Hello, world")
+                    }
+                }
         }
     }
 }

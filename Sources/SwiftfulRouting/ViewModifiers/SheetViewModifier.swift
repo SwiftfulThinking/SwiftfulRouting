@@ -16,10 +16,8 @@ struct SheetViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .sheet(item: Binding(if: option, is: .sheet, value: item), onDismiss: nil) { destination in
-                RouterView {
-                    if let view = item.wrappedValue?.destination {
-                        view
-                    }
+                if let view = item.wrappedValue?.destination {
+                    view
                 }
             }
     }
