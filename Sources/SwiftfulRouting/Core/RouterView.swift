@@ -40,8 +40,14 @@ struct OptionalNavigationView<Content:View>: View {
     
     @ViewBuilder var body: some View {
         if addNavigationView {
-            NavigationView {
-                content
+            if #available(iOS 16.0, *) {
+                NavigationStack {
+                    content
+                }
+            } else {
+                NavigationView {
+                    content
+                }
             }
         } else {
             content

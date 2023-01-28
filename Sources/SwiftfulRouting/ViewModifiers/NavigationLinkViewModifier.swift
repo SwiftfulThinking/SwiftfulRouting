@@ -14,19 +14,26 @@ struct NavigationLinkViewModifier: ViewModifier {
     let item: Binding<AnyDestination?>
 
     func body(content: Content) -> some View {
-        content
-            .background(
-                ZStack {
-                    NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
-                        ZStack {
-                            if let view = item.wrappedValue?.destination {
-                                view
-                            }
-                        }
-                    } label: {
-                        EmptyView()
-                    }
+        if #available(iOS 16.0, *) {
+            content
+                .navigationDestination(for: AnyDestination.self) { value in
+                    value.destination
                 }
-            )
+        } else {
+            content
+                .background(
+                    ZStack {
+                        NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
+                            ZStack {
+                                if let view = item.wrappedValue?.destination {
+                                    view
+                                }
+                            }
+                        } label: {
+                            EmptyView()
+                        }
+                    }
+                )
+        }
     }
 }
