@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+/// Contains an instance of Router. Created as a seperate class so that it can exist in the environment alongside the default routers.
+public class TopRouter: ObservableObject {
+    
+    public let router: Router
+    
+    public init(router: Router) {
+        self.router = router
+    }
+    
+}
+
 /// Each Router can support 1 active segue, 1 active modal, and 1 active alert.
 public class Router: ObservableObject {
         
@@ -38,7 +49,7 @@ public class Router: ObservableObject {
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             await MainActor.run(body: {
-                self.screen = AnyDestination(SubRouterView(content: { destination() }))
+                self.screen = AnyDestination(destination())
             })
         }
     }
