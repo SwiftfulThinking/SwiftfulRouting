@@ -36,14 +36,14 @@ public class Router: ObservableObject {
 
         // To do: Must wait 0.01 seconds between updating segueOption and screen or segue will not execute.
         // Need to figure out why that is and hopefully remove any delay / sleep.
-        Task {
-            try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
+//        Task {
+//            try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             
             // Push maintains the current NavigationView
             // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
             let shouldAddNavigationView = option != .push
             self.screen = AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))
-        }
+//        }
     }
     
     public func dismissScreen() {
