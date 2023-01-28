@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions.
+/// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
 public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
@@ -23,12 +23,12 @@ public struct RouterView<T:View>: View {
     public var body: some View {
         OptionalNavigationView(addNavigationView: addNavigationView) {
             content(router)
+                .showingScreen(option: router.segueOption, item: $router.screen)
         }
         .onAppear(perform: {
             router.configure(presentationMode: presentationMode)
         })
         .showingAlert(option: router.alertOption, item: $router.alert)
-        .showingScreen(option: router.segueOption, item: $router.screen)
         .showingModal(configuration: router.modalConfiguration, item: $router.modal)
     }
 }
