@@ -120,7 +120,7 @@ public struct RouterView<T:View>: View, Router {
                 print("NEW STACK!")
             } else {
                 // Increment view stack
-                self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
+                self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screenStack, content: destination)))
                 print("INCREMENTING!")
             }
         }
