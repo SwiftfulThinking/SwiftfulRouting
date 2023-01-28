@@ -67,7 +67,7 @@ public class Router: ObservableObject {
         self.presentationMode?.wrappedValue.dismiss()
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T) {
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) {
         guard self.alert == nil else {
             dismissAlert()
             return
