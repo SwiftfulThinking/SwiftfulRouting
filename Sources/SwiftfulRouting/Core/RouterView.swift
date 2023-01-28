@@ -131,13 +131,17 @@ public struct RouterView<T:View>: View, Router {
         } else {
             // Using existing Navigation
             
-            // If screenStack isEmpty, then we are in the root RouterView and should use $screens
-            // If screenStack is not empty, then stack has been passed from a previous RouterView and we shoudl append to the stack
-            
-            if screenStack.isEmpty {
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
+            // iOS 16+ uses NavigationStack and can push additional views to an existing heirarchy
+            if #available(iOS 16, *) {
+                // If screenStack isEmpty, then we are in the root RouterView and should use $screens
+                // If screenStack is not empty, then stack has been passed from a previous RouterView and we shoudl append to the stack
+                if screenStack.isEmpty {
+                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
+                } else {
+                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
+                }
             } else {
-                self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination)))
             }
         }
     }
