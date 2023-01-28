@@ -67,14 +67,14 @@ public class Router: ObservableObject {
         self.presentationMode?.wrappedValue.dismiss()
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, @ViewBuilder alert: @escaping () -> T) {
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T) {
         guard self.alert == nil else {
             dismissAlert()
             return
         }
         
         self.alertOption = option
-        self.alert = AnyAlert(title: title, buttons: alert())
+        self.alert = AnyAlert(title: title, subtitle: subtitle, buttons: alert())
     }
     
     public func dismissAlert() {
