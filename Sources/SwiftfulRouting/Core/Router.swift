@@ -14,7 +14,7 @@ public class Router: ObservableObject {
     var presentationMode: Binding<PresentationMode>? = nil
     
     @Published private(set) var segueOption: SegueOption = .push
-    @Published var screen: AnyDestination? = nil
+    @Published var screens: [AnyDestination] = []
     
     @Published private(set) var alertOption: AlertOption = .alert
     @Published var alert: AnyAlert? = nil
@@ -23,12 +23,12 @@ public class Router: ObservableObject {
     @Published var modal: AnyDestination? = nil
     
     func configure(presentationMode: Binding<PresentationMode>?) {
-        self.screen = nil
+        self.screens = []
         self.presentationMode = presentationMode
     }
         
     public func showScreen<T:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (Router) -> T) {
-        guard self.screen == nil else {
+        guard self.screens.isEmpty else {
             print("Cannot segue because a destination has already been set in this router.")
             return
         }
@@ -37,7 +37,7 @@ public class Router: ObservableObject {
         // Push maintains the current NavigationView
         // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
         let shouldAddNavigationView = option != .push
-        self.screen = AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))
+        self.screens = [AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))]
     }
     
     public func dismissScreen() {

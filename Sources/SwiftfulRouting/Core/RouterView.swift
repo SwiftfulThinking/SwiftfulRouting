@@ -21,9 +21,9 @@ public struct RouterView<T:View>: View {
     }
     
     public var body: some View {
-        OptionalNavigationView(addNavigationView: addNavigationView) {
+        OptionalNavigationView(addNavigationView: addNavigationView, router: router) {
             content(router)
-                .showingScreen(option: router.segueOption, item: $router.screen)
+                .showingScreen(option: router.segueOption, items: $router.screens)
         }
         .onAppear(perform: {
             router.configure(presentationMode: presentationMode)
@@ -36,12 +36,20 @@ public struct RouterView<T:View>: View {
 struct OptionalNavigationView<Content:View>: View {
     
     let addNavigationView: Bool
+    let router: Router
     @ViewBuilder var content: Content
     
     @ViewBuilder var body: some View {
         if addNavigationView {
             if #available(iOS 16.0, *) {
-                NavigationStack {
+                // TODO: Make this an extension in Binding.swift?
+                let path = Binding(get: {
+                    router.screens
+                }, set: { newValue, _ in
+                    router.screens = newValue
+                })
+                
+                NavigationStack(path: path) {
                     content
                 }
             } else {
@@ -70,16 +78,16 @@ struct RouterView_Previews: PreviewProvider {
 
 extension View {
     
-    @ViewBuilder func showingScreen(option: SegueOption, item: Binding<AnyDestination?>) -> some View {
+    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>) -> some View {
         if #available(iOS 14, *) {
             self
-                .modifier(NavigationLinkViewModifier(option: option, item: item))
-                .modifier(SheetViewModifier(option: option, item: item))
-                .modifier(FullScreenCoverViewModifier(option: option, item: item))
+                .modifier(NavigationLinkViewModifier(option: option, items: items))
+                .modifier(SheetViewModifier(option: option, items: items))
+                .modifier(FullScreenCoverViewModifier(option: option, items: items))
         } else {
             self
-                .modifier(NavigationLinkViewModifier(option: option, item: item))
-                .modifier(SheetViewModifier(option: option, item: item))
+                .modifier(NavigationLinkViewModifier(option: option, items: items))
+                .modifier(SheetViewModifier(option: option, items: items))
         }
     }
 

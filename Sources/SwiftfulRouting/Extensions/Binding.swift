@@ -29,3 +29,15 @@ extension Binding where Value == AnyDestination? {
         }
     }
 }
+
+func bindingToFirstElement<T>(in array: Binding<[T]>) -> Binding<T?> {
+    Binding {
+        array.wrappedValue.first
+    } set: { newValue, _ in
+        if let newValue {
+            array.wrappedValue[0] = newValue
+        } else {
+            array.wrappedValue.removeFirst()
+        }
+    }
+}

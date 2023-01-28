@@ -11,14 +11,15 @@ import SwiftUI
 struct SheetViewModifier: ViewModifier {
     
     let option: SegueOption
-    let item: Binding<AnyDestination?>
+    let items: Binding<[AnyDestination]>
 
     func body(content: Content) -> some View {
         content
-            .sheet(item: Binding(if: option, is: .sheet, value: item), onDismiss: nil) { destination in
-                if let view = item.wrappedValue?.destination {
+            .sheet(item: Binding(if: option, is: .sheet, value: bindingToFirstElement(in: items)), onDismiss: nil) { destination in
+                if let view = items.first?.wrappedValue.destination {
                     view
                 }
             }
     }
+    
 }

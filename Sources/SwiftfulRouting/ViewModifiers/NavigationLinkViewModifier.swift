@@ -11,7 +11,7 @@ import SwiftUI
 struct NavigationLinkViewModifier: ViewModifier {
     
     let option: SegueOption
-    let item: Binding<AnyDestination?>
+    let items: Binding<[AnyDestination]>
 
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
@@ -23,9 +23,9 @@ struct NavigationLinkViewModifier: ViewModifier {
             content
                 .background(
                     ZStack {
-                        NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: item))) {
+                        NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: bindingToFirstElement(in: items)))) {
                             ZStack {
-                                if let view = item.wrappedValue?.destination {
+                                if let view = items.wrappedValue.first?.destination {
                                     view
                                 }
                             }
