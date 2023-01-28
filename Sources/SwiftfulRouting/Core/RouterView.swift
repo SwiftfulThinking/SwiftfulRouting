@@ -11,6 +11,7 @@ public protocol Router {
     func showScreen<V:View>(
         _ option: SegueOption,
         @ViewBuilder destination: @escaping (AnyRouter) -> V)
+    
     func dismissScreen()
     
     func showAlert<V:View>(
@@ -18,6 +19,7 @@ public protocol Router {
         title: String,
         subtitle: String?,
         @ViewBuilder alert: @escaping () -> V)
+    
     func dismissAlert()
     
     func showModal<V:View>(
@@ -27,6 +29,7 @@ public protocol Router {
         backgroundColor: Color?,
         useDeviceBounds: Bool,
         @ViewBuilder destination: @escaping () -> V)
+    
     func dismissModal()
 }
 
@@ -70,14 +73,14 @@ public struct RouterView<T:View>: View, Router {
     @Environment(\.presentationMode) var presentationMode
     let addNavigationView: Bool
 
-    @State private(set) var segueOption: SegueOption = .push
-    @State var screens: [AnyDestination] = []
+    @State private var segueOption: SegueOption = .push
+    @State private var screens: [AnyDestination] = []
 
-    @State private(set) var alertOption: AlertOption = .alert
-    @State var alert: AnyAlert? = nil
+    @State private var alertOption: AlertOption = .alert
+    @State private var alert: AnyAlert? = nil
 
-    @State private(set) var modalConfiguration: ModalConfiguration = .default
-    @State var modal: AnyDestination? = nil
+    @State private var modalConfiguration: ModalConfiguration = .default
+    @State private var modal: AnyDestination? = nil
     
     let content: (AnyRouter) -> T
     
