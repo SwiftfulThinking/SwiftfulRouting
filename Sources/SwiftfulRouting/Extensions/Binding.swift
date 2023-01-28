@@ -26,6 +26,7 @@ extension Binding where Value == AnyDestination? {
             selected == option ? value.wrappedValue : nil
         } set: { newValue in
             value.wrappedValue = newValue
+            print("SETTING NEW VALUE: \(newValue)")
         }
     }
 }
