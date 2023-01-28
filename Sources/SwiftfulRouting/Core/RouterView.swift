@@ -117,21 +117,20 @@ public struct RouterView<T:View>: View, Router {
 
         // Push maintains the current Navigation heirarchy
         // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
-        let shouldAddNavigationView = option != .push
 
-        if shouldAddNavigationView {
+        if option != .push {
             // Add Navigation, reset view stack
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: nil, content: destination)))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
         } else {
             // Using existing Navigation
             
-            // If start of a new stack
+            // If screenStack isEmpty, then we are in the root RouterView and should use $screens
+            // If screenStack is not empty, then stack has been passed from a previous RouterView and we shoudl append to the stack
+            
             if screenStack.isEmpty {
-                // Start view stack
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
             } else {
-                // Increment view stack
-                self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screenStack, content: destination)))
+                self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
             }
         }
     }
@@ -142,7 +141,7 @@ public struct RouterView<T:View>: View, Router {
         
         var localStack: [AnyDestination] = []
         for destination in destinations {
-            let bindingStack = (screenStack.isEmpty && localStack.isEmpty) ? $screens : $screenStack
+            let bindingStack = screenStack.isEmpty ? $screens : $screenStack
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, content: { router in
                 AnyView(destination(router))
             }))
