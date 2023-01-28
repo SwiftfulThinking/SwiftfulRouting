@@ -74,7 +74,8 @@ public struct RouterView<T:View>: View, Router {
     let addNavigationView: Bool
 
     @State private var segueOption: SegueOption = .push
-    @State private var screens: [AnyDestination] = []
+    @State private var screensNew: [AnyDestination] = []
+    @Binding private var screens: [AnyDestination]
 
     @State private var alertOption: AlertOption = .alert
     @State private var alert: AnyAlert? = nil
@@ -84,8 +85,9 @@ public struct RouterView<T:View>: View, Router {
     
     let content: (AnyRouter) -> T
     
-    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
+        self._screens = screens ?? .constant([])
         self.content = content
     }
     
@@ -99,17 +101,26 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+        self.segueOption = option
+
+        // Push maintains the current Navigation heirarchy
+        // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
+        let shouldAddNavigationView = option != .push
+
+        guard shouldAddNavigationView else {
+            
+            return
+        }
+        
+        
+        //
         guard self.screens.isEmpty else {
             print("Cannot segue because a destination has already been set in this router.")
             return
         }
-        self.segueOption = option
         
-        // Push maintains the current NavigationView
-        // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
-        let shouldAddNavigationView = option != .push
         self.screens = [
-            AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, content: destination))
+            AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination))
         ]
     }
     
