@@ -11,43 +11,83 @@ import SwiftUI
 public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var router: Router
-    let content: (Router) -> T
+    let addNavigationView: Bool
+
+    @State private(set) var segueOption: SegueOption = .push
+    @State var screens: [AnyDestination] = []
+
+    @State private(set) var alertOption: AlertOption = .alert
+    @State var alert: AnyAlert? = nil
+
+    @State private(set) var modalConfiguration: ModalConfiguration = .default
+    @State var modal: AnyDestination? = nil
     
-    public init(router: Router, @ViewBuilder content: @escaping (Router) -> T) {
-        self._router = StateObject(wrappedValue: router)
+    let content: (RouterView) -> T
+    
+    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (RouterView) -> T) {
+        self.addNavigationView = addNavigationView
         self.content = content
     }
     
     public var body: some View {
-        OptionalNavigationView(addNavigationView: router.addNavigationView, router: router) {
-            content(router)
-                .showingScreen(option: router.segueOption, items: $router.screens.value)
+        OptionalNavigationView(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
+            content(self)
+                .showingScreen(option: segueOption, items: $screens)
         }
-        .onAppear(perform: {
-            router.configure(presentationMode: presentationMode)
-        })
-        .showingAlert(option: router.alertOption, item: $router.alert)
-        .showingModal(configuration: router.modalConfiguration, item: $router.modal)
+        .showingAlert(option: alertOption, item: $alert)
+        .showingModal(configuration: modalConfiguration, item: $modal)
+    }
+    
+    public func dismissScreen() {
+        self.presentationMode.wrappedValue.dismiss()
+    }
+    
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) {
+        guard self.alert == nil else {
+            dismissAlert()
+            return
+        }
+        
+        self.alertOption = option
+        self.alert = AnyAlert(title: title, subtitle: subtitle, buttons: alert())
+    }
+    
+    public func dismissAlert() {
+        self.alert = nil
+    }
+    
+    public func showModal<T:View>(
+        transition: AnyTransition = .move(edge: .bottom),
+        animation: Animation = .easeInOut,
+        alignment: Alignment = .center,
+        backgroundColor: Color? = nil,
+        useDeviceBounds: Bool = true,
+        @ViewBuilder destination: @escaping () -> T) {
+            guard self.modal == nil else {
+                dismissModal()
+                return
+            }
+            
+            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
+            self.modal = AnyDestination(destination())
+        }
+    
+    public func dismissModal() {
+        self.modal = nil
     }
 }
 
 struct OptionalNavigationView<Content:View>: View {
     
     let addNavigationView: Bool
-    let router: Router
+    let segueOption: SegueOption
+    @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
     
     @ViewBuilder var body: some View {
         if addNavigationView {
             if #available(iOS 16.0, *) {
-                // TODO: Make this an extension in Binding.swift?
-                let bindingToScreens = Binding(get: {
-                    router.screens.value
-                }, set: { newValue, _ in
-                    router.screens.value = newValue
-                })
-                let path = Binding(if: router.segueOption, is: .push, value: bindingToScreens)
+                let path = Binding(if: segueOption, is: .push, value: $screens)
                 
                 NavigationStack(path: path) {
                     content
