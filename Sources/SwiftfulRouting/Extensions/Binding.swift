@@ -51,8 +51,10 @@ func bindingToFirstElement<T>(in array: Binding<[T]>) -> Binding<T?> {
         print(array)
         if let newValue {
             array.wrappedValue[0] = newValue
-        } else {
+        } else if let lastItem = array.wrappedValue.last {
             array.wrappedValue.removeLast()
+        } else {
+            print("NO ITEMS BRO")
         }
     }
 }
