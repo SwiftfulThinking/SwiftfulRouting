@@ -42,6 +42,7 @@ public class Router: ObservableObject {
     
     public func dismissScreen() {
         self.presentationMode?.wrappedValue.dismiss()
+        print("DISMISS SCREEEN!")
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) {
