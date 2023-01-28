@@ -50,16 +50,9 @@ public class Router: ObservableObject {
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             
-            switch option {
-            case .sheet, .fullScreenCover:
-                self.screen = AnyDestination(RouterView { router in
-                    destination(router)
-                })
-            case .push:
-                self.screen = AnyDestination(SubRouterView { router in
-                    destination(router)
-                })
-            }
+            self.screen = AnyDestination(RouterView { router in
+                destination(router)
+            })
         }
     }
     
