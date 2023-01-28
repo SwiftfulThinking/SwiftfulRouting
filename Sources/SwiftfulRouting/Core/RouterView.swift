@@ -111,8 +111,16 @@ public struct RouterView<T:View>: View, Router {
             // Add Navigation, reset view stack
             self.screens = [AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: nil, content: destination))]
         } else {
-            // Using existing Navigation, increment view stack
-            self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
+            // Using existing Navigation
+            
+            // If start of a new stack
+            if screenStack.isEmpty {
+                // Increment view stack
+                self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
+            } else {
+                // Start view stack
+                self.screens = [AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination))]
+            }
         }
         
         
