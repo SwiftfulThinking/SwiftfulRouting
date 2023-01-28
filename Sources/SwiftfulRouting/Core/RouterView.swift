@@ -13,7 +13,7 @@ public protocol Router {
         @ViewBuilder destination: @escaping (AnyRouter) -> V)
     
     @available(iOS 16, *)
-    func pushStack(_ option: SegueOption, destinations: [(AnyRouter) -> AnyView])
+    func pushStack(destinations: [(AnyRouter) -> AnyView])
 
     func dismissScreen()
     
@@ -44,8 +44,8 @@ public struct AnyRouter: Router {
     }
     
     @available(iOS 16, *)
-    public func pushStack(_ option: SegueOption, destinations: [(AnyRouter) -> AnyView]) {
-        object.pushStack(option, destinations: destinations)
+    public func pushStack(destinations: [(AnyRouter) -> AnyView]) {
+        object.pushStack(destinations: destinations)
     }
     
     public func dismissScreen() {
@@ -137,8 +137,8 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func pushStack(_ option: SegueOption, destinations: [(AnyRouter) -> AnyView]) {
-        self.segueOption = option
+    public func pushStack(destinations: [(AnyRouter) -> AnyView]) {
+        self.segueOption = .push
         
         var localStack: [AnyDestination] = []
         
