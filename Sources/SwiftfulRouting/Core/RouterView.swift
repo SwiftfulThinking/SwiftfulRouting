@@ -8,25 +8,25 @@
 import SwiftUI
 
 public protocol Router {
-    func showScreen<T:View>(
+    func showScreen<V:View>(
         _ option: SegueOption,
-        @ViewBuilder destination: @escaping (AnyRouter) -> T)
+        @ViewBuilder destination: @escaping (AnyRouter) -> V)
     func dismissScreen()
     
-    func showAlert<T:View>(
+    func showAlert<V:View>(
         _ option: AlertOption,
         title: String,
         subtitle: String?,
-        @ViewBuilder alert: @escaping () -> T)
+        @ViewBuilder alert: @escaping () -> V)
     func dismissAlert()
     
-    func showModal<T:View>(
+    func showModal<V:View>(
         transition: AnyTransition,
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?,
         useDeviceBounds: Bool,
-        @ViewBuilder destination: @escaping () -> T)
+        @ViewBuilder destination: @escaping () -> V)
     func dismissModal()
 }
 
@@ -65,9 +65,8 @@ public struct AnyRouter: Router {
 }
 
 /// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
-public struct RouterView: View, Router {
-    public typealias Content = View
-
+public struct RouterView<T:View>: View, Router {
+    
     @Environment(\.presentationMode) var presentationMode
     let addNavigationView: Bool
 
@@ -80,23 +79,23 @@ public struct RouterView: View, Router {
     @State private(set) var modalConfiguration: ModalConfiguration = .default
     @State var modal: AnyDestination? = nil
     
-    let content: (AnyRouter) -> any Content
+    let content: (AnyRouter) -> T
     
-    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (AnyRouter) -> any Content) {
+    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self.content = content
     }
     
     public var body: some View {
         OptionalNavigationView(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
-            AnyView(content(AnyRouter(object: self)))
+            content(AnyRouter(object: self))
                 .showingScreen(option: segueOption, items: $screens)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
-    public func showScreen(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> some View) {
+    public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         guard self.screens.isEmpty else {
             print("Cannot segue because a destination has already been set in this router.")
             return
@@ -107,7 +106,7 @@ public struct RouterView: View, Router {
         // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
         let shouldAddNavigationView = option != .push
         self.screens = [
-            AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))
+            AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, content: destination))
         ]
     }
     
