@@ -15,7 +15,7 @@ public struct RouterView<T:View>: View {
     let addNavigationView: Bool
     let content: (Router) -> T
     
-    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (Router) -> T) {
+    public init(addNavigationView: Bool = true, @ViewBuilder content: @escaping (Router) -> T) {
         self.addNavigationView = addNavigationView
         self.content = content
     }
