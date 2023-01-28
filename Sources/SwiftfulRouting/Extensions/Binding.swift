@@ -29,6 +29,13 @@ extension Binding where Value == AnyDestination? {
         }
     }
     
+    init(if2 selected: SegueOption, is option: SegueOption, value: AnyDestination?) {
+        self.init {
+            selected == option ? value : nil
+        } set: { newValue in
+            
+        }
+    }
 }
 
 extension Binding where Value == Array<AnyDestination> {
