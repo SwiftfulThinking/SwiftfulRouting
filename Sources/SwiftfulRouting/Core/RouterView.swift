@@ -11,11 +11,13 @@ public protocol Router {
     func showScreen<V:View>(
         _ option: SegueOption,
         @ViewBuilder destination: @escaping (AnyRouter) -> V)
-    
+    func dismissScreen()
+
     @available(iOS 16, *)
     func pushStack(destinations: [(AnyRouter) -> any View])
 
-    func dismissScreen()
+    @available(iOS 16, *)
+    func popToRoot()
     
     func showAlert<V:View>(
         _ option: AlertOption,
@@ -43,13 +45,18 @@ public struct AnyRouter: Router {
         object.showScreen(option, destination: destination)
     }
     
+    public func dismissScreen() {
+        object.dismissScreen()
+    }
+
     @available(iOS 16, *)
     public func pushStack(destinations: [(AnyRouter) -> any View]) {
         object.pushStack(destinations: destinations)
     }
     
-    public func dismissScreen() {
-        object.dismissScreen()
+    @available(iOS 16, *)
+    public func popToRoot() {
+        object.popToRoot()
     }
     
     public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
@@ -157,6 +164,12 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
+    }
+    
+    @available(iOS 16, *)
+    public func popToRoot() {
+        self.screens = []
+        self.screenStack = []
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) {
