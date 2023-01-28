@@ -12,26 +12,46 @@ public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var router = Router()
+    let addNavigationView: Bool
     let content: (Router) -> T
     
-    public init(@ViewBuilder content: @escaping (Router) -> T) {
+    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (Router) -> T) {
+        self.addNavigationView = addNavigationView
         self.content = content
     }
     
     public var body: some View {
-        content(router)
-            .onAppear(perform: {
-                router.configure(presentationMode: presentationMode)
-            })
-            .showingAlert(option: router.alertOption, item: $router.alert)
-            .showingScreen(option: router.segueOption, item: $router.screen)
-            .showingModal(configuration: router.modalConfiguration, item: $router.modal)
+        OptionalNavigationView(addNavigationView: addNavigationView) {
+            content(router)
+        }
+        .onAppear(perform: {
+            router.configure(presentationMode: presentationMode)
+        })
+        .showingAlert(option: router.alertOption, item: $router.alert)
+        .showingScreen(option: router.segueOption, item: $router.screen)
+        .showingModal(configuration: router.modalConfiguration, item: $router.modal)
+    }
+}
+
+struct OptionalNavigationView<Content:View>: View {
+    
+    let addNavigationView: Bool
+    @ViewBuilder var content: Content
+    
+    @ViewBuilder var body: some View {
+        if addNavigationView {
+            NavigationView {
+                content
+            }
+        } else {
+            content
+        }
     }
 }
 
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
-        RouterView { router in
+        RouterView(addNavigationView: true) { router in
             Text("Hi")
                 .onTapGesture {
                     router.showScreen(.push) { router in

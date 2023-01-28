@@ -39,9 +39,10 @@ public class Router: ObservableObject {
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000) // 0.01 seconds
             
-            self.screen = AnyDestination(RouterView { router in
-                destination(router)
-            })
+            // Push maintains the current NavigationView
+            // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
+            let shouldAddNavigationView = option != .push
+            self.screen = AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))
         }
     }
     
