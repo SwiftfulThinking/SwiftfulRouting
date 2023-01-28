@@ -11,17 +11,16 @@ import SwiftUI
 public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var router = Router()
-    let addNavigationView: Bool
+    @StateObject private var router: Router
     let content: (Router) -> T
     
-    public init(addNavigationView: Bool = true, @ViewBuilder content: @escaping (Router) -> T) {
-        self.addNavigationView = addNavigationView
+    public init(router: Router, @ViewBuilder content: @escaping (Router) -> T) {
+        self._router = StateObject(wrappedValue: router)
         self.content = content
     }
     
     public var body: some View {
-        OptionalNavigationView(addNavigationView: addNavigationView, router: router) {
+        OptionalNavigationView(addNavigationView: router.addNavigationView, router: router) {
             content(router)
                 .showingScreen(option: router.segueOption, items: $router.screens.value)
         }
@@ -66,14 +65,14 @@ struct OptionalNavigationView<Content:View>: View {
 
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
-        RouterView(addNavigationView: true) { router in
+//        RouterView(addNavigationView: true) { router in
             Text("Hi")
                 .onTapGesture {
-                    router.showScreen(.push) { router in
-                        Text("Hello, world")
-                    }
+//                    router.showScreen(.push) { router in
+//                        Text("Hello, world")
+//                    }
                 }
-        }
+//        }
     }
 }
 

@@ -12,6 +12,7 @@ import Combine
 @MainActor
 public class Router: ObservableObject {
         
+    let addNavigationView: Bool
     var presentationMode: Binding<PresentationMode>? = nil
     
     @Published private(set) var segueOption: SegueOption = .push
@@ -23,6 +24,11 @@ public class Router: ObservableObject {
     
     @Published private(set) var modalConfiguration: ModalConfiguration = .default
     @Published var modal: AnyDestination? = nil
+    
+    public init(addNavigationView: Bool = true, screens: (CurrentValueSubject<[AnyDestination], Never>)? = nil) {
+        self.addNavigationView = addNavigationView
+        self.screens = screens ?? CurrentValueSubject([])
+    }
     
     func configure(presentationMode: Binding<PresentationMode>?) {
         self.screens.send([])
@@ -39,7 +45,15 @@ public class Router: ObservableObject {
         // Push maintains the current NavigationView
         // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
         let shouldAddNavigationView = option != .push
-        self.screens.send([AnyDestination(RouterView(addNavigationView: shouldAddNavigationView, content: destination))])
+        self.screens.send([
+            AnyDestination(
+                RouterView(
+                    router: Router(
+                        addNavigationView: shouldAddNavigationView,
+                        screens: shouldAddNavigationView ? nil : screens),
+                    content: destination)
+            )
+        ])
     }
     
     public func dismissScreen() {
