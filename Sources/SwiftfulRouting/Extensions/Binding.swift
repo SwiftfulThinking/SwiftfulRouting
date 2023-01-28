@@ -28,14 +28,6 @@ extension Binding where Value == AnyDestination? {
             value.wrappedValue = newValue
         }
     }
-    
-    init(if2 selected: SegueOption, is option: SegueOption, value: AnyDestination?) {
-        self.init {
-            selected == option ? value : nil
-        } set: { newValue in
-            
-        }
-    }
 }
 
 extension Binding where Value == Array<AnyDestination> {
@@ -54,14 +46,14 @@ func bindingToFirstElement<T>(in array: Binding<[T]>) -> Binding<T?> {
     Binding {
         array.wrappedValue.first
     } set: { newValue, _ in
-        print("PRINTING VALUE:")
-        print(array)
-        if let newValue {
-            array.wrappedValue[0] = newValue
-        } else if let lastItem = array.wrappedValue.last {
-            array.wrappedValue.removeLast()
-        } else {
-            print("NO ITEMS BRO")
-        }
+//        print("PRINTING VALUE:")
+//        print(array)
+//        if let newValue {
+//            array.wrappedValue[0] = newValue
+//        } else if let lastItem = array.wrappedValue.last {
+//            array.wrappedValue.removeLast()
+//        } else {
+//            print("NO ITEMS BRO")
+//        }
     }
 }
