@@ -102,7 +102,7 @@ public struct RouterView<T:View>: View, Router {
     
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = option
-
+        print("COUNT ON SEGUE: \(screenStack.count)")
         // Push maintains the current Navigation heirarchy
         // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
         let shouldAddNavigationView = option != .push
@@ -117,9 +117,11 @@ public struct RouterView<T:View>: View, Router {
             if screenStack.isEmpty {
                 // Start view stack
                 self.screens = [AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination))]
+                print("NEW STACK!")
             } else {
                 // Increment view stack
                 self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
+                print("INCREMENTING!")
             }
         }
         
