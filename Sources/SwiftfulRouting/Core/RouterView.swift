@@ -13,7 +13,7 @@ public protocol Router {
         @ViewBuilder destination: @escaping (AnyRouter) -> V)
     
     @available(iOS 16, *)
-    func pushStack(destinations: [(AnyRouter) -> AnyView])
+    func pushStack(destinations: [(AnyRouter) -> any View])
 
     func dismissScreen()
     
@@ -44,7 +44,7 @@ public struct AnyRouter: Router {
     }
     
     @available(iOS 16, *)
-    public func pushStack(destinations: [(AnyRouter) -> AnyView]) {
+    public func pushStack(destinations: [(AnyRouter) -> any View]) {
         object.pushStack(destinations: destinations)
     }
     
@@ -137,18 +137,16 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func pushStack(destinations: [(AnyRouter) -> AnyView]) {
+    public func pushStack(destinations: [(AnyRouter) -> any View]) {
         self.segueOption = .push
         
         var localStack: [AnyDestination] = []
-        
         for destination in destinations {
-            if screenStack.isEmpty && localStack.isEmpty {
-                let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: $screens, content: destination))
-                localStack.append(view)
-            } else {
-                localStack.append(AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: $screenStack, content: destination)))
-            }
+            let bindingStack = (screenStack.isEmpty && localStack.isEmpty) ? $screens : $screenStack
+            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, content: { router in
+                AnyView(destination(router))
+            }))
+            localStack.append(view)
         }
         
         if screenStack.isEmpty {
