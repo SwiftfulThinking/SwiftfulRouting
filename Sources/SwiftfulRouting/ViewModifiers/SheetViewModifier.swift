@@ -15,8 +15,8 @@ struct SheetViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .sheet(item: Binding(if: option, is: .sheet, value: bindingToFirstElement(in: items)), onDismiss: nil) { destination in
-                if let view = items.first?.wrappedValue.destination {
+            .sheet(item: Binding(if: option, is: .sheet, value: bindingToLastElement(in: items)), onDismiss: nil) { destination in
+                if let view = items.last?.wrappedValue.destination {
                     view
                 }
             }

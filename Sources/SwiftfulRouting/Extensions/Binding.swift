@@ -42,9 +42,9 @@ extension Binding where Value == Array<AnyDestination> {
     
 }
 
-func bindingToFirstElement<T>(in array: Binding<[T]>) -> Binding<T?> {
+func bindingToLastElement<T>(in array: Binding<[T]>) -> Binding<T?> {
     Binding {
-        array.wrappedValue.first
+        array.wrappedValue.last
     } set: { newValue, _ in
         if array.wrappedValue.last != nil {
             array.wrappedValue.removeLast()
