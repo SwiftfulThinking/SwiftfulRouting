@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-// remove top router
-// remove environment objects
-// remove RouterView, only have SubRouter view? NavigationView is for user to add? no?
-
 /// Contains an instance of Router. Created as a seperate class so that it can exist in the environment alongside the default routers.
 public class TopRouter: ObservableObject {
     
