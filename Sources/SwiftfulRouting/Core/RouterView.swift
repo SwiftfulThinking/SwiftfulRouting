@@ -22,7 +22,6 @@ public struct RouterView<T:View>: View {
             .showingAlert(option: router.alertOption, item: $router.alert)
             .showingScreen(option: router.segueOption, item: $router.screen)
             .showingModal(configuration: router.modalConfiguration, item: $router.modal)
-            .environmentObject(router)
     }
 }
 
