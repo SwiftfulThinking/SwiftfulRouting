@@ -7,8 +7,31 @@
 
 import SwiftUI
 
+public protocol Router {
+    func showScreen<T:View>(
+        _ option: SegueOption,
+        @ViewBuilder destination: @escaping (Router) -> T)
+    func dismissScreen()
+    
+    func showAlert<T:View>(
+        _ option: AlertOption,
+        title: String,
+        subtitle: String?,
+        @ViewBuilder alert: @escaping () -> T)
+    func dismissAlert()
+    
+    func showModal<T:View>(
+        transition: AnyTransition,
+        animation: Animation,
+        alignment: Alignment,
+        backgroundColor: Color?,
+        useDeviceBounds: Bool,
+        @ViewBuilder destination: @escaping () -> T)
+    func dismissModal()
+}
+
 /// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
-public struct RouterView<T:View>: View {
+public struct RouterView<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
     let addNavigationView: Bool
@@ -24,7 +47,7 @@ public struct RouterView<T:View>: View {
     
     let content: (RouterView) -> T
     
-    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (RouterView) -> T) {
+    public init(addNavigationView: Bool, @ViewBuilder content: @escaping (Router) -> T) {
         self.addNavigationView = addNavigationView
         self.content = content
     }
@@ -37,6 +60,22 @@ public struct RouterView<T:View>: View {
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
+    
+    public func showScreen<T:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (Router) -> T) {
+        guard self.screens.isEmpty else {
+            print("Cannot segue because a destination has already been set in this router.")
+            return
+        }
+        self.segueOption = option
+        
+        // Push maintains the current NavigationView
+        // Sheet and FullScreenCover enter new Environemnts and require a new one to be added.
+        let shouldAddNavigationView = option != .push
+        self.screens = [
+            AnyDestination(destination(self))
+        ]
+    }
+
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
