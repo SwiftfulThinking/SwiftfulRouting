@@ -33,7 +33,7 @@ public protocol Router {
 public struct AnyRouter: Router {
     let object: any Router
     
-    public func showScreen<T>(_ option: SegueOption, destination: @escaping (AnyRouter) -> T) where T : View {
+    public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
         object.showScreen(option, destination: destination)
     }
     
@@ -41,7 +41,7 @@ public struct AnyRouter: Router {
         object.dismissScreen()
     }
     
-    public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String?, alert: @escaping () -> T) where T : View {
+    public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
         object.showAlert(option, title: title, subtitle: subtitle, alert: alert)
     }
     
@@ -49,7 +49,13 @@ public struct AnyRouter: Router {
         object.dismissAlert()
     }
     
-    public func showModal<T>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, useDeviceBounds: Bool, destination: @escaping () -> T) where T : View {
+    public func showModal<T>(
+        transition: AnyTransition = .move(edge: .bottom),
+        animation: Animation = .easeInOut,
+        alignment: Alignment = .center,
+        backgroundColor: Color? = nil,
+        useDeviceBounds: Bool = true,
+        @ViewBuilder destination: @escaping () -> T) where T : View {
         object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds, destination: destination)
     }
     
