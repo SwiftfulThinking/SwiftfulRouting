@@ -15,7 +15,7 @@ public class Router: ObservableObject {
     var presentationMode: Binding<PresentationMode>? = nil
     
     @Published private(set) var segueOption: SegueOption = .push
-    var screens: CurrentValueSubject<[AnyDestination], Never> = CurrentValueSubject([])
+    @Published var screens: CurrentValueSubject<[AnyDestination], Never> = CurrentValueSubject([])
 //    @Published var screens: [AnyDestination] = []
     
     @Published private(set) var alertOption: AlertOption = .alert
