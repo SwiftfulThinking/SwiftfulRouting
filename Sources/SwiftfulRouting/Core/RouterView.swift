@@ -74,8 +74,8 @@ public struct RouterView<T:View>: View, Router {
     let addNavigationView: Bool
 
     @State private var segueOption: SegueOption = .push
-    @State private var screensNew: [AnyDestination] = []
-    @Binding private var screens: [AnyDestination]
+    @State private var screens: [AnyDestination] = []
+    @Binding private var screenStack: [AnyDestination] // Binding to view stack from previous RouterViews
 
     @State private var alertOption: AlertOption = .alert
     @State private var alert: AnyAlert? = nil
@@ -87,7 +87,7 @@ public struct RouterView<T:View>: View, Router {
     
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
-        self._screens = screens ?? .constant([])
+        self._screenStack = screens ?? .constant([])
         self.content = content
     }
     
@@ -107,21 +107,24 @@ public struct RouterView<T:View>: View, Router {
         // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
         let shouldAddNavigationView = option != .push
 
-        guard shouldAddNavigationView else {
-            
-            return
+        if shouldAddNavigationView {
+            // Add Navigation, reset view stack
+            self.screens = [AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: nil, content: destination))]
+        } else {
+            // Using existing Navigation, increment view stack
+            self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination)))
         }
         
         
         //
-        guard self.screens.isEmpty else {
-            print("Cannot segue because a destination has already been set in this router.")
-            return
-        }
-        
-        self.screens = [
-            AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination))
-        ]
+//        guard self.screens.isEmpty else {
+//            print("Cannot segue because a destination has already been set in this router.")
+//            return
+//        }
+//
+//        self.screens = [
+//            AnyDestination(RouterView<V>(addNavigationView: shouldAddNavigationView, screens: $screens, content: destination))
+//        ]
     }
     
     public func dismissScreen() {
