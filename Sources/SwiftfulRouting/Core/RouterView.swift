@@ -12,7 +12,11 @@ public struct RouterView<T:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var router = Router()
-    public let content: (Router) -> T
+    let content: (Router) -> T
+    
+    public init(@ViewBuilder content: @escaping (Router) -> T) {
+        self.content = content
+    }
     
     public var body: some View {
         content(router)
