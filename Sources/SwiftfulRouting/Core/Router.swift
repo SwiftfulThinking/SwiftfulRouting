@@ -7,17 +7,6 @@
 
 import SwiftUI
 
-/// Contains an instance of Router. Created as a seperate class so that it can exist in the environment alongside the default routers.
-public class TopRouter: ObservableObject {
-    
-    public let router: Router
-    
-    public init(router: Router) {
-        self.router = router
-    }
-    
-}
-
 /// Each Router can support 1 active segue, 1 active modal, and 1 active alert.
 @MainActor
 public class Router: ObservableObject {
