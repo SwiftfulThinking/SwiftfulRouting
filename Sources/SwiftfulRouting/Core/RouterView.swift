@@ -23,7 +23,7 @@ public struct RouterView<T:View>: View {
     public var body: some View {
         OptionalNavigationView(addNavigationView: addNavigationView, router: router) {
             content(router)
-                .showingScreen(option: router.segueOption, items: $router.screens)
+                .showingScreen(option: router.segueOption, items: $router.screens.value)
         }
         .onAppear(perform: {
             router.configure(presentationMode: presentationMode)
@@ -44,9 +44,9 @@ struct OptionalNavigationView<Content:View>: View {
             if #available(iOS 16.0, *) {
                 // TODO: Make this an extension in Binding.swift?
                 let bindingToScreens = Binding(get: {
-                    router.screens
+                    router.screens.value
                 }, set: { newValue, _ in
-                    router.screens = newValue
+                    router.screens.value = newValue
                 })
                 let path = Binding(if: router.segueOption, is: .push, value: bindingToScreens)
                 
