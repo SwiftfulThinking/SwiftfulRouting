@@ -32,7 +32,6 @@ struct ModalViewModifier: ViewModifier {
 
                         view
                             .frame(configuration: configuration)
-                            .background(Color.orange.opacity(0.5))
                             .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
                             .transition(configuration.transition)
                             .zIndex(3)
