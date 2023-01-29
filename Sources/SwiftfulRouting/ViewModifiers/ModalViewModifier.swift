@@ -28,13 +28,13 @@ struct ModalViewModifier: ViewModifier {
                             .zIndex(1)
 
                         view
+                            .frame(configuration: configuration)
+                            .background(Color.orange.opacity(0.5))
                             .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
                             .transition(configuration.transition)
                             .zIndex(2)
                     }
                 }
-                .frame(configuration: configuration)
-                .background(Color.orange.opacity(0.5))
                 .zIndex(999)
                 .animation(configuration.animation, value: item.wrappedValue?.destination == nil)
             )
