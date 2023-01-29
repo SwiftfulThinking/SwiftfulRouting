@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
+
 public struct RouterView<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
@@ -20,6 +21,8 @@ public struct RouterView<T:View>: View, Router {
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
+
+    @State private var sheetConfig: SheetConfig? = .init(detents: [.medium, .large], selection: nil, showDragIndicator: true)
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -38,7 +41,7 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             content(AnyRouter(object: self))
-                .showingScreen(option: segueOption, items: $screens)
+                .showingScreen(option: segueOption, items: $screens, config: sheetConfig)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -163,8 +166,14 @@ struct RouterView_Previews: PreviewProvider {
 
 extension View {
     
-    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>) -> some View {
-        if #available(iOS 14, *) {
+    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>, config: SheetConfig?) -> some View {
+        if #available(iOS 16, *) {
+            self
+                .modifier(NavigationLinkViewModifier(option: option, items: items))
+                .modifier(ResizableSheetViewModifier(option: option, items: items, config: config))
+//                .modifier(SheetViewModifier(option: option, items: items))
+                .modifier(FullScreenCoverViewModifier(option: option, items: items))
+        } else if #available(iOS 14, *) {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
                 .modifier(SheetViewModifier(option: option, items: items))
