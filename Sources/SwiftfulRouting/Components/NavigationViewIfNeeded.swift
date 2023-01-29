@@ -47,12 +47,13 @@ struct NavigationStackTransformable<Content:View>: View {
     var body: some View {
         NavigationStack(path: $path) {
             content
-        }
-        .onChange(of: screens) { newValue in
-            // Binding(if: segueOption, is: .push, value: $screens)
-            if segueOption == .push {
-                path.append(newValue)
-            }
+                .onChange(of: screens) { newValue in
+                    // Binding(if: segueOption, is: .push, value: $screens)
+                    print("ON CHANGE: \(newValue)")
+                    if segueOption == .push {
+                        path.append(newValue)
+                    }
+                }
         }
     }
     
