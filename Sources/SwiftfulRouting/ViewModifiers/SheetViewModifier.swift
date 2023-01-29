@@ -13,13 +13,14 @@ struct SheetViewModifier: ViewModifier {
     let option: SegueOption
     let items: Binding<[AnyDestination]>
     let config: SheetConfig?
+    let sheetSize: Binding<PresentationDetentTransformable>
 
     func body(content: Content) -> some View {
         content
             .sheet(item: Binding(if: option, is: .sheet, value: bindingToLastElement(in: items)), onDismiss: nil) { destination in
                 if let view = items.wrappedValue.last?.destination {
                     view
-                        .presentationDetentsIfAvailable(config: config)
+                        .presentationDetentsIfAvailable(config: config, sheetSize: sheetSize)
                         .onChange(of: config?.selection?.wrappedValue) { newValue in
                             print("NEW VALUE!: \(newValue)")
                         }
@@ -33,12 +34,16 @@ struct SheetViewModifier: ViewModifier {
 
 extension View {
     
-    @ViewBuilder func presentationDetentsIfAvailable(config: SheetConfig?) -> some View {
+    @ViewBuilder func presentationDetentsIfAvailable(config: SheetConfig?, sheetSize: Binding<PresentationDetentTransformable>) -> some View {
         if #available(iOS 16, *), let config {
             let configuration = SheetConfiguration(config)
 //            if let selection = configuration.selection {
                 self
-                .presentationDetents(configuration.detents, selection: configuration.selection)
+                .presentationDetents(configuration.detents, selection: Binding(get: {
+                    sheetSize.wrappedValue.asPresentationDetent
+                }, set: { newValue, _ in
+                    sheetSize.wrappedValue = PresentationDetentTransformable(detent: newValue)
+                }))
                     .presentationDragIndicator(configuration.showDragIndicator)
                     .onChange(of: configuration.selection.wrappedValue) { newValue in
                         print("change config select: \(newValue)")
