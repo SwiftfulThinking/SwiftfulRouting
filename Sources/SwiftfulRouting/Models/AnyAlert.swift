@@ -13,13 +13,13 @@ struct AnyAlert: Identifiable {
     let title: String
     let subtitle: String?
     let buttons: AnyView
-    let buttonsiOS14: [Alert.Button]?
+    let buttonsiOS13: [Alert.Button]?
 
-    init<T:View>(title: String, subtitle: String? = nil, buttons: T, buttonsiOS14: [Alert.Button]? = nil) {
+    init<T:View>(title: String, subtitle: String? = nil, buttons: T, buttonsiOS13: [Alert.Button]? = nil) {
         self.title = title
         self.subtitle = subtitle
         self.buttons = AnyView(buttons)
-        self.buttonsiOS14 = buttonsiOS14
+        self.buttonsiOS13 = buttonsiOS13
     }
     
     /// iOS 14 support for Alerts
@@ -31,9 +31,9 @@ struct AnyAlert: Identifiable {
             subtitleView = Text(subtitle)
         }
         
-        if let buttonsiOS14, buttonsiOS14.indices.contains(1) {
-            let primaryButton = buttonsiOS14[0]
-            let secondaryButton = buttonsiOS14[1]
+        if let buttonsiOS13, buttonsiOS13.indices.contains(1) {
+            let primaryButton = buttonsiOS13[0]
+            let secondaryButton = buttonsiOS13[1]
             return Alert(
                 title: titleView,
                 message: subtitleView,
@@ -43,7 +43,7 @@ struct AnyAlert: Identifiable {
             return Alert(
                 title: titleView,
                 message: subtitleView,
-                dismissButton: buttonsiOS14?.first)
+                dismissButton: buttonsiOS13?.first)
         }
     }
     
@@ -56,6 +56,6 @@ struct AnyAlert: Identifiable {
             subtitleView = Text(subtitle)
         }
 
-        return ActionSheet(title: titleView, message: subtitleView, buttons: buttonsiOS14 ?? [])
+        return ActionSheet(title: titleView, message: subtitleView, buttons: buttonsiOS13 ?? [])
     }
 }

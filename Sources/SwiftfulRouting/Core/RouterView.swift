@@ -144,14 +144,14 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: [Alert.Button]?) {
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
         guard self.alert == nil else {
             dismissAlert()
             return
         }
         
         self.alertOption = option
-        self.alert = AnyAlert(title: title, subtitle: subtitle, buttons: alert(), buttonsiOS14: buttonsiOS14)
+        self.alert = AnyAlert(title: title, subtitle: subtitle, buttons: alert(), buttonsiOS13: buttonsiOS13)
     }
     
     public func dismissAlert() {
@@ -195,7 +195,7 @@ struct RouterView_Previews: PreviewProvider {
 
 extension View {
     
-    func showingScreen(
+    @ViewBuilder func showingScreen(
         option: SegueOption,
         screens: Binding<[AnyDestination]>,
         screenStack: [AnyDestination],
@@ -203,25 +203,41 @@ extension View {
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
         showDragIndicator: Bool) -> some View {
-            self
-                .modifier(NavigationLinkViewModifier(
-                    option: option,
-                    screens: screens,
-                    shouldAddNavigationDestination: screenStack.isEmpty
-                ))
-                .modifier(SheetViewModifier(
-                    option: option,
-                    screens: screens,
-                    sheetDetents: sheetDetents,
-                    sheetSelection: sheetSelection,
-                    sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator
-                ))
-                .modifier(FullScreenCoverViewModifier(
-                    option: option,
-                    screens: screens
-                ))
-
+            if #available(iOS 14, *) {
+                self
+                    .modifier(NavigationLinkViewModifier(
+                        option: option,
+                        screens: screens,
+                        shouldAddNavigationDestination: screenStack.isEmpty
+                    ))
+                    .modifier(SheetViewModifier(
+                        option: option,
+                        screens: screens,
+                        sheetDetents: sheetDetents,
+                        sheetSelection: sheetSelection,
+                        sheetSelectionEnabled: sheetSelectionEnabled,
+                        showDragIndicator: showDragIndicator
+                    ))
+                    .modifier(FullScreenCoverViewModifier(
+                        option: option,
+                        screens: screens
+                    ))
+            } else {
+                self
+                    .modifier(NavigationLinkViewModifier(
+                        option: option,
+                        screens: screens,
+                        shouldAddNavigationDestination: screenStack.isEmpty
+                    ))
+                    .modifier(SheetViewModifier(
+                        option: option,
+                        screens: screens,
+                        sheetDetents: sheetDetents,
+                        sheetSelection: sheetSelection,
+                        sheetSelectionEnabled: sheetSelectionEnabled,
+                        showDragIndicator: showDragIndicator
+                    ))
+            }
     }
 
     @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
