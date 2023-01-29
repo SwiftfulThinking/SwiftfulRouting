@@ -50,10 +50,13 @@ struct NavigationStackTransformable<Content:View>: View {
                 .onChange(of: screens) { newValue in
                     // Binding(if: segueOption, is: .push, value: $screens)
                     print("ON CHANGE: \(newValue)")
-                    if segueOption == .push {
-                        newValue.forEach({ path.append($0) })
+//                    if segueOption == .push {
+//                        newValue.forEach({ path.append($0) })
 //                        path.append(contentsOf: newValue)
-                    }
+//                    }
+                    
+                    path = .init(newValue)
+                    
                 }
         }
     }
