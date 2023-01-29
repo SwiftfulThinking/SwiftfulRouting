@@ -15,6 +15,7 @@ struct SheetConfiguration {
     let showDragIndicator: Visibility
     
     init(_ config: SheetConfig) {
+        print("SheetConfiguration init")
         self.detents = config.detents.setMap({ $0.asPresentationDetent })
         if let selection = config.selection {
             self.selection = Binding(get: {
