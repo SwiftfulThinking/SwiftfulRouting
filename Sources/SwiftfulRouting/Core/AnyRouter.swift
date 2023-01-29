@@ -67,7 +67,7 @@ public struct AnyRouter: Router {
         transition: AnyTransition = AnyTransition.opacity.animation(.default),
         animation: Animation = .default,
         alignment: Alignment = .center,
-        backgroundColor: Color? = nil,
+        backgroundColor: Color? = Color.black.opacity(0.001),
         useDeviceBounds: Bool = true,
         @ViewBuilder destination: @escaping () -> T) where T : View {
         object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds, destination: destination)

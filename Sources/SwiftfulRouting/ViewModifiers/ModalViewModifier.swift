@@ -19,20 +19,23 @@ struct ModalViewModifier: ViewModifier {
                 ZStack {
                     if let view = item.wrappedValue?.destination {
                         
-                        (configuration.backgroundColor ?? Color.black.opacity(0.001))
-                            .edgesIgnoringSafeArea(.all)
-                            .transition(AnyTransition.opacity.animation(configuration.animation))
-                            .onTapGesture {
-                                item.wrappedValue = nil
-                            }
-                            .zIndex(1)
+                        if let backgroundColor = configuration.backgroundColor {
+                            backgroundColor
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.all)
+                                .transition(AnyTransition.opacity.animation(configuration.animation))
+                                .onTapGesture {
+                                    item.wrappedValue = nil
+                                }
+                                .zIndex(2)
+                        }
 
                         view
                             .frame(configuration: configuration)
                             .background(Color.orange.opacity(0.5))
                             .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
                             .transition(configuration.transition)
-                            .zIndex(2)
+                            .zIndex(3)
                     }
                 }
                 .zIndex(999)
