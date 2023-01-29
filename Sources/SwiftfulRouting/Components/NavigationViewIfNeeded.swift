@@ -51,7 +51,8 @@ struct NavigationStackTransformable<Content:View>: View {
                     // Binding(if: segueOption, is: .push, value: $screens)
                     print("ON CHANGE: \(newValue)")
                     if segueOption == .push {
-                        path.append(newValue)
+                        newValue.forEach({ path.append($0) })
+//                        path.append(contentsOf: newValue)
                     }
                 }
         }
