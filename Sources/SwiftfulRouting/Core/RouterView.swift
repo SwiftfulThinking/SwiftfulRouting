@@ -14,7 +14,7 @@ public struct RouterView<T:View>: View, Router {
     @Environment(\.presentationMode) var presentationMode
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
-
+ 
     // Segues
     @State private var segueOption: SegueOption = .push
     @State private var screens: [AnyDestination] = []
@@ -22,7 +22,8 @@ public struct RouterView<T:View>: View, Router {
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
 
-    @State private var sheetConfig: SheetConfig? = nil //.init(detents: [.medium, .large], selection: nil, showDragIndicator: true)
+    // Configuration for resizable sheet on iOS 16+
+    @State private var sheetConfig: SheetConfig? = nil
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -62,15 +63,7 @@ public struct RouterView<T:View>: View, Router {
             
             // iOS 16 uses NavigationStack and can push additional views onto an existing view stack
             if #available(iOS 16, *) {
-                if screenStack.isEmpty {
-                    // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
-                } else {
-                    // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
-                }
-                return
-                
+                setScreenForiOS16(destination: destination)
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
@@ -79,8 +72,18 @@ public struct RouterView<T:View>: View, Router {
         }
     }
     
+    private func setScreenForiOS16<V:View>(destination: @escaping (AnyRouter) -> V) {
+        if screenStack.isEmpty {
+            // We are in the root Router and should start building on $screens
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
+        } else {
+            // We are not in the root Router and should continue off of $screenStack
+            self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
+        }
+    }
+    
     @available(iOS 16, *)
-    public func pushStack(destinations: [(AnyRouter) -> any View]) {
+    public func pushScreens(destinations: [(AnyRouter) -> any View]) {
         // iOS 16 supports NavigationStack, which can push a stack of views and increment an existing view stack
         self.segueOption = .push
         
@@ -103,6 +106,13 @@ public struct RouterView<T:View>: View, Router {
         } else {
             self.screenStack.append(contentsOf: localStack)
         }
+    }
+    
+    @available(iOS 16, *)
+    public func showResizableSheet<V:View>(config: SheetConfig, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+        self.segueOption = .sheet
+        self.sheetConfig = config
+        self.setScreenForiOS16(destination: destination)
     }
     
     public func dismissScreen() {

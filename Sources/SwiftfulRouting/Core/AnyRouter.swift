@@ -28,8 +28,13 @@ public struct AnyRouter: Router {
 
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
     @available(iOS 16, *)
-    public func pushStack(destinations: [(AnyRouter) -> any View]) {
-        object.pushStack(destinations: destinations)
+    public func pushScreens(destinations: [(AnyRouter) -> any View]) {
+        object.pushScreens(destinations: destinations)
+    }
+    
+    @available(iOS 16, *)
+    public func showResizableSheet<V>(config: SheetConfig, destination: @escaping (AnyRouter) -> V) where V : View {
+        object.showResizableSheet(config: config, destination: destination)
     }
     
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
