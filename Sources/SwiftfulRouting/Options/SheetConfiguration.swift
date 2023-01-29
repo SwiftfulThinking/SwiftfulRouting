@@ -32,7 +32,7 @@ struct SheetConfiguration {
 /// Allows PresentationDetents to be injected without requiring iOS 16
 public struct SheetConfig {
     let detents: Set<PresentationDetentTransformable>
-    let selection: Binding<PresentationDetentTransformable>?
+    public let selection: Binding<PresentationDetentTransformable>?
     let showDragIndicator: Bool
     
     public init(detents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool) {
