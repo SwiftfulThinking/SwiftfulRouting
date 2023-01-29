@@ -39,6 +39,7 @@ public struct SheetConfig {
         self.detents = detents
         self.selection = selection
         self.showDragIndicator = showDragIndicator
+        print("SHEET CONFIG STRUCT CREATED: \(selection?.wrappedValue)")
     }
     
 //    public mutating func select(_ detent: PresentationDetentTransformable?) {
