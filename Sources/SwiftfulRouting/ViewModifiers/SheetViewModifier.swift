@@ -20,6 +20,9 @@ struct SheetViewModifier: ViewModifier {
                 if let view = items.wrappedValue.last?.destination {
                     view
                         .presentationDetentsIfAvailable(config: config)
+                        .onChange(of: config?.selection?.wrappedValue) { newValue in
+                            print("NEW VALUE!: \(newValue)")
+                        }
                 }
             }
     }
