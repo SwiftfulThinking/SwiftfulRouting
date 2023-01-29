@@ -23,7 +23,7 @@ public struct RouterView<T:View>: View, Router {
     @Binding private var screenStack: [AnyDestination]
 
     // Configuration for resizable sheet on iOS 16+
-    @State private var sheetConfig: SheetConfig? = nil
+    @State private var sheetConfig: SheetConfig = .init(detents: [.large], selection: .constant(.large), showDragIndicator: true)
     @State private var sheetSize: Binding<PresentationDetentTransformable>? = nil
 
     // Alerts
@@ -175,7 +175,7 @@ struct RouterView_Previews: PreviewProvider {
 
 extension View {
     
-    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>, config: SheetConfig?, sheetSize: Binding<PresentationDetentTransformable>?) -> some View {
+    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>, config: SheetConfig, sheetSize: Binding<PresentationDetentTransformable>?) -> some View {
         if #available(iOS 16, *) {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
@@ -184,12 +184,12 @@ extension View {
         } else if #available(iOS 14, *) {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items, config: nil, sheetSize: sheetSize))
+                .modifier(SheetViewModifier(option: option, items: items, config: config, sheetSize: sheetSize))
                 .modifier(FullScreenCoverViewModifier(option: option, items: items))
         } else {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items, config: nil, sheetSize: sheetSize))
+                .modifier(SheetViewModifier(option: option, items: items, config: config, sheetSize: sheetSize))
         }
     }
 

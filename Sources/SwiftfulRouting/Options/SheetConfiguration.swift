@@ -20,9 +20,9 @@ struct SheetConfiguration {
         self.showDragIndicator = config.showDragIndicator ? .visible : .hidden
 
         self.selection = Binding(get: {
-            config.selection?.wrappedValue.asPresentationDetent ?? .large
+            config.selection.wrappedValue.asPresentationDetent
         }, set: { newValue, _ in
-            config.selection?.wrappedValue = PresentationDetentTransformable(detent: newValue)
+            config.selection.wrappedValue = PresentationDetentTransformable(detent: newValue)
         })
 //        if let detent = config.selection?.wrappedValue.asPresentationDetent {
 //            self.selection = Binding(get: {
@@ -39,12 +39,12 @@ struct SheetConfiguration {
 /// Allows PresentationDetents to be injected without requiring iOS 16
 public struct SheetConfig {
     let detents: Set<PresentationDetentTransformable>
-    let selection: Binding<PresentationDetentTransformable>?
+    let selection: Binding<PresentationDetentTransformable>
     let showDragIndicator: Bool
     
     public init(detents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool) {
         self.detents = detents
-        self.selection = selection
+        self.selection = selection ?? .constant(.large)
         self.showDragIndicator = showDragIndicator
         print("SHEET CONFIG STRUCT CREATED: \(selection?.wrappedValue)")
     }
