@@ -50,19 +50,23 @@ public struct SheetConfig {
     }
 }
 
-public enum PresentationDetentTransformable {
+public enum PresentationDetentTransformable: Hashable {
     case medium
     case large
+    case height(CGFloat)
+    case fraction(CGFloat)
+    case unknown
     
     @available(iOS 16.0, *)
     init(detent: PresentationDetent) {
+        // FIXME: Unable to convert .height(CGFloat) and .fraction(CGFloat) back from PresentationDetent to PresentationDetentTransformable
         switch detent {
         case .medium:
             self = .medium
         case .large:
             self = .large
         default:
-            self = .large
+            self = .unknown
         }
     }
     
@@ -73,7 +77,32 @@ public enum PresentationDetentTransformable {
             return .medium
         case .large:
             return .large
+        case .height(let height):
+            return .height(height)
+        case .fraction(let fraction):
+            return .fraction(fraction)
+        case .unknown:
+            return .large
         }
+    }
+    
+    private var id: String {
+        switch self {
+        case .medium:
+            return "medium"
+        case .large:
+            return "large"
+        case .height(let height):
+            return "height_\(height)"
+        case .fraction(let fraction):
+            return "fraction_\(fraction)"
+        case .unknown:
+            return "unknown"
+        }
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
