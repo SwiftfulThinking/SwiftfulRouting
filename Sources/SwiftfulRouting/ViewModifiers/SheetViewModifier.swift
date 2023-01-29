@@ -27,6 +27,12 @@ struct SheetViewModifier: ViewModifier {
                         .onAppear {
                             print("STARIG VALUE: \(config?.selection?.wrappedValue)")
                         }
+                        .onChange(of: sheetSize.wrappedValue) { newValue in
+                            print("222 NEW VALUE!: \(newValue)")
+                        }
+                        .onAppear {
+                            print("222 VALUE: \(sheetSize.wrappedValue)")
+                        }
                 }
             }
     }

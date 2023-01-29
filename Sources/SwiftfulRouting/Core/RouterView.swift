@@ -111,7 +111,6 @@ public struct RouterView<T:View>: View, Router {
         self.segueOption = .sheet
         self.sheetConfig = config
         self.sheetSize = selection
-        print("showResizableSheet: \(config.selection?.wrappedValue)")
         self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
     }
     
