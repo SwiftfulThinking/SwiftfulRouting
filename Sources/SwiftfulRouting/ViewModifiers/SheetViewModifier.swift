@@ -36,15 +36,21 @@ extension View {
     @ViewBuilder func presentationDetentsIfAvailable(config: SheetConfig?) -> some View {
         if #available(iOS 16, *), let config {
             let configuration = SheetConfiguration(config)
-            if let selection = configuration.selection {
+//            if let selection = configuration.selection {
                 self
-                    .presentationDetents(configuration.detents, selection: selection)
+                .presentationDetents(configuration.detents, selection: configuration.selection)
                     .presentationDragIndicator(configuration.showDragIndicator)
-            } else {
-                self
-                    .presentationDetents(configuration.detents)
-                    .presentationDragIndicator(configuration.showDragIndicator)
-            }
+                    .onChange(of: configuration.selection.wrappedValue) { newValue in
+                        print("change config select: \(newValue)")
+                    }
+                    .onChange(of: config.selection?.wrappedValue) { newValue in
+                        print("change config: \(newValue)")
+                    }
+//            } else {
+//                self
+//                    .presentationDetents(configuration.detents)
+//                    .presentationDragIndicator(configuration.showDragIndicator)
+//            }
         } else {
             self
         }

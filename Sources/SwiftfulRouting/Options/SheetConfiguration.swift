@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 16.0, *)
 struct SheetConfiguration {
     let detents: Set<PresentationDetent>
-    let selection: Binding<PresentationDetent>?
+    let selection: Binding<PresentationDetent>
     let showDragIndicator: Visibility
     
     init(_ config: SheetConfig) {
