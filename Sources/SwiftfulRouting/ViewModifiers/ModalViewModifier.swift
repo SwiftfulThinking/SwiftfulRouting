@@ -34,6 +34,7 @@ struct ModalViewModifier: ViewModifier {
                     }
                 }
                 .frame(configuration: configuration)
+                .background(Color.orange.opacity(0.5))
                 .zIndex(999)
                 .animation(configuration.animation, value: item.wrappedValue?.destination == nil)
             )
