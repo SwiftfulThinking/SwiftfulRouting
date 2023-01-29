@@ -24,10 +24,8 @@ struct NavigationLinkViewModifier: ViewModifier {
                 .background(
                     ZStack {
                         NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: bindingToLastElement(in: items)))) {
-                            ZStack {
-                                if let view = items.wrappedValue.last?.destination {
-                                    view
-                                }
+                            if let view = items.wrappedValue.last?.destination {
+                                view
                             }
                         } label: {
                             EmptyView()
