@@ -8,21 +8,17 @@
 import Foundation
 import SwiftUI
 
-public struct VisualEffectViewRepresentable: UIViewRepresentable {
+struct VisualEffectViewRepresentable: UIViewRepresentable {
     
     let effect: UIVisualEffect
     
-    public init(effect: UIVisualEffect) {
-        self.effect = effect
-    }
-    
-    public func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
+    func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
         let view = UIVisualEffectView()
         view.effect = effect
         return view
     }
     
-    public func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
+    func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
         
     }
     
