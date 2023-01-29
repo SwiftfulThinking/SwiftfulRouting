@@ -46,7 +46,9 @@ public struct AnyRouter: Router {
     }
     
     /// Show any Alert or ConfirmationDialog.
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: AnyAlertiOS14Buttons? = nil) where T : View {
+    ///
+    ///  WARNING: Alert modifiers were deprecated between iOS 14 & iOS 15. iOS 14 will use buttonsiOS14, while iOS 15+ will use @ViewBuilder alert.
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: [Alert.Button]? = nil) where T : View {
         object.showAlert(option, title: title, subtitle: subtitle, alert: alert, buttonsiOS14: buttonsiOS14)
     }
     

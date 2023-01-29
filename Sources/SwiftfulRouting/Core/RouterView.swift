@@ -144,7 +144,7 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: AnyAlertiOS14Buttons?) {
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: [Alert.Button]?) {
         guard self.alert == nil else {
             dismissAlert()
             return
@@ -225,14 +225,10 @@ extension View {
     }
 
     @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
-        if #available(iOS 15, *) {
-            if option == .confirmationDialog {
-                modifier(ConfirmationDialogViewModifier(item: item))
-            } else {
-                modifier(AlertViewModifier(item: item))
-            }
+        if option == .confirmationDialog {
+            modifier(ConfirmationDialogViewModifier(item: item))
         } else {
-            self
+            modifier(AlertViewModifier(item: item))
         }
     }
     
