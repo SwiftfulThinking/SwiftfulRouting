@@ -27,6 +27,18 @@ struct ModalViewModifier: ViewModifier {
                                 .onTapGesture {
                                     item.wrappedValue = nil
                                 }
+                                .zIndex(1)
+                        }
+                        
+                        if let backgroundEffect = configuration.backgroundEffect {
+                            VisualEffectViewRepresentable(effect: backgroundEffect.effect)
+                                .opacity(backgroundEffect.opacity)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.all)
+                                .transition(AnyTransition.opacity.animation(configuration.animation))
+                                .onTapGesture {
+                                    item.wrappedValue = nil
+                                }
                                 .zIndex(2)
                         }
 
@@ -56,17 +68,3 @@ extension View {
 }
 
 
-struct VisualEffectView: UIViewRepresentable {
-    
-    let effect: UIVisualEffect
-    
-    func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
-        let view = UIVisualEffectView()
-        view.effect = effect
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
-    }
-    
-}

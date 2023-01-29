@@ -24,6 +24,6 @@ public protocol Router {
     @available(iOS 15, *)
     func dismissAlert()
     
-    func showModal<V:View>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, useDeviceBounds: Bool, @ViewBuilder destination: @escaping () -> V)
+    func showModal<V:View>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, @ViewBuilder destination: @escaping () -> V)
     func dismissModal()
 }

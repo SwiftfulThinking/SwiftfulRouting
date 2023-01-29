@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  RouterView.swift
 //  
 //
 //  Created by Nick Sarno on 4/30/22.
@@ -131,6 +131,7 @@ public struct RouterView<T:View>: View, Router {
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?,
+        backgroundEffect: BackgroundEffect?,
         useDeviceBounds: Bool,
         @ViewBuilder destination: @escaping () -> T) {
             guard self.modal == nil else {
@@ -138,7 +139,7 @@ public struct RouterView<T:View>: View, Router {
                 return
             }
             
-            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
+            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds)
             self.modal = AnyDestination(destination())
         }
     
