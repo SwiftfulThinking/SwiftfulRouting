@@ -43,7 +43,7 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             content(AnyRouter(object: self))
-                .showingScreen(option: segueOption, items: $screens, config: sheetConfig, sheetSize: sheetSize)
+                .showingScreen(option: segueOption, items: $screens, config: sheetConfig, sheetSize: sheetSize ?? .constant(.large))
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -175,7 +175,7 @@ struct RouterView_Previews: PreviewProvider {
 
 extension View {
     
-    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>, config: SheetConfig, sheetSize: Binding<PresentationDetentTransformable>?) -> some View {
+    @ViewBuilder func showingScreen(option: SegueOption, items: Binding<[AnyDestination]>, config: SheetConfig, sheetSize: Binding<PresentationDetentTransformable>) -> some View {
         if #available(iOS 16, *) {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))

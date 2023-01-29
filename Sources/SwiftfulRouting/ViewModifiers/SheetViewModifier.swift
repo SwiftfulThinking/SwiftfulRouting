@@ -13,7 +13,7 @@ struct SheetViewModifier: ViewModifier {
     let option: SegueOption
     let items: Binding<[AnyDestination]>
     let config: SheetConfig
-    let sheetSize: Binding<PresentationDetentTransformable>?
+    let sheetSize: Binding<PresentationDetentTransformable>
 
     func body(content: Content) -> some View {
         content
@@ -27,11 +27,11 @@ struct SheetViewModifier: ViewModifier {
                         .onAppear {
                             print("STARIG VALUE: \(config.selection.wrappedValue)")
                         }
-                        .onChange(of: sheetSize?.wrappedValue) { newValue in
+                        .onChange(of: sheetSize.wrappedValue) { newValue in
                             print("222 NEW VALUE!: \(newValue)")
                         }
                         .onAppear {
-                            print("222 VALUE: \(sheetSize?.wrappedValue)")
+                            print("222 VALUE: \(sheetSize.wrappedValue)")
                         }
                 }
             }
@@ -40,16 +40,16 @@ struct SheetViewModifier: ViewModifier {
 
 extension View {
     
-    @ViewBuilder func presentationDetentsIfAvailable(config: SheetConfig, sheetSize: Binding<PresentationDetentTransformable>?) -> some View {
+    @ViewBuilder func presentationDetentsIfAvailable(config: SheetConfig, sheetSize: Binding<PresentationDetentTransformable>) -> some View {
         if #available(iOS 16, *) {
             let configuration = SheetConfiguration(config)
 //            if let selection = configuration.selection {
                 self
 //                .presentationDetents(configuration.detents, selection: configuration.selection)
                 .presentationDetents(configuration.detents, selection: Binding(get: {
-                    sheetSize?.wrappedValue.asPresentationDetent ?? config.detents.first?.asPresentationDetent ?? .large
+                    sheetSize.wrappedValue.asPresentationDetent ?? config.detents.first?.asPresentationDetent ?? .large
                 }, set: { newValue, _ in
-                    sheetSize?.wrappedValue = PresentationDetentTransformable(detent: newValue)
+                    sheetSize.wrappedValue = PresentationDetentTransformable(detent: newValue)
                 }))
                     .presentationDragIndicator(configuration.showDragIndicator)
                     .onChange(of: configuration.selection.wrappedValue) { newValue in
