@@ -1,6 +1,6 @@
 # SwiftfulRouting  🤙
 
-A native, declarative framework for programattic navigation (routing) in SwiftUI applications, fully decoupled from the View.
+A native, declarative framework for programmatic navigation (routing) in SwiftUI applications, fully decoupled from the View.
 
 **Setup time:** 1 minute
 
