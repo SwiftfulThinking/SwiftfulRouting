@@ -33,10 +33,10 @@ public struct AnyRouter: Router {
     }
     
     @available(iOS 16, *)
-    public func showResizableSheet<V>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>?, destination: @escaping (AnyRouter) -> V) where V : View {
-        object.showResizableSheet(config: config, selection: selection, destination: destination)
+    public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
+        object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, destination: destination)
     }
-    
+        
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
     ///
     ///  WARNING: Does not dismiss Sheet or FullScreenCover.

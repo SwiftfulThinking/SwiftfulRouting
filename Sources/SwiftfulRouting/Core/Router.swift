@@ -19,7 +19,7 @@ public protocol Router {
     func popToRoot()
     
     @available(iOS 16, *)
-    func showResizableSheet<V:View>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>?, @ViewBuilder destination: @escaping (AnyRouter) -> V)
+    func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, @ViewBuilder destination: @escaping (AnyRouter) -> V)
     
     @available(iOS 15, *)
     func showAlert<V:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> V)
