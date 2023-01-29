@@ -17,13 +17,14 @@ struct SheetConfiguration {
     init(_ config: SheetConfig) {
         print("SheetConfiguration init")
         self.detents = config.detents.setMap({ $0.asPresentationDetent })
-        if let selection = config.selection {
+        if let detent = config.selection?.wrappedValue.asPresentationDetent {
             self.selection = Binding(get: {
-                print("SheetConfiguration GETTING VALUE: \(selection.wrappedValue)")
-                return selection.wrappedValue.asPresentationDetent
+                print("SheetConfiguration GETTING VALUE: \(detent)")
+//                return config.selection?.wrappedValue.asPresentationDetent
+                return detent
             }, set: { newValue, _ in
                 print("SheetConfiguration SETTING NEW VALUE: \(newValue)")
-                selection.wrappedValue = PresentationDetentTransformable(detent: newValue)
+                config.selection?.wrappedValue = PresentationDetentTransformable(detent: newValue)
             })
         } else {
             self.selection = nil
