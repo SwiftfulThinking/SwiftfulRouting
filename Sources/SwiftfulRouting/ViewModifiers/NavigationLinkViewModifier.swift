@@ -12,15 +12,9 @@ struct NavigationLinkViewModifier: ViewModifier {
     
     let option: SegueOption
     let screens: Binding<[AnyDestination]>
-    @State private var shouldAddNavigationDestination: Bool
     
-    init(option: SegueOption,
-        screens: Binding<[AnyDestination]>,
-        screenStack: [AnyDestination]) {
-        self.option = option
-        self.screens = screens
-        self._shouldAddNavigationDestination = State(wrappedValue: screenStack.isEmpty)
-    }
+    // Must be @State so that this modifier can control the state & not add .navigationDestination twice
+    @State var shouldAddNavigationDestination: Bool
 
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
@@ -31,9 +25,6 @@ struct NavigationLinkViewModifier: ViewModifier {
                 }
                 .navigationDestination(for: AnyDestination.self) { value in
                     value.destination
-                }
-                .onAppear {
-                    print("DID APPEAR!!!!")
                 }
             } else {
                 content

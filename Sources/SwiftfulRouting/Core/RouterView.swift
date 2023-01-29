@@ -207,7 +207,7 @@ extension View {
                 .modifier(NavigationLinkViewModifier(
                     option: option,
                     screens: screens,
-                    screenStack: screenStack
+                    shouldAddNavigationDestination: screenStack.isEmpty
                 ))
                 .modifier(SheetViewModifier(
                     option: option,
