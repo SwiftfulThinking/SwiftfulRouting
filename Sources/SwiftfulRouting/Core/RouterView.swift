@@ -109,6 +109,7 @@ public struct RouterView<T:View>: View, Router {
     public func showResizableSheet<V:View>(config: SheetConfig, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetConfig = config
+        print("showResizableSheet: \(config.selection?.wrappedValue)")
         self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
     }
     
