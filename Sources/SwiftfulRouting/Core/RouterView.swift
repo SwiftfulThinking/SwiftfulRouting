@@ -241,11 +241,9 @@ extension View {
     }
 
     @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
-        if option == .confirmationDialog {
-            modifier(ConfirmationDialogViewModifier(item: item))
-        } else {
-            modifier(AlertViewModifier(item: item))
-        }
+        self
+            .modifier(ConfirmationDialogViewModifier(option: option, item: item))
+            .modifier(AlertViewModifier(option: option, item: item))
     }
     
     func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {

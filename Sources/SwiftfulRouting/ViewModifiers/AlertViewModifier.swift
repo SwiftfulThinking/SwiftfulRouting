@@ -10,12 +10,13 @@ import SwiftUI
 
 struct AlertViewModifier: ViewModifier {
     
+    let option: AlertOption
     let item: Binding<AnyAlert?>
 
     func body(content: Content) -> some View {
         if #available(iOS 15.0, *) {
             content
-                .alert(item.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: item)) {
+                .alert(item.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: Binding(if: option, is: .alert, value: item))) {
                     item.wrappedValue?.buttons
                 } message: {
                     if let subtitle = item.wrappedValue?.subtitle {
