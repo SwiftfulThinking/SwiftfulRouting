@@ -38,6 +38,10 @@ struct NavigationViewIfNeeded<Content:View>: View {
 @available(iOS 16, *)
 struct NavigationStackTransformable<Content:View>: View {
     
+    // Convert [AnyDestination] to NavigationPath
+    // Note: it works without the conversion, but there is a warning in console.
+    //      "Only root-level navigation destinations are effective for a navigation stack with a homogeneous path"
+    
     let segueOption: SegueOption
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
@@ -47,17 +51,9 @@ struct NavigationStackTransformable<Content:View>: View {
     var body: some View {
         NavigationStack(path: $path) {
             content
-                .onChange(of: screens) { newValue in
-                    // Binding(if: segueOption, is: .push, value: $screens)
-//                    print("ON CHANGE: \(newValue)")
-//                    if segueOption == .push {
-//                        newValue.forEach({ path.append($0) })
-//                        path.append(contentsOf: newValue)
-//                    }
-                    
-                    path = .init(newValue)
-                    
-                }
+        }
+        .onChange(of: screens) { newValue in
+            path = .init(newValue)
         }
     }
     
