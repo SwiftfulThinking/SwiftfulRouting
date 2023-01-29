@@ -53,6 +53,7 @@ struct NavigationStackTransformable<Content:View>: View {
             content
         }
         .onChange(of: screens) { newValue in
+            print("NEW VALUE and \(segueOption)")
             if segueOption == .push {
                 path = .init(newValue)
             }
