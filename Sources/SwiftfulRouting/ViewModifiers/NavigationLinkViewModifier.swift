@@ -18,10 +18,12 @@ struct NavigationLinkViewModifier: ViewModifier {
         if #available(iOS 16.0, *) {
             // If we are continuing an existing stack, don't need to add another .navigationDestination modifier
             if screenStack.isEmpty {
-                content
-                    .navigationDestination(for: AnyDestination.self) { value in
-                        value.destination
-                    }
+                ZStack {
+                    content
+                }
+                .navigationDestination(for: AnyDestination.self) { value in
+                    value.destination
+                }
             } else {
                 content
             }
