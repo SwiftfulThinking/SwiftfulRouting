@@ -45,12 +45,12 @@ extension View {
             let configuration = SheetConfiguration(config)
 //            if let selection = configuration.selection {
                 self
-                .presentationDetents(configuration.detents, selection: configuration.selection)
-//                .presentationDetents(configuration.detents, selection: Binding(get: {
-//                    sheetSize?.wrappedValue.asPresentationDetent ?? config.detents.first?.asPresentationDetent ?? .large
-//                }, set: { newValue, _ in
-//                    sheetSize?.wrappedValue = PresentationDetentTransformable(detent: newValue)
-//                }))
+//                .presentationDetents(configuration.detents, selection: configuration.selection)
+                .presentationDetents(configuration.detents, selection: Binding(get: {
+                    sheetSize?.wrappedValue.asPresentationDetent ?? config.detents.first?.asPresentationDetent ?? .large
+                }, set: { newValue, _ in
+                    sheetSize?.wrappedValue = PresentationDetentTransformable(detent: newValue)
+                }))
                     .presentationDragIndicator(configuration.showDragIndicator)
                     .onChange(of: configuration.selection.wrappedValue) { newValue in
                         print("change config select: \(newValue)")
