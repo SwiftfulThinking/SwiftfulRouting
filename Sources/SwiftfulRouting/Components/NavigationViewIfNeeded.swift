@@ -47,6 +47,7 @@ struct NavigationStackTransformable<Content:View>: View {
     @ViewBuilder var content: Content
 
     @State private var path: NavigationPath = .init()
+    @State private var isPushEnabled: Bool = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -54,10 +55,11 @@ struct NavigationStackTransformable<Content:View>: View {
         }
         .onChange(of: segueOption, perform: { newValue in
             print("SEGUE CHANGE: \(newValue)")
+            isPushEnabled = newValue == .push
         })
         .onChange(of: screens) { newValue in
             print("NEW VALUE and \(segueOption)")
-            if segueOption == .push {
+            if isPushEnabled {
                 path = .init(newValue)
             }
         }
