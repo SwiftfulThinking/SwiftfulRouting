@@ -75,23 +75,23 @@ public enum PresentationDetentTransformable: Hashable {
         }
     }
     
-    private var id: String {
+    var title: String {
         switch self {
         case .medium:
-            return "medium"
+            return "Medium"
         case .large:
-            return "large"
+            return "Large"
         case .height(let height):
-            return "height_\(height)"
+            return "Height: \(height) px"
         case .fraction(let fraction):
-            return "fraction_\(fraction)"
+            return "Fraction: \((fraction * 100))%"
         case .unknown:
             return "unknown"
         }
     }
     
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(title)
     }
 }
 
