@@ -77,7 +77,7 @@ public struct AnyRouter: Router {
     public func showBasicModal<T>(@ViewBuilder destination: @escaping () -> T) where T : View {
         showModal(
             transition: AnyTransition.opacity.animation(.easeInOut),
-            animation: .spring(),
+            animation: .easeInOut,
             alignment: .center,
             backgroundColor: Color.black.opacity(0.4),
             useDeviceBounds: true,
