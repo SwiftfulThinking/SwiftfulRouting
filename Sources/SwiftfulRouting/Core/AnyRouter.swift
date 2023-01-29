@@ -30,10 +30,12 @@ public struct AnyRouter: Router {
         object.popToRoot()
     }
     
+    @available(iOS 15, *)
     public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
         object.showAlert(option, title: title, subtitle: subtitle, alert: alert)
     }
     
+    @available(iOS 15, *)
     public func dismissAlert() {
         object.dismissAlert()
     }

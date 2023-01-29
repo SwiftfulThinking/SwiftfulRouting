@@ -187,11 +187,7 @@ extension View {
         }
     }
     
-    @ViewBuilder func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
-        if #available(iOS 14, *) {
-            modifier(ModalViewModifier(configuration: configuration, item: item))
-        } else {
-            self
-        }
+    func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
+        modifier(ModalViewModifier(configuration: configuration, item: item))
     }
 }
