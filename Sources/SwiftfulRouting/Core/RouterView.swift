@@ -112,7 +112,7 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) {
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T) {
         guard self.alert == nil else {
             dismissAlert()
             return
@@ -127,11 +127,11 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public func showModal<T:View>(
-        transition: AnyTransition = .move(edge: .bottom),
-        animation: Animation = .easeInOut,
-        alignment: Alignment = .center,
-        backgroundColor: Color? = nil,
-        useDeviceBounds: Bool = true,
+        transition: AnyTransition,
+        animation: Animation,
+        alignment: Alignment,
+        backgroundColor: Color?,
+        useDeviceBounds: Bool,
         @ViewBuilder destination: @escaping () -> T) {
             guard self.modal == nil else {
                 dismissModal()
