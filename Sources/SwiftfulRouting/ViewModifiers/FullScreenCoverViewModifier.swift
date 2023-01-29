@@ -16,7 +16,7 @@ struct FullScreenCoverViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: bindingToLastElement(in: items)), onDismiss: nil) { _ in
+            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: Binding(toLastElementIn: items)), onDismiss: nil) { _ in
                 if let view = items.wrappedValue.last?.destination {
                     view
                 }

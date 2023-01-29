@@ -23,7 +23,7 @@ struct NavigationLinkViewModifier: ViewModifier {
             content
                 .background(
                     ZStack {
-                        NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: bindingToLastElement(in: items)))) {
+                        NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: Binding(toLastElementIn: items)))) {
                             if let view = items.wrappedValue.last?.destination {
                                 view
                             }

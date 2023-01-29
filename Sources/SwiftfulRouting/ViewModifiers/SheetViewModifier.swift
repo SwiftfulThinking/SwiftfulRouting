@@ -19,7 +19,7 @@ struct SheetViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .sheet(item: Binding(if: option, is: .sheet, value: bindingToLastElement(in: items)), onDismiss: nil) { destination in
+            .sheet(item: Binding(if: option, is: .sheet, value: Binding(toLastElementIn: items)), onDismiss: nil) { destination in
                 if let view = items.wrappedValue.last?.destination {
                     view
                         .presentationDetentsIfNeeded(

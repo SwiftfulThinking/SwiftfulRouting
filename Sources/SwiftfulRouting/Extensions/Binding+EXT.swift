@@ -55,15 +55,37 @@ extension Binding where Value == PresentationDetent {
     
 }
 
-func bindingToLastElement<T>(in array: Binding<[T]>) -> Binding<T?> {
-    Binding {
-        array.wrappedValue.last
-    } set: { newValue, _ in
-        if array.wrappedValue.last != nil {
-            array.wrappedValue.removeLast()
+
+extension Binding {
+    
+    init<V:Hashable>(toLastElementIn array: Binding<[V]>) where Value == V? {
+        self.init {
+            array.wrappedValue.last
+        } set: { newValue in
+            if let newValue {
+                // Check for newValue in array before updating
+                if let index = array.wrappedValue.firstIndex(of: newValue) {
+                    array.wrappedValue[index] = newValue
+                }
+            } else {
+                // Check for last item in array before removing (not safe)
+                if array.wrappedValue.last != nil {
+                    array.wrappedValue.removeLast()
+                }
+            }
         }
     }
 }
+
+//func bindingToLastElement<T>(in array: Binding<[T]>) -> Binding<T?> {
+//    Binding {
+//        array.wrappedValue.last
+//    } set: { newValue, _ in
+//        if array.wrappedValue.last != nil {
+//            array.wrappedValue.removeLast()
+//        }
+//    }
+//}
 
 /*
 
