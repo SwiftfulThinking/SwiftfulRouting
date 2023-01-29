@@ -13,7 +13,8 @@ struct SheetViewModifier: ViewModifier {
     let option: SegueOption
     let items: Binding<[AnyDestination]>
     let sheetDetents: Set<PresentationDetentTransformable>
-    @Binding var sheetSize: PresentationDetentTransformable
+    @Binding var sheetSelection: PresentationDetentTransformable
+    let sheetSelectionEnabled: Bool
     let showDragIndicator: Bool
 
     func body(content: Content) -> some View {
@@ -21,7 +22,11 @@ struct SheetViewModifier: ViewModifier {
             .sheet(item: Binding(if: option, is: .sheet, value: bindingToLastElement(in: items)), onDismiss: nil) { destination in
                 if let view = items.wrappedValue.last?.destination {
                     view
-                        .presentationDetentsIfAvailable(sheetDetents: sheetDetents, sheetSize: $sheetSize, showDragIndicator: showDragIndicator)
+                        .presentationDetentsIfNeeded(
+                            sheetDetents: sheetDetents,
+                            sheetSelection: $sheetSelection,
+                            sheetSelectionEnabled: sheetSelectionEnabled,
+                            showDragIndicator: showDragIndicator)
                 }
             }
     }
@@ -29,18 +34,25 @@ struct SheetViewModifier: ViewModifier {
 
 extension View {
     
-    @ViewBuilder func presentationDetentsIfAvailable(
+    @ViewBuilder func presentationDetentsIfNeeded(
         sheetDetents: Set<PresentationDetentTransformable>,
-        sheetSize: Binding<PresentationDetentTransformable>,
+        sheetSelection: Binding<PresentationDetentTransformable>,
+        sheetSelectionEnabled: Bool,
         showDragIndicator: Bool) -> some View {
             if #available(iOS 16, *) {
-                self
-                    .presentationDetents(sheetDetents.setMap({ $0.asPresentationDetent }), selection: Binding(get: {
-                        sheetSize.wrappedValue.asPresentationDetent //?? config.detents.first?.asPresentationDetent ?? .large
-                    }, set: { newValue, _ in
-                        sheetSize.wrappedValue = PresentationDetentTransformable(detent: newValue)
-                    }))
-                    .presentationDragIndicator(showDragIndicator ? .visible : .hidden)
+                if sheetSelectionEnabled {
+                    self
+                        .presentationDetents(sheetDetents.setMap({ $0.asPresentationDetent }), selection: Binding(get: {
+                            sheetSelection.wrappedValue.asPresentationDetent
+                        }, set: { newValue, _ in
+                            sheetSelection.wrappedValue = PresentationDetentTransformable(detent: newValue)
+                        }))
+                        .presentationDragIndicator(showDragIndicator ? .visible : .hidden)
+                } else {
+                    self
+                        .presentationDetents(sheetDetents.setMap({ $0.asPresentationDetent }))
+                        .presentationDragIndicator(showDragIndicator ? .visible : .hidden)
+                }
             } else {
                 self
             }

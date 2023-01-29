@@ -25,7 +25,8 @@ public struct RouterView<T:View>: View, Router {
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
     @State private var sheetDetents: Set<PresentationDetentTransformable> = [.large]
-    @State private var sheetSize: Binding<PresentationDetentTransformable> = .constant(.large)
+    @State private var sheetSelection: Binding<PresentationDetentTransformable> = .constant(.large)
+    @State private var sheetSelectionEnabled: Bool = false
     @State private var showDragIndicator: Bool = true
 
     // Alerts
@@ -45,7 +46,13 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             content(AnyRouter(object: self))
-                .showingScreen(option: segueOption, items: $screens, sheetDetents: sheetDetents, sheetSize: sheetSize, showDragIndicator: showDragIndicator)
+                .showingScreen(
+                    option: segueOption,
+                    items: $screens,
+                    sheetDetents: sheetDetents,
+                    sheetSelection: sheetSelection,
+                    sheetSelectionEnabled: sheetSelectionEnabled,
+                    showDragIndicator: showDragIndicator)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -58,7 +65,7 @@ public struct RouterView<T:View>: View, Router {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
             self.sheetDetents = [.large]
-            self.sheetSize = .constant(.large)
+            self.sheetSelectionEnabled = false
             self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
         } else {
             // Using existing Navigation
@@ -113,10 +120,16 @@ public struct RouterView<T:View>: View, Router {
     public func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool = true, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetDetents = sheetDetents
-        if let selection {
-            self.sheetSize = selection
-        }
         self.showDragIndicator = showDragIndicator
+
+        // If selection == nil, then need to avoid using sheetSelection modifier
+        if let selection {
+            self.sheetSelection = selection
+            self.sheetSelectionEnabled = true
+        } else {
+            self.sheetSelectionEnabled = false
+        }
+        
         self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
     }
     
@@ -181,27 +194,31 @@ struct RouterView_Previews: PreviewProvider {
 
 extension View {
     
-    @ViewBuilder func showingScreen(
+    func showingScreen(
         option: SegueOption,
         items: Binding<[AnyDestination]>,
         sheetDetents: Set<PresentationDetentTransformable>,
-        sheetSize: Binding<PresentationDetentTransformable>,
+        sheetSelection: Binding<PresentationDetentTransformable>,
+        sheetSelectionEnabled: Bool,
         showDragIndicator: Bool) -> some View {
-        if #available(iOS 16, *) {
             self
-                .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items, sheetDetents: sheetDetents, sheetSize: sheetSize, showDragIndicator: showDragIndicator))
-                .modifier(FullScreenCoverViewModifier(option: option, items: items))
-        } else if #available(iOS 14, *) {
-            self
-                .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items, sheetDetents: sheetDetents, sheetSize: sheetSize, showDragIndicator: showDragIndicator))
-                .modifier(FullScreenCoverViewModifier(option: option, items: items))
-        } else {
-            self
-                .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items, sheetDetents: sheetDetents, sheetSize: sheetSize, showDragIndicator: showDragIndicator))
-        }
+                .modifier(NavigationLinkViewModifier(
+                    option: option,
+                    items: items
+                ))
+                .modifier(SheetViewModifier(
+                    option: option,
+                    items: items,
+                    sheetDetents: sheetDetents,
+                    sheetSelection: sheetSelection,
+                    sheetSelectionEnabled: sheetSelectionEnabled,
+                    showDragIndicator: showDragIndicator
+                ))
+                .modifier(FullScreenCoverViewModifier(
+                    option: option,
+                    items: items
+                ))
+
     }
 
     @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
