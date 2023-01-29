@@ -63,22 +63,19 @@ public struct RouterView<T:View>: View, Router {
             
             // iOS 16 uses NavigationStack and can push additional views onto an existing view stack
             if #available(iOS 16, *) {
-                setScreenForiOS16(destination: destination)
+                if screenStack.isEmpty {
+                    // We are in the root Router and should start building on $screens
+                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
+                } else {
+                    // We are not in the root Router and should continue off of $screenStack
+                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
+                }
+                
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
                 self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination)))
             }
-        }
-    }
-    
-    private func setScreenForiOS16<V:View>(destination: @escaping (AnyRouter) -> V) {
-        if screenStack.isEmpty {
-            // We are in the root Router and should start building on $screens
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
-        } else {
-            // We are not in the root Router and should continue off of $screenStack
-            self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
         }
     }
     
@@ -112,7 +109,7 @@ public struct RouterView<T:View>: View, Router {
     public func showResizableSheet<V:View>(config: SheetConfig, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetConfig = config
-        self.setScreenForiOS16(destination: destination)
+        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
     }
     
     public func dismissScreen() {
