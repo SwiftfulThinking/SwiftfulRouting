@@ -18,8 +18,10 @@ struct SheetConfiguration {
         self.detents = config.detents.setMap({ $0.asPresentationDetent })
         if let selection = config.selection {
             self.selection = Binding(get: {
-                selection.wrappedValue.asPresentationDetent
+                print("SheetConfiguration GETTING VALUE: \(selection.wrappedValue)")
+                return selection.wrappedValue.asPresentationDetent
             }, set: { newValue, _ in
+                print("SheetConfiguration SETTING NEW VALUE: \(newValue)")
                 selection.wrappedValue = PresentationDetentTransformable(detent: newValue)
             })
         } else {
