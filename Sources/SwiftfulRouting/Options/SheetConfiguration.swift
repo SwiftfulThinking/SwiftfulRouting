@@ -17,19 +17,22 @@ struct SheetConfiguration {
     init(_ config: SheetConfig) {
         print("SheetConfiguration init")
         self.detents = config.detents.setMap({ $0.asPresentationDetent })
-        if let detent = config.selection?.wrappedValue.asPresentationDetent {
-            self.selection = Binding(get: {
-                print("SheetConfiguration GETTING VALUE: \(detent)")
-//                return config.selection?.wrappedValue.asPresentationDetent
-                return detent
-            }, set: { newValue, _ in
-                print("SheetConfiguration SETTING NEW VALUE: \(newValue)")
-                config.selection?.wrappedValue = PresentationDetentTransformable(detent: newValue)
-            })
-        } else {
-            self.selection = nil
-        }
         self.showDragIndicator = config.showDragIndicator ? .visible : .hidden
+
+        self.selection = Binding(get: {
+            config.selection?.wrappedValue.asPresentationDetent ?? .large
+        }, set: { newValue, _ in
+            config.selection?.wrappedValue = PresentationDetentTransformable(detent: newValue)
+        })
+//        if let detent = config.selection?.wrappedValue.asPresentationDetent {
+//            self.selection = Binding(get: {
+//                return detent
+//            }, set: { newValue, _ in
+//                config.selection?.wrappedValue = PresentationDetentTransformable(detent: newValue)
+//            })
+//        } else {
+//            self.selection = nil
+//        }
     }
 }
 
