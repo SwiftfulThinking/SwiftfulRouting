@@ -24,6 +24,7 @@ public struct RouterView<T:View>: View, Router {
 
     // Configuration for resizable sheet on iOS 16+
     @State private var sheetConfig: SheetConfig? = nil
+    @State private var sheetSize: Binding<PresentationDetentTransformable>? = nil
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -106,9 +107,10 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func showResizableSheet<V:View>(config: SheetConfig, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showResizableSheet<V:View>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetConfig = config
+        self.sheetSize = selection
         print("showResizableSheet: \(config.selection?.wrappedValue)")
         self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
     }
