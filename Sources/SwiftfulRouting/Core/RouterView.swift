@@ -48,7 +48,8 @@ public struct RouterView<T:View>: View, Router {
             content(AnyRouter(object: self))
                 .showingScreen(
                     option: segueOption,
-                    items: $screens,
+                    screens: $screens,
+                    screenStack: screenStack,
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
@@ -196,7 +197,8 @@ extension View {
     
     func showingScreen(
         option: SegueOption,
-        items: Binding<[AnyDestination]>,
+        screens: Binding<[AnyDestination]>,
+        screenStack: [AnyDestination],
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
@@ -204,11 +206,12 @@ extension View {
             self
                 .modifier(NavigationLinkViewModifier(
                     option: option,
-                    items: items
+                    screens: screens,
+                    screenStack: screenStack
                 ))
                 .modifier(SheetViewModifier(
                     option: option,
-                    items: items,
+                    screens: screens,
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
@@ -216,7 +219,7 @@ extension View {
                 ))
                 .modifier(FullScreenCoverViewModifier(
                     option: option,
-                    items: items
+                    screens: screens
                 ))
 
     }

@@ -11,7 +11,7 @@ import SwiftUI
 struct SheetViewModifier: ViewModifier {
     
     let option: SegueOption
-    let items: Binding<[AnyDestination]>
+    let screens: Binding<[AnyDestination]>
     let sheetDetents: Set<PresentationDetentTransformable>
     @Binding var sheetSelection: PresentationDetentTransformable
     let sheetSelectionEnabled: Bool
@@ -19,8 +19,8 @@ struct SheetViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .sheet(item: Binding(if: option, is: .sheet, value: Binding(toLastElementIn: items)), onDismiss: nil) { destination in
-                if let view = items.wrappedValue.last?.destination {
+            .sheet(item: Binding(if: option, is: .sheet, value: Binding(toLastElementIn: screens)), onDismiss: nil) { destination in
+                if let view = screens.wrappedValue.last?.destination {
                     view
                         .presentationDetentsIfNeeded(
                             sheetDetents: sheetDetents,

@@ -12,12 +12,12 @@ import SwiftUI
 struct FullScreenCoverViewModifier: ViewModifier {
     
     let option: SegueOption
-    let items: Binding<[AnyDestination]>
+    let screens: Binding<[AnyDestination]>
 
     func body(content: Content) -> some View {
         content
-            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: Binding(toLastElementIn: items)), onDismiss: nil) { _ in
-                if let view = items.wrappedValue.last?.destination {
+            .fullScreenCover(item: Binding(if: option, is: .fullScreenCover, value: Binding(toLastElementIn: screens)), onDismiss: nil) { _ in
+                if let view = screens.wrappedValue.last?.destination {
                     view
                 }
             }
