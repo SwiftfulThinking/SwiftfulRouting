@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-/// Type-erased Router
+/// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
     
@@ -47,7 +47,7 @@ public struct AnyRouter: Router {
     
     /// Show any Alert or ConfirmationDialog.
     ///
-    ///  WARNING: Alert modifiers were deprecated between iOS 14 & iOS 15. iOS 14 will use buttonsiOS14, while iOS 15+ will use @ViewBuilder alert.
+    ///  WARNING: Alert modifiers were deprecated between iOS 14 & iOS 15. iOS 14 will use 'buttonsiOS14' parameter, while iOS 15+ will use '@ViewBuilder alert' parameter.
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: [Alert.Button]? = nil) where T : View {
         object.showAlert(option, title: title, subtitle: subtitle, alert: alert, buttonsiOS14: buttonsiOS14)
     }
