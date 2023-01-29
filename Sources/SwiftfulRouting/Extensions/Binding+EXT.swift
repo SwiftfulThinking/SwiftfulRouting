@@ -76,17 +76,3 @@ extension Binding {
         }
     }
 }
-
-//func bindingToLastElement<T>(in array: Binding<[T]>) -> Binding<T?> {
-//    Binding {
-//        array.wrappedValue.last
-//    } set: { newValue, _ in
-//        if array.wrappedValue.last != nil {
-//            array.wrappedValue.removeLast()
-//        }
-//    }
-//}
-
-/*
-
- */
