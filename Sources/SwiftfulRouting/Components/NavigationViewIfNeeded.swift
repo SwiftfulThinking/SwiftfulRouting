@@ -53,6 +53,10 @@ struct NavigationStackTransformable<Content:View>: View {
         NavigationStack(path: $path) {
             content
         }
+        .onAppear {
+            print("APPEAR: \(segueOption)")
+            isPushEnabled = segueOption == .push
+        }
         .onChange(of: segueOption, perform: { newValue in
             print("SEGUE CHANGE: \(newValue)")
             isPushEnabled = newValue == .push
