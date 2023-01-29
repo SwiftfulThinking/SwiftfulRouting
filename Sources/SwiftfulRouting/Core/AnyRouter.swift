@@ -46,13 +46,11 @@ public struct AnyRouter: Router {
     }
     
     /// Show any Alert or ConfirmationDialog.
-    @available(iOS 15, *)
-    public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
-        object.showAlert(option, title: title, subtitle: subtitle, alert: alert)
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: AnyAlertiOS14Buttons? = nil) where T : View {
+        object.showAlert(option, title: title, subtitle: subtitle, alert: alert, buttonsiOS14: buttonsiOS14)
     }
     
     /// Convenience method for a simple alert with title text and ok button.
-    @available(iOS 15, *)
     public func showBasicAlert(text: String, action: (() -> Void)? = nil) {
         showAlert(.alert, title: text) {
             Button("OK") {
@@ -62,7 +60,6 @@ public struct AnyRouter: Router {
     }
     
     /// Dismiss presented alert. Note: Alerts often dismiss themselves. Calling this anyway is ok.
-    @available(iOS 15, *)
     public func dismissAlert() {
         object.dismissAlert()
     }

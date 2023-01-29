@@ -144,14 +144,14 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T) {
+    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS14: AnyAlertiOS14Buttons?) {
         guard self.alert == nil else {
             dismissAlert()
             return
         }
         
         self.alertOption = option
-        self.alert = AnyAlert(title: title, subtitle: subtitle, buttons: alert())
+        self.alert = AnyAlert(title: title, subtitle: subtitle, buttons: alert(), buttonsiOS14: buttonsiOS14)
     }
     
     public func dismissAlert() {
