@@ -12,23 +12,6 @@ struct SheetViewModifier: ViewModifier {
     
     let option: SegueOption
     let items: Binding<[AnyDestination]>
-
-    func body(content: Content) -> some View {
-        content
-            .sheet(item: Binding(if: option, is: .sheet, value: bindingToLastElement(in: items)), onDismiss: nil) { destination in
-                if let view = items.wrappedValue.last?.destination {
-                    view
-                }
-            }
-    }
-    
-}
-
-@available(iOS 16, *)
-struct ResizableSheetViewModifier: ViewModifier {
-    
-    let option: SegueOption
-    let items: Binding<[AnyDestination]>
     let config: SheetConfig?
 
     func body(content: Content) -> some View {
@@ -44,9 +27,8 @@ struct ResizableSheetViewModifier: ViewModifier {
 
 extension View {
     
-    @available(iOS 16.0, *)
     @ViewBuilder func presentationDetentsConfig(config: SheetConfig?) -> some View {
-        if let config {
+        if #available(iOS 16, *), let config {
             let configuration = SheetPresentationConfiguration(config)
             if let selection = configuration.selection {
                 self

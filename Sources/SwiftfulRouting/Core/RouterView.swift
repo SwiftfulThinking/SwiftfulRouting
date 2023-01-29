@@ -22,7 +22,7 @@ public struct RouterView<T:View>: View, Router {
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
 
-    @State private var sheetConfig: SheetConfig? = .init(detents: [.medium, .large], selection: nil, showDragIndicator: true)
+    @State private var sheetConfig: SheetConfig? = nil //.init(detents: [.medium, .large], selection: nil, showDragIndicator: true)
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -170,18 +170,17 @@ extension View {
         if #available(iOS 16, *) {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(ResizableSheetViewModifier(option: option, items: items, config: config))
-//                .modifier(SheetViewModifier(option: option, items: items))
+                .modifier(SheetViewModifier(option: option, items: items, config: config))
                 .modifier(FullScreenCoverViewModifier(option: option, items: items))
         } else if #available(iOS 14, *) {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items))
+                .modifier(SheetViewModifier(option: option, items: items, config: nil))
                 .modifier(FullScreenCoverViewModifier(option: option, items: items))
         } else {
             self
                 .modifier(NavigationLinkViewModifier(option: option, items: items))
-                .modifier(SheetViewModifier(option: option, items: items))
+                .modifier(SheetViewModifier(option: option, items: items, config: nil))
         }
     }
 
