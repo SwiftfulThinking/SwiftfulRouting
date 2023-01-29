@@ -13,6 +13,7 @@ public struct ModalConfiguration {
     let animation: Animation
     let alignment: Alignment
     let backgroundColor: Color?
+    let backgroundEffect: BackgroundEffect?
     let useDeviceBounds: Bool
     
     static let `default` = ModalConfiguration(
@@ -20,5 +21,16 @@ public struct ModalConfiguration {
         animation: .easeInOut,
         alignment: .bottom,
         backgroundColor: nil,
+        backgroundEffect: nil,
         useDeviceBounds: true)
+}
+
+public struct BackgroundEffect {
+    let effect: UIVisualEffect
+    let opacity: CGFloat
+    
+    public init(effect: UIVisualEffect, opacity: CGFloat) {
+        self.effect = effect
+        self.opacity = opacity
+    }
 }

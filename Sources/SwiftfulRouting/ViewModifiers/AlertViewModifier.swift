@@ -8,19 +8,25 @@
 import Foundation
 import SwiftUI
 
-@available (iOS 15, *)
 struct AlertViewModifier: ViewModifier {
     
     let item: Binding<AnyAlert?>
 
     func body(content: Content) -> some View {
-        content
-            .alert(item.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: item)) {
-                item.wrappedValue?.buttons
-            } message: {
-                if let subtitle = item.wrappedValue?.subtitle {
-                    Text(subtitle)
+        if #available(iOS 15.0, *) {
+            content
+                .alert(item.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: item)) {
+                    item.wrappedValue?.buttons
+                } message: {
+                    if let subtitle = item.wrappedValue?.subtitle {
+                        Text(subtitle)
+                    }
                 }
-            }
+        } else {
+            content
+                .alert(isPresented: Binding(ifNotNil: item)) {
+                    item.wrappedValue?.alert ?? Alert(title: Text("Error"))
+                }
+        }
     }
 }

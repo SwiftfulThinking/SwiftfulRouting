@@ -18,8 +18,10 @@ struct ModalViewModifier: ViewModifier {
             .overlay(
                 ZStack {
                     if let view = item.wrappedValue?.destination {
+                        
                         if let backgroundColor = configuration.backgroundColor {
                             backgroundColor
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.all)
                                 .transition(AnyTransition.opacity.animation(configuration.animation))
                                 .onTapGesture {
@@ -27,12 +29,24 @@ struct ModalViewModifier: ViewModifier {
                                 }
                                 .zIndex(1)
                         }
+                        
+                        if let backgroundEffect = configuration.backgroundEffect {
+                            VisualEffectViewRepresentable(effect: backgroundEffect.effect)
+                                .opacity(backgroundEffect.opacity)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.all)
+                                .transition(AnyTransition.opacity.animation(configuration.animation))
+                                .onTapGesture {
+                                    item.wrappedValue = nil
+                                }
+                                .zIndex(2)
+                        }
 
                         view
                             .frame(configuration: configuration)
                             .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
                             .transition(configuration.transition)
-                            .zIndex(2)
+                            .zIndex(3)
                     }
                 }
                 .zIndex(999)
@@ -52,3 +66,5 @@ extension View {
     }
     
 }
+
+

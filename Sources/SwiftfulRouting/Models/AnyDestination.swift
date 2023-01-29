@@ -8,11 +8,21 @@
 import Foundation
 import SwiftUI
 
-struct AnyDestination: Identifiable {
-    let id = UUID().uuidString
-    let destination: AnyView
+public struct AnyDestination: Identifiable, Hashable {
+    public let id = UUID().uuidString
+    public let destination: AnyView
 
-    init<T:View>(_ destination: T) {
+    public init<T:View>(_ destination: T) {
         self.destination = AnyView(destination)
     }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    public static func == (lhs: AnyDestination, rhs: AnyDestination) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    
 }
