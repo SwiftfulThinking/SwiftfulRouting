@@ -19,6 +19,9 @@ struct NavigationLinkViewModifier: ViewModifier {
                 .navigationDestination(for: AnyDestination.self) { value in
                     value.destination
                 }
+                .onAppear {
+                    print("ADDING ANOTHER NAVDEST")
+                }
         } else {
             content
                 .background(
