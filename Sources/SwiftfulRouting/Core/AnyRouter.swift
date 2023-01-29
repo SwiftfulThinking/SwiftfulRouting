@@ -48,7 +48,7 @@ public struct AnyRouter: Router {
     
     /// Convenience method for a simple alert with title text and ok button.
     @available(iOS 15, *)
-    public func showBasicAlert(text: String, action: (() -> Void)?) {
+    public func showBasicAlert(text: String, action: (() -> Void)? = nil) {
         showAlert(.alert, title: text) {
             Button("OK") {
                 action?()
