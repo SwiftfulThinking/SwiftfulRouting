@@ -12,7 +12,7 @@ SwiftUI is a declarative framework, and therefore, a SwiftUI router should be de
 
 ## Under the hood
 
-As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. The framework can support 1 Segue, 1 Alert, and 1 Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View.
+As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. The framework can support 1 active Segue, 1 active Alert, and 1 active Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View.
 
 ## Setup ☕️
 
@@ -82,11 +82,36 @@ struct MyView: View {
 
 ## Usage 🦾
 
-The returned router is a type-erased `Router`, named `AnyRouter`. Refer to `AnyRouter.swift` to see all accessible methods. 
+The returned router is a type-erased `Router`, named `AnyRouter`. Refer to `AnyRouter.swift` to see all accessible methods.
+
+## RouterView 🏠
+
+Use RouterView to enter the framework's view heirarchy and use the returned `router: AnyRouter` to perform navigation.
+
+```swift
+RouterView { router in
+   MyView(router: router)
+}
+```
+
+Be default, your view will be wrapped in with navigation heirarchy (iOS 16+ uses a NavigationStack, iOS15 and below uses NavigationView). 
+- If your view is already within a navigation heirarchy, set `addNavigationView` to `FALSE`. 
+- If your view is within a NavigationStack, use `screens` to bind to the existing stack path.
+- The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
+
+```swift
+RouterView(addNavigationView: false, screens: $existingStack) { router in
+   MyView(router: router)
+        .navigationBarHidden(true)
+        .toolbar {
+        }
+}
+```
 
 ## Segues ⏩
 
-Router supports native SwiftUI segues, including .push (NavigationLink), .sheet, and .fullScreenCover.
+Router supports native SwiftUI segues, including .push (NavigationLink), .sheet, and .fullScreenCover. 
+- You may use `router.dismissScreen()`, `@Environment(\.presentationMode) var presentationMode` or `@Environment(\.dismiss) var dismiss` to dismiss the screen.
 
 ```swift
 router.showScreen(.push, destination: (AnyRouter) -> View)
@@ -94,7 +119,7 @@ router.showScreen(.sheet, destination: (AnyRouter) -> View)
 router.showScreen(.fullScreenCover, destination: (AnyRouter) -> View)
 router.dismissScreen()
 ```
-iOS 16 also supports NavigationStack and resizable Sheets.
+iOS 16 also supports NavigationStack and resizable Sheets. Note that `popToRoot` purposely dismisses all views pushed onto the NavigationStack, but does not dismiss `.sheet` or `.fullScreenCover`.
 
 ```swift
 router.pushScreens(destinations: [(AnyRouter) -> any View]
@@ -104,7 +129,7 @@ router.showResizableSheeet(sheetDetents: Detent, selection: Binding<Detent>, sho
 
 ## Alerts 🚨
 
-Router supports native SwiftUI alerts, including .alert and .confirmationDialog.
+Router supports native SwiftUI alerts, including `.alert` and `.confirmationDialog`.
 
 ```swift
 router.showAlert(.alert, title: String, alert: () -> View)
