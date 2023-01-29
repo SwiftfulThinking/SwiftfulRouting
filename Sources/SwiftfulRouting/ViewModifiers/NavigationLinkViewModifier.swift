@@ -24,6 +24,9 @@ struct NavigationLinkViewModifier: ViewModifier {
                 .navigationDestination(for: AnyDestination.self) { value in
                     value.destination
                 }
+                .onAppear {
+                    print("DID APPEAR!!!!")
+                }
             } else {
                 content
             }
