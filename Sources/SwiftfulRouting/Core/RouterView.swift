@@ -7,81 +7,6 @@
 
 import SwiftUI
 
-public protocol Router {
-    func showScreen<V:View>(
-        _ option: SegueOption,
-        @ViewBuilder destination: @escaping (AnyRouter) -> V)
-    func dismissScreen()
-
-    @available(iOS 16, *)
-    func pushStack(destinations: [(AnyRouter) -> any View])
-
-    @available(iOS 16, *)
-    func popToRoot()
-    
-    func showAlert<V:View>(
-        _ option: AlertOption,
-        title: String,
-        subtitle: String?,
-        @ViewBuilder alert: @escaping () -> V)
-    
-    func dismissAlert()
-    
-    func showModal<V:View>(
-        transition: AnyTransition,
-        animation: Animation,
-        alignment: Alignment,
-        backgroundColor: Color?,
-        useDeviceBounds: Bool,
-        @ViewBuilder destination: @escaping () -> V)
-    
-    func dismissModal()
-}
-
-public struct AnyRouter: Router {
-    let object: any Router
-    
-    public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreen(option, destination: destination)
-    }
-    
-    public func dismissScreen() {
-        object.dismissScreen()
-    }
-
-    @available(iOS 16, *)
-    public func pushStack(destinations: [(AnyRouter) -> any View]) {
-        object.pushStack(destinations: destinations)
-    }
-    
-    @available(iOS 16, *)
-    public func popToRoot() {
-        object.popToRoot()
-    }
-    
-    public func showAlert<T>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
-        object.showAlert(option, title: title, subtitle: subtitle, alert: alert)
-    }
-    
-    public func dismissAlert() {
-        object.dismissAlert()
-    }
-    
-    public func showModal<T>(
-        transition: AnyTransition = .move(edge: .bottom),
-        animation: Animation = .easeInOut,
-        alignment: Alignment = .center,
-        backgroundColor: Color? = nil,
-        useDeviceBounds: Bool = true,
-        @ViewBuilder destination: @escaping () -> T) where T : View {
-        object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds, destination: destination)
-    }
-    
-    public func dismissModal() {
-        object.dismissModal()
-    }
-}
-
 /// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
 public struct RouterView<T:View>: View, Router {
     
@@ -111,7 +36,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public var body: some View {
-        OptionalNavigationView(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             content(AnyRouter(object: self))
                 .showingScreen(option: segueOption, items: $screens)
         }
@@ -122,25 +47,30 @@ public struct RouterView<T:View>: View, Router {
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = option
 
-        // Push maintains the current Navigation heirarchy
-        // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
-
         if option != .push {
-            // Add Navigation, reset view stack
+            // Add new Navigation
+            // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
+            
             self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
         } else {
             // Using existing Navigation
+            // Push continues in the existing Environment and uses the existing Navigation
             
-            // iOS 16+ uses NavigationStack and can push additional views to an existing heirarchy
+            
+            // iOS 16 uses NavigationStack and can push additional views onto an existing view stack
             if #available(iOS 16, *) {
-                // If screenStack isEmpty, then we are in the root RouterView and should use $screens
-                // If screenStack is not empty, then stack has been passed from a previous RouterView and we shoudl append to the stack
                 if screenStack.isEmpty {
+                    // We are in the root Router and should start building on $screens
                     self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
                 } else {
+                    // We are not in the root Router and should continue off of $screenStack
                     self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
                 }
+                return
+                
+            // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
+                // Push a new screen and don't pass view stack to child view (screens == nil)
                 self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination)))
             }
         }
@@ -148,11 +78,17 @@ public struct RouterView<T:View>: View, Router {
     
     @available(iOS 16, *)
     public func pushStack(destinations: [(AnyRouter) -> any View]) {
+        // iOS 16 supports NavigationStack, which can push a stack of views and increment an existing view stack
         self.segueOption = .push
         
+        // Loop on injected destinations and add them to localStack
+        // If screenStack.isEmpty, we are in the root Router and should start building on $screens
+        // Else, we are not in the root Router and should continue off of $screenStack
+
         var localStack: [AnyDestination] = []
-        for destination in destinations {
-            let bindingStack = screenStack.isEmpty ? $screens : $screenStack
+        let bindingStack = screenStack.isEmpty ? $screens : $screenStack
+
+        destinations.forEach { destination in
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, content: { router in
                 AnyView(destination(router))
             }))
@@ -211,42 +147,16 @@ public struct RouterView<T:View>: View, Router {
     }
 }
 
-struct OptionalNavigationView<Content:View>: View {
-    
-    let addNavigationView: Bool
-    let segueOption: SegueOption
-    @Binding var screens: [AnyDestination]
-    @ViewBuilder var content: Content
-    
-    @ViewBuilder var body: some View {
-        if addNavigationView {
-            if #available(iOS 16.0, *) {
-                let path = Binding(if: segueOption, is: .push, value: $screens)
-                
-                NavigationStack(path: path) {
-                    content
-                }
-            } else {
-                NavigationView {
-                    content
-                }
-            }
-        } else {
-            content
-        }
-    }
-}
-
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
-//        RouterView(addNavigationView: true) { router in
+        RouterView { router in
             Text("Hi")
                 .onTapGesture {
-//                    router.showScreen(.push) { router in
-//                        Text("Hello, world")
-//                    }
+                    router.showScreen(.push) { router in
+                        Text("Hello, world")
+                    }
                 }
-//        }
+        }
     }
 }
 
