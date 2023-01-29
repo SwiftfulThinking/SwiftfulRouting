@@ -33,7 +33,7 @@ public struct AnyRouter: Router {
     }
     
     @available(iOS 16, *)
-    public func showResizableSheet<V>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>, destination: @escaping (AnyRouter) -> V) where V : View {
+    public func showResizableSheet<V>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>?, destination: @escaping (AnyRouter) -> V) where V : View {
         object.showResizableSheet(config: config, selection: selection, destination: destination)
     }
     

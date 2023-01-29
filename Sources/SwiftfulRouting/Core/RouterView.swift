@@ -107,7 +107,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func showResizableSheet<V:View>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showResizableSheet<V:View>(config: SheetConfig, selection: Binding<PresentationDetentTransformable>?, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetConfig = config
         self.sheetSize = selection
