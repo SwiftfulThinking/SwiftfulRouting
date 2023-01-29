@@ -30,6 +30,17 @@ extension Binding where Value == AnyDestination? {
     }
 }
 
+extension Binding where Value == AnyAlert? {
+    
+    init(if selected: AlertOption, is option: AlertOption, value: Binding<AnyAlert?>) {
+        self.init {
+            selected == option ? value.wrappedValue : nil
+        } set: { newValue in
+            value.wrappedValue = newValue
+        }
+    }
+}
+
 extension Binding where Value == Array<AnyDestination> {
     
     init(if selected: SegueOption, is option: SegueOption, value: Binding<[AnyDestination]>) {
