@@ -42,6 +42,19 @@ extension Binding where Value == Array<AnyDestination> {
     
 }
 
+@available(iOS 16, *)
+extension Binding where Value == PresentationDetent {
+    
+    init(selection: Binding<PresentationDetentTransformable>) {
+        self.init {
+            selection.wrappedValue.asPresentationDetent
+        } set: { newValue in
+            selection.wrappedValue = PresentationDetentTransformable(detent: newValue)
+        }
+    }
+    
+}
+
 func bindingToLastElement<T>(in array: Binding<[T]>) -> Binding<T?> {
     Binding {
         array.wrappedValue.last
@@ -51,3 +64,7 @@ func bindingToLastElement<T>(in array: Binding<[T]>) -> Binding<T?> {
         }
     }
 }
+
+/*
+
+ */

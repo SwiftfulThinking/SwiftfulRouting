@@ -42,11 +42,7 @@ extension View {
             if #available(iOS 16, *) {
                 if sheetSelectionEnabled {
                     self
-                        .presentationDetents(sheetDetents.setMap({ $0.asPresentationDetent }), selection: Binding(get: {
-                            sheetSelection.wrappedValue.asPresentationDetent
-                        }, set: { newValue, _ in
-                            sheetSelection.wrappedValue = PresentationDetentTransformable(detent: newValue)
-                        }))
+                        .presentationDetents(sheetDetents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: sheetSelection))
                         .presentationDragIndicator(showDragIndicator ? .visible : .hidden)
                 } else {
                     self
