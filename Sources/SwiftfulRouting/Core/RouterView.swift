@@ -57,7 +57,8 @@ public struct RouterView<T:View>: View, Router {
         if option != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
-            
+            self.sheetDetents = [.large]
+            self.sheetSize = .constant(.large)
             self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
         } else {
             // Using existing Navigation

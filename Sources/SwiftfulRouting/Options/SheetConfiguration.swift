@@ -8,55 +8,36 @@
 import Foundation
 import SwiftUI
 
-@available(iOS 16.0, *)
-struct SheetConfiguration {
-    let detents: Set<PresentationDetent>
-    let selection: Binding<PresentationDetent>
-    let showDragIndicator: Visibility
-    
-    init(_ config: SheetConfig) {
-        print("SheetConfiguration init")
-        self.detents = config.detents.setMap({ $0.asPresentationDetent })
-        self.showDragIndicator = config.showDragIndicator ? .visible : .hidden
-
-        self.selection = Binding(get: {
-            config.selection.wrappedValue.asPresentationDetent
-        }, set: { newValue, _ in
-            config.selection.wrappedValue = PresentationDetentTransformable(detent: newValue)
-        })
-//        if let detent = config.selection?.wrappedValue.asPresentationDetent {
-//            self.selection = Binding(get: {
-//                return detent
-//            }, set: { newValue, _ in
-//                config.selection?.wrappedValue = PresentationDetentTransformable(detent: newValue)
-//            })
-//        } else {
-//            self.selection = nil
-//        }
-    }
-}
+//@available(iOS 16.0, *)
+//struct SheetConfiguration {
+//    let detents: Set<PresentationDetent>
+//    let selection: Binding<PresentationDetent>
+//    let showDragIndicator: Visibility
+//    
+//    init(_ config: SheetConfig) {
+//        self.detents = config.detents.setMap({ $0.asPresentationDetent })
+//        self.showDragIndicator = config.showDragIndicator ? .visible : .hidden
+//
+//        self.selection = Binding(get: {
+//            config.selection.wrappedValue.asPresentationDetent
+//        }, set: { newValue, _ in
+//            config.selection.wrappedValue = PresentationDetentTransformable(detent: newValue)
+//        })
+//    }
+//}
 
 /// Allows PresentationDetents to be injected without requiring iOS 16
-public struct SheetConfig {
-    let detents: Set<PresentationDetentTransformable>
-    let selection: Binding<PresentationDetentTransformable>
-    let showDragIndicator: Bool
-    
-    public init(detents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool) {
-        self.detents = detents
-        self.selection = selection ?? .constant(.large)
-        self.showDragIndicator = showDragIndicator
-        print("SHEET CONFIG STRUCT CREATED: \(selection?.wrappedValue)")
-    }
-    
-//    public mutating func select(_ detent: PresentationDetentTransformable?) {
-//        guard let detent else {
-//            selection = nil
-//            return
-//        }
-//        selection?.wrappedValue = detent
+//public struct SheetConfig {
+//    let detents: Set<PresentationDetentTransformable>
+//    let selection: Binding<PresentationDetentTransformable>
+//    let showDragIndicator: Bool
+//
+//    public init(detents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool) {
+//        self.detents = detents
+//        self.selection = selection ?? .constant(.large)
+//        self.showDragIndicator = showDragIndicator
 //    }
-}
+//}
 
 public enum PresentationDetentTransformable: Hashable {
     case medium
