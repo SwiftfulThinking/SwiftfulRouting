@@ -1,14 +1,18 @@
-# SwiftfulRouting  🕊
+# SwiftfulRouting  🤙
 
-Native, declarative routing for SwiftUI applications
+A native, declarative framework for programattic navigation (routing) in SwiftUI applications, fully decoupled from the View.
 
 **Setup time:** 1 minute
 
 **Sample project:** https://github.com/SwiftfulThinking/SwiftfulRoutingExample
 
-## Overview 🤓
+## Overview
 
-SwiftUI is a declarative framework, and therefore, a SwiftUI router should be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution is to declare all modifiers to support the routing in advance by adding a new set of modifiers at the root of each segue's destination where the destination is an optional, type-erased view. This maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution.
+SwiftUI is a declarative framework, and therefore, a SwiftUI router should be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution is to declare all modifiers to support the routing in advance. 
+
+## Under the hood
+
+As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. The framework can support 1 Segue, 1 Alert, and 1 Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View.
 
 ## Setup ☕️
 
@@ -24,32 +28,32 @@ Import the package
 import SwiftfulRouting
 ```
 
-Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a NavigationView and add modifiers to support all potential segues. If you're already inside a NavigationView, use `SubRouterView` instead.
+Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a Navigation heirarchy and add modifiers to support all potential segues. Use the returned `router` to perform navigation.
 
 ```swift
 struct ContentView: View {
     var body: some View {
-        RouterView {
-            MyView()
+        RouterView { router in
+            MyView(router: router)
         }
     }
 }
 ```
 
-The `Router` will be available as an `EnvironmentObject` of all child views of `RouterView`. Each `Router` object can simultaneously support one active segue, one active alert, and one active modal. A new Router is created and added to the Environment after each segue.
+Each `Router` object can simultaneously support 1 active Segue, 1 active Alert, and 1 active Modal. A new Router is created and added to the view heirarchy after each Segue.
 
 
 ```swift
 struct MyView: View {
 
-    @EnvironmentObject private var router: Router
+    let router: AnyRouter
     
     var body: some View {
         VStack {
             Text("Segue")
                 .onTapGesture {
-                    router.showScreen(.push) {
-                        ThirdView()
+                    router.showScreen(.push) { router in
+                        ThirdView(router: router)
                     }
                 }
             
@@ -76,15 +80,26 @@ struct MyView: View {
 }
 ```
 
+## Usage 🦾
+
+The returned router is a type-erased `Router`, named `AnyRouter`. Refer to `AnyRouter.swift` to see all accessible methods. 
+
 ## Segues ⏩
 
 Router supports native SwiftUI segues, including .push (NavigationLink), .sheet, and .fullScreenCover.
 
 ```swift
-router.showScreen(.push, destination: () -> View)
-router.showScreen(.sheet, destination: () -> View)
-router.showScreen(.fullScreenCover, destination: () -> View)
+router.showScreen(.push, destination: (AnyRouter) -> View)
+router.showScreen(.sheet, destination: (AnyRouter) -> View)
+router.showScreen(.fullScreenCover, destination: (AnyRouter) -> View)
 router.dismissScreen()
+```
+iOS 16 also supports NavigationStack and resizable Sheets.
+
+```swift
+router.pushScreens(destinations: [(AnyRouter) -> any View]
+router.popToRoot()
+router.showResizableSheeet(sheetDetents: Detent, selection: Binding<Detent>, showDragIndicator: Bool, destination: (AnyRouter) -> View)
 ```
 
 ## Alerts 🚨
@@ -97,9 +112,15 @@ router.showAlert(.confirmationDialog, title: String, alert: () -> View)
 router.dismissAlert()
 ```
 
+Additional convenience methods:
+
+```swift
+router.showBasicAlert(text: String, action: (() -> Void)?)
+```
+
 ## Modals 🪧
 
-Router also supports any modal transition, which displays above the current content.
+Router also supports any modal transition, which displays above the current content. Customize transition, animation, background color/blur, etc.
 
 ```swift
 router.showModal(destination: () -> View)
@@ -107,8 +128,15 @@ router.showModal(
   transition: AnyTransition, 
   animation: Animation, 
   alignment: Alignment, 
-  backgroundColor: Color?, 
+  backgroundColor: Color?,
+  backgroundEffect: BackgroundEffect?,
   useDeviceBounds: Bool, 
   destination: () -> View)
 router.dismissModal()
+```
+
+Additional convenience methods:
+
+```swift
+router.showBasicModal(destination: () -> View)
 ```
