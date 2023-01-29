@@ -24,7 +24,7 @@ public struct RouterView<T:View>: View, Router {
 
     // Configuration for resizable sheet on iOS 16+
     @State private var sheetConfig: SheetConfig = .init(detents: [.large], selection: .constant(.large), showDragIndicator: true)
-    @State private var sheetSize: Binding<PresentationDetentTransformable>? = nil
+    @State private var sheetSize: Binding<PresentationDetentTransformable> = .constant(.large)
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -43,7 +43,7 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             content(AnyRouter(object: self))
-                .showingScreen(option: segueOption, items: $screens, config: sheetConfig, sheetSize: sheetSize ?? .constant(.large))
+                .showingScreen(option: segueOption, items: $screens, config: sheetConfig, sheetSize: sheetSize)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
