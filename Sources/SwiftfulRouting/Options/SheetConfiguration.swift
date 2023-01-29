@@ -75,7 +75,7 @@ public enum PresentationDetentTransformable: Hashable {
         }
     }
     
-    var title: String {
+    public var title: String {
         switch self {
         case .medium:
             return "Medium"
