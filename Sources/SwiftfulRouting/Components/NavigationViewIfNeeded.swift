@@ -18,9 +18,6 @@ struct NavigationViewIfNeeded<Content:View>: View {
     @ViewBuilder var body: some View {
         if addNavigationView {
             if #available(iOS 16.0, *) {
-//                NavigationStack(path: Binding(if: segueOption, is: .push, value: $screens)) {
-//                    content
-//                }
                 NavigationStackTransformable(segueOption: segueOption, screens: $screens) {
                     content
                 }
@@ -54,88 +51,16 @@ struct NavigationStackTransformable<Content:View>: View {
             content
         }
         .onAppear {
-            print("APPEAR: \(segueOption)")
             isPushEnabled = segueOption == .push
         }
         .onChange(of: segueOption, perform: { newValue in
-            print("SEGUE CHANGE: \(newValue)")
             isPushEnabled = newValue == .push
         })
         .onChange(of: screens) { newValue in
-            print("NEW VALUE and \(segueOption)")
             if isPushEnabled {
                 path = .init(newValue)
             }
         }
     }
     
-    
 }
-
-
-//@available(iOS 16.0, *)
-//struct CealUIApp: View {
-//    @State private var path: NavigationPath = .init()
-//    var body: some View {
-//        NavigationStack(path: $path){
-//            OnBoardingView(path: $path)
-//                .navigationDestination(for: ViewOptions.self) { option in
-//                    option.view($path)
-//                }
-//        }
-//    }
-//    //Create an `enum` so you can define your options
-//    enum ViewOptions{
-//        case userTypeView
-//        case register
-//        //Assign each case with a `View`
-//        @ViewBuilder func view(_ path: Binding<NavigationPath>) -> some View{
-//            switch self{
-//            case .userTypeView:
-//                UserTypeView(path: path)
-//            case .register:
-//                RegisterView()
-//            }
-//        }
-//    }
-//}
-//@available(iOS 16.0, *)
-//struct OnBoardingView: View {
-//    @Binding var path: NavigationPath
-//    var body: some View {
-//        Button {
-//            //Append to the path the enum value
-//
-//            path.append(CealUIApp.ViewOptions.userTypeView)
-//        } label: {
-//            Text("Hello")
-//        }
-//
-//    }
-//}
-//@available(iOS 16.0, *)
-//struct UserTypeView: View {
-//    @Binding var path: NavigationPath
-//    var body: some View {
-//        Button {
-//            //Append to the path the enum value
-//            path.append(CealUIApp.ViewOptions.register)
-//        } label: {
-//            Text("Hello")
-//        }
-//
-//    }
-//}
-//@available(iOS 16.0, *)
-//struct RegisterView: View {
-//    var body: some View {
-//        Text("Register")
-//
-//    }
-//}
-//@available(iOS 16.0, *)
-//struct CealUIApp_Previews: PreviewProvider {
-//    static var previews: some View {
-//        CealUIApp()
-//    }
-//}
