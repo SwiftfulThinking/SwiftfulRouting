@@ -136,6 +136,10 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
+        
+        if !screenStack.isEmpty {
+            screenStack.removeLast()
+        }
     }
     
     @available(iOS 16, *)
