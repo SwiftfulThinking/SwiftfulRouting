@@ -155,7 +155,7 @@ public struct RouterView<T:View>: View, Router {
         // which then leads to the next push appearing on top of existing (incorrect) stack
         // Note: this is called onDismiss (which happens going forward AND backward, but we only want to removeLast if going backward - in which scenario screenStack.count <= screenStackIndex
         
-        let didGoBackward = screens.count <= screenStackIndex
+        let didGoBackward = screenStack.count <= screenStackIndex
         if didGoBackward && !screenStack.isEmpty {
             screenStack.removeLast()
         }
