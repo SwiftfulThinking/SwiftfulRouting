@@ -18,6 +18,7 @@ public struct RouterView<T:View>: View, Router {
     // Segues
     @State private var segueOption: SegueOption = .push
     @State private var screens: [AnyDestination] = []
+    @State private var screenStackIndex: Int
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -40,6 +41,7 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
+        self._screenStackIndex = State(initialValue: screens?.wrappedValue.count ?? 0)
         self.content = content
     }
     
@@ -151,8 +153,10 @@ public struct RouterView<T:View>: View, Router {
         // iOS 16 supports screenStack, however,
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
-        // Note: this is called onDismiss (which happens going forward AND backward, but we only want to removeLast if going backward - in which scenario screens.isEmpty
-        if screens.isEmpty && !screenStack.isEmpty {
+        // Note: this is called onDismiss (which happens going forward AND backward, but we only want to removeLast if going backward - in which scenario screenStack.count <= screenStackIndex
+        
+        let didGoBackward = screens.count <= screenStackIndex
+        if didGoBackward && !screenStack.isEmpty {
             screenStack.removeLast()
         }
     }
