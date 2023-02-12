@@ -56,9 +56,12 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
-                .onDisappear {
-                    dropLastScreenFromStackForiOS16()
-                }
+                .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: { isPresented in
+                    print("NEW VALUE::: \(isPresented)")
+                    if !isPresented {
+                        dropLastScreenFromStackForiOS16IfNeeded()
+                    }
+                })
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -149,14 +152,13 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    private func dropLastScreenFromStackForiOS16() {
+    private func dropLastScreenFromStackForiOS16IfNeeded() {
         // iOS 16 supports screenStack, however,
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
         // Note: this is called onDismiss (which happens going forward AND backward, but we only want to removeLast if going backward - in which scenario screenStack.count <= screenStackIndex
         
-        let didGoBackward = screenStack.count <= screenStackIndex
-        if didGoBackward && !screenStack.isEmpty {
+        if !screenStack.isEmpty {
             screenStack.removeLast()
         }
     }
@@ -265,5 +267,14 @@ extension View {
     
     func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
         modifier(ModalViewModifier(configuration: configuration, item: item))
+    }
+    
+    @ViewBuilder func onChangeIfiOS15<E:Equatable>(of value: E, perform: @escaping (E) -> Void) -> some View {
+        if #available(iOS 15, *) {
+            self
+                .onChange(of: value, perform: perform)
+        } else {
+            self
+        }
     }
 }
