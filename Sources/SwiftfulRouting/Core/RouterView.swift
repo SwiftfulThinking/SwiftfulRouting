@@ -56,12 +56,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
-                .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: { isPresented in
-                    print("NEW VALUE::: \(isPresented)")
-                    if !isPresented {
-                        dropLastScreenFromStackForiOS16IfNeeded()
-                    }
-                })
+                .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: dropLastScreenFromStackForiOS16IfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -152,13 +147,14 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    private func dropLastScreenFromStackForiOS16IfNeeded() {
+    private func dropLastScreenFromStackForiOS16IfNeeded(isPresented: Bool) {
         // iOS 16 supports screenStack, however,
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
-        // Note: this is called onDismiss (which happens going forward AND backward, but we only want to removeLast if going backward - in which scenario screenStack.count <= screenStackIndex
         
-        if !screenStack.isEmpty {
+        // This is called when isPresented changes, and should only dismiss if isPresented = false
+        
+        if !isPresented && !screenStack.isEmpty {
             screenStack.removeLast()
         }
     }
