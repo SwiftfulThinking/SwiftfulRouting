@@ -18,6 +18,7 @@ public struct RouterView<T:View>: View, Router {
     // Segues
     @State private var segueOption: SegueOption = .push
     @State private var screens: [AnyDestination] = []
+    @State private var screenStackIndex: Int
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -40,6 +41,7 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
+        self._screenStackIndex = State(initialValue: screens?.wrappedValue.count ?? 0)
         self.content = content
     }
     
@@ -54,9 +56,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
-                .onDisappear {
-                    dropLastScreenFromStackForiOS16()
-                }
+                .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: dropLastScreenFromStackForiOS16IfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -147,11 +147,14 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    private func dropLastScreenFromStackForiOS16() {
+    private func dropLastScreenFromStackForiOS16IfNeeded(isPresented: Bool) {
         // iOS 16 supports screenStack, however,
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
-        if !screenStack.isEmpty {
+        
+        // This is called when isPresented changes, and should only dismiss if isPresented = false
+        
+        if !isPresented && !screenStack.isEmpty {
             screenStack.removeLast()
         }
     }
@@ -260,5 +263,14 @@ extension View {
     
     func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
         modifier(ModalViewModifier(configuration: configuration, item: item))
+    }
+    
+    @ViewBuilder func onChangeIfiOS15<E:Equatable>(of value: E, perform: @escaping (E) -> Void) -> some View {
+        if #available(iOS 15, *) {
+            self
+                .onChange(of: value, perform: perform)
+        } else {
+            self
+        }
     }
 }
