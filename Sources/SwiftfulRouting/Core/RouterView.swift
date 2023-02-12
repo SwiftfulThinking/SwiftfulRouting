@@ -151,7 +151,8 @@ public struct RouterView<T:View>: View, Router {
         // iOS 16 supports screenStack, however,
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
-        if !screenStack.isEmpty {
+        // Note: this is called onDismiss (which happens going forward AND backward, but we only want to removeLast if going backward - in which scenario screens.isEmpty
+        if screens.isEmpty && !screenStack.isEmpty {
             screenStack.removeLast()
         }
     }
