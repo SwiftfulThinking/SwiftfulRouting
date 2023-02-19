@@ -17,8 +17,7 @@ public struct RouterView<T:View>: View, Router {
  
     // Segues
     @State private var segueOption: SegueOption = .push
-    @State private var screens: [AnyDestination] = []
-    @State private var screenStackIndex: Int
+    @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -41,7 +40,6 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
-        self._screenStackIndex = State(initialValue: screens?.wrappedValue.count ?? 0)
         self.content = content
     }
     

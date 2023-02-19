@@ -16,6 +16,10 @@ public struct AnyRouter: Router {
         self.object = object
     }
     
+    public var screens: [AnyDestination] {
+        object.screens
+    }
+    
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
         object.showScreen(option, destination: destination)
