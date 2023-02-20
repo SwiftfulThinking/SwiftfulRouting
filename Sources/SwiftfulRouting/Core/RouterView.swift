@@ -83,7 +83,10 @@ public struct RouterView<T:View>: View, Router {
         .showingModal(configuration: modalConfiguration, item: $modal)
         .onFirstAppear {
             print("set stack count: \(screens.count)")
-            screenStackCount = screens.count
+            Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                screenStackCount = screens.count
+            }
         }
     }
     
