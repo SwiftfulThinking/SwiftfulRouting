@@ -62,7 +62,6 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
-        print("didset :\((screens?.wrappedValue.count ?? 0))")
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.content = content
     }
@@ -79,23 +78,16 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
                 .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: dropLastScreenFromStackForiOS16IfNeeded)
-                .onFirstAppear {
-//                    print("first appear")
-//                    Task {
-//                        try? await Task.sleep(nanoseconds: 3_000_000_000)
-//                        print("set stack count: \(screens.count)")
-//                    }
-                }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
-        .onChangeIfiOS15(of: screens.count, perform: { newValue in
-            print("OLD: \(screenStackCount), NEW: \(newValue)")
-            if newValue > 0 && screenStackCount == 0 {
-                screenStackCount = newValue
-                print("set stack count: \(screens.count)")
-            }
-        })
+//        .onChangeIfiOS15(of: screens.count, perform: { newValue in
+//            print("OLD: \(screenStackCount), NEW: \(newValue)")
+//            if newValue > 0 && screenStackCount == 0 {
+//                screenStackCount = newValue
+//                print("set stack count: \(screens.count)")
+//            }
+//        })
     }
     
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
@@ -116,17 +108,14 @@ public struct RouterView<T:View>: View, Router {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    print("append a")
                     self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
                 } else {
-                    print("append b")
                     // We are not in the root Router and should continue off of $screenStack
                     self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
-                print("append c")
                 // Push a new screen and don't pass view stack to child view (screens == nil)
                 self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination)))
             }
@@ -192,11 +181,8 @@ public struct RouterView<T:View>: View, Router {
         // which then leads to the next push appearing on top of existing (incorrect) stack
         
         // This is called when isPresented changes, and should only removeLast if isPresented = false
-        // This is 
         
-        print("ssc: \(screenStack.count) :: \(screenStackCount)")
         if !isPresented && screenStack.count == (screenStackCount + 1) {
-            print("remove a :: \(screenStack.first?.id ?? "n/a")")
             screenStack.removeLast()
         }
     }
