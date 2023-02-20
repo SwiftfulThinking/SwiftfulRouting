@@ -82,11 +82,11 @@ public struct RouterView<T:View>: View, Router {
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
         .onFirstAppear {
-//            Task {
-//                try? await Task.sleep(nanoseconds: 3_000_000_000)
+            Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
                 screenStackCount = screenStack.count
                 print("set stack count: \(screens.count)")
-//            }
+            }
         }
     }
     
