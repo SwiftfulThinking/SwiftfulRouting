@@ -63,6 +63,7 @@ public struct RouterView<T:View>: View, Router {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         print("didset :\((screens?.wrappedValue.count ?? 0))")
+        self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.content = content
     }
     
@@ -82,7 +83,6 @@ public struct RouterView<T:View>: View, Router {
                     print("first appear")
                     Task {
                         try? await Task.sleep(nanoseconds: 3_000_000_000)
-                        screenStackCount = screenStack.count
                         print("set stack count: \(screens.count)")
                     }
                 }
@@ -188,7 +188,7 @@ public struct RouterView<T:View>: View, Router {
         // This is 
         
         print("ssc: \(screenStack.count) :: \(screenStackCount)")
-        if !isPresented && (screenStack.count + 1) == screenStackCount {
+        if !isPresented && screenStack.count == screenStackCount {
             print("remove a :: \(screenStack.first?.id ?? "n/a")")
             screenStack.removeLast()
         }
