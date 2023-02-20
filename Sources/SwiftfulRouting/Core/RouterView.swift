@@ -79,16 +79,22 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
                 .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: dropLastScreenFromStackForiOS16IfNeeded)
-                .onFirstAppear {
-                    print("first appear")
-                    Task {
-                        try? await Task.sleep(nanoseconds: 3_000_000_000)
-                        print("set stack count: \(screens.count)")
-                    }
-                }
+//                .onFirstAppear {
+//                    print("first appear")
+//                    Task {
+//                        try? await Task.sleep(nanoseconds: 3_000_000_000)
+//                        print("set stack count: \(screens.count)")
+//                    }
+//                }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+        .onChangeIfiOS15(of: screens.count, perform: { newValue in
+            if newValue > 0 && screenStackCount == 0 {
+                screenStackCount = newValue
+                print("set stack count: \(screens.count)")
+            }
+        })
     }
     
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
