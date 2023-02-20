@@ -42,6 +42,7 @@ public struct RouterView<T:View>: View, Router {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
+        print("didset :\((screens?.wrappedValue.count ?? 0))")
         self.content = content
     }
     
