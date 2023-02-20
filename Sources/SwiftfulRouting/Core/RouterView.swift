@@ -80,21 +80,21 @@ public struct RouterView<T:View>: View, Router {
                     showDragIndicator: showDragIndicator)
                 .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: dropLastScreenFromStackForiOS16IfNeeded)
                 .onFirstAppear {
-                    print("first appear")
-                    Task {
+//                    print("first appear")
+//                    Task {
 //                        try? await Task.sleep(nanoseconds: 3_000_000_000)
-                        print("set stack count: \(screens.count)")
-                    }
+//                        print("set stack count: \(screens.count)")
+//                    }
                 }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
         .onChangeIfiOS15(of: screens.count, perform: { newValue in
             print("OLD: \(screenStackCount), NEW: \(newValue)")
-//            if newValue > 0 && screenStackCount == 0 {
-//                screenStackCount = newValue
-//                print("set stack count: \(screens.count)")
-//            }
+            if newValue > 0 && screenStackCount == 0 {
+                screenStackCount = newValue
+                print("set stack count: \(screens.count)")
+            }
         })
     }
     
