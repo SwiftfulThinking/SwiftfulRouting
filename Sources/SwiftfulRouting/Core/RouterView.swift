@@ -7,6 +7,27 @@
 
 import SwiftUI
 
+extension View {
+    func onFirstAppear(perform action: @escaping () -> Void) -> some View {
+        self.modifier(OnFirstAppearModifier(action: action))
+    }
+}
+
+struct OnFirstAppearModifier: ViewModifier {
+    let action: @MainActor () -> Void
+    @State private var isFirstAppear = true
+    
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                if isFirstAppear {
+                    action()
+                    isFirstAppear = false
+                }
+            }
+    }
+}
+
 /// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
 
 public struct RouterView<T:View>: View, Router {
@@ -17,11 +38,11 @@ public struct RouterView<T:View>: View, Router {
  
     // Segues
     @State private var segueOption: SegueOption = .push
-    @State private var screens: [AnyDestination] = []
-    @State private var screenStackIndex: Int
+    @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
+    @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
@@ -41,7 +62,7 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
-        self._screenStackIndex = State(initialValue: screens?.wrappedValue.count ?? 0)
+        self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.content = content
     }
     
@@ -152,9 +173,9 @@ public struct RouterView<T:View>: View, Router {
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
         
-        // This is called when isPresented changes, and should only dismiss if isPresented = false
+        // This is called when isPresented changes, and should only removeLast if isPresented = false
         
-        if !isPresented && !screenStack.isEmpty {
+        if !isPresented && screenStack.count == (screenStackCount + 1) {
             screenStack.removeLast()
         }
     }
