@@ -78,14 +78,17 @@ public struct RouterView<T:View>: View, Router {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
+                    print("append a")
                     self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
                 } else {
+                    print("append b")
                     // We are not in the root Router and should continue off of $screenStack
                     self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
+                print("append c")
                 // Push a new screen and don't pass view stack to child view (screens == nil)
                 self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination)))
             }
@@ -153,6 +156,7 @@ public struct RouterView<T:View>: View, Router {
         // This is called when isPresented changes, and should only dismiss if isPresented = false
         
         if !isPresented && !screenStack.isEmpty {
+            print("remove a")
             screenStack.removeLast()
         }
     }
