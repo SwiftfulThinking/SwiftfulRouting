@@ -195,7 +195,7 @@ public struct RouterView<T:View>: View, Router {
         // This is 
         
         print("ssc: \(screenStack.count) :: \(screenStackCount)")
-        if !isPresented && screenStack.count == screenStackCount {
+        if !isPresented && screenStack.count == (screenStackCount + 1) {
             print("remove a :: \(screenStack.first?.id ?? "n/a")")
             screenStack.removeLast()
         }
