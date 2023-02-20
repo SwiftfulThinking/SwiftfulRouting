@@ -156,7 +156,7 @@ public struct RouterView<T:View>: View, Router {
         // This is called when isPresented changes, and should only dismiss if isPresented = false
         
         if !isPresented && !screenStack.isEmpty {
-            print("remove a")
+            print("remove a :: \(screenStack.first?.id ?? "n/a")")
             screenStack.removeLast()
         }
     }
