@@ -21,6 +21,7 @@ public struct RouterView<T:View>: View, Router {
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
+    @State private var screenStackCount: Int
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
@@ -40,6 +41,7 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
+        self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.content = content
     }
     
@@ -153,9 +155,10 @@ public struct RouterView<T:View>: View, Router {
         // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
         // which then leads to the next push appearing on top of existing (incorrect) stack
         
-        // This is called when isPresented changes, and should only dismiss if isPresented = false
+        // This is called when isPresented changes, and should only removeLast if isPresented = false
+        // This is 
         
-        if !isPresented && !screenStack.isEmpty {
+        if !isPresented && (screenStack.count + 1) == screenStackCount {
             print("remove a :: \(screenStack.first?.id ?? "n/a")")
             screenStack.removeLast()
         }
