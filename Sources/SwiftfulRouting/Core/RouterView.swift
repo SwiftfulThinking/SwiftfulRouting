@@ -14,16 +14,17 @@ extension View {
 }
 
 struct OnFirstAppearModifier: ViewModifier {
-    let action: () -> Void
-    var isFirstAppear = true
+    let action: @MainActor () -> Void
+    @State private var isFirstAppear = true
     
     func body(content: Content) -> some View {
-        content.onAppear {
-            if isFirstAppear {
-                action()
-                isFirstAppear = false
+        content
+            .onAppear {
+                if isFirstAppear {
+                    action()
+                    isFirstAppear = false
+                }
             }
-        }
     }
 }
 
