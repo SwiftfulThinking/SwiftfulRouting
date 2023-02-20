@@ -90,6 +90,7 @@ public struct RouterView<T:View>: View, Router {
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
         .onChangeIfiOS15(of: screens.count, perform: { newValue in
+            print("NEW: \(newValue), OLD: \(screenStackCount)")
             if newValue > 0 && screenStackCount == 0 {
                 screenStackCount = newValue
                 print("set stack count: \(screens.count)")
