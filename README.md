@@ -12,7 +12,11 @@ SwiftUI is a declarative framework, and therefore, a SwiftUI router should be de
 
 ## Under the hood
 
-As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. The framework can support 1 active Segue, 1 active Alert, and 1 active Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View.
+As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. The framework can support 1 active Segue, 1 active Alert, and 1 active Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. 
+
+## Architecture
+
+Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View. See sample project for examples of MVC, MVVM and VIPER design patterns.
 
 ## Setup ☕️
 
