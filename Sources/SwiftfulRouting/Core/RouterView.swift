@@ -7,6 +7,26 @@
 
 import SwiftUI
 
+extension View {
+    func onFirstAppear(perform action: @escaping () -> Void) -> some View {
+        self.modifier(OnFirstAppearModifier(action: action))
+    }
+}
+
+struct OnFirstAppearModifier: ViewModifier {
+    let action: () -> Void
+    var isFirstAppear = true
+    
+    func body(content: Content) -> some View {
+        content.onAppear {
+            if isFirstAppear {
+                action()
+                isFirstAppear = false
+            }
+        }
+    }
+}
+
 /// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
 
 public struct RouterView<T:View>: View, Router {
@@ -21,7 +41,7 @@ public struct RouterView<T:View>: View, Router {
     
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
-    @State private var screenStackCount: Int
+    @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
@@ -41,7 +61,6 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
-        self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         print("didset :\((screens?.wrappedValue.count ?? 0))")
         self.content = content
     }
@@ -61,6 +80,10 @@ public struct RouterView<T:View>: View, Router {
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+        .onFirstAppear {
+            print("set stack count: \(screens.count)")
+            screenStackCount = screens.count
+        }
     }
     
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
