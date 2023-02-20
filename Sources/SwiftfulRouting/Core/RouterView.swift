@@ -158,6 +158,7 @@ public struct RouterView<T:View>: View, Router {
         // This is called when isPresented changes, and should only removeLast if isPresented = false
         // This is 
         
+        print("ssc: \(screenStack.count) :: \(screenStackCount)")
         if !isPresented && (screenStack.count + 1) == screenStackCount {
             print("remove a :: \(screenStack.first?.id ?? "n/a")")
             screenStack.removeLast()
