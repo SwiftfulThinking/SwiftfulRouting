@@ -1,20 +1,20 @@
 # SwiftfulRouting  🤙
 
-A native, declarative framework for programmatic navigation (routing) in SwiftUI applications, fully decoupled from the View.
+A native, declarative framework for programmatic navigation in SwiftUI applications, fully decoupled from the View.
 
 **Setup time:** 1 minute
 
 **Sample project:** https://github.com/SwiftfulThinking/SwiftfulRoutingExample
 
-## Overview
+## Overview 🚀
 
 SwiftUI is a declarative framework, and therefore, a SwiftUI router should be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution is to declare all modifiers to support the routing in advance. 
 
-## Under the hood
+## Under the hood ⚙️
 
 As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. The framework can support 1 active Segue, 1 active Alert, and 1 active Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. 
 
-## Architecture
+## Architecture 🏗️
 
 Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View. See sample project for examples of MVC, MVVM and VIPER design patterns.
 
@@ -136,8 +136,8 @@ router.showResizableSheeet(sheetDetents: Detent, selection: Binding<Detent>, sho
 Router supports native SwiftUI alerts, including `.alert` and `.confirmationDialog`.
 
 ```swift
-router.showAlert(.alert, title: String, alert: () -> View)
-router.showAlert(.confirmationDialog, title: String, alert: () -> View)
+router.showAlert(.alert, title: String, subtitle: String?, alert: () -> View)
+router.showAlert(.confirmationDialog, title: String, subtitle: String?, alert: () -> View)
 router.dismissAlert()
 ```
 
@@ -169,3 +169,11 @@ Additional convenience methods:
 ```swift
 router.showBasicModal(destination: () -> View)
 ```
+
+## Contribute 🤓
+
+Community contributions are encouraged! Please ensure that your code adheres to the project's existing coding style and structure. Most new features are likely to be derivatives of existing features, so many of the existing ViewModifiers and Bindings should be reused.
+
+- [Open an issue](https://github.com/SwiftfulThinking/SwiftfulRouting/issues) for issues with the existing codebase.
+- [Open a discussion](https://github.com/SwiftfulThinking/SwiftfulRouting/discussions) for new feature requests.
+- [Submit a pull request](https://github.com/SwiftfulThinking/SwiftfulRouting/pulls) when the feature is ready.
