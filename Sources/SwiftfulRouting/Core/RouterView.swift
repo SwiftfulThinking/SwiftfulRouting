@@ -176,7 +176,7 @@ public struct RouterView<T:View>: View, Router {
         // This is called when isPresented changes, and should only removeLast if isPresented = false
         
         if !isPresented && screenStack.count == (screenStackCount + 1) {
-            screenStack.removeLast()
+//            screenStack.removeLast()
         }
     }
     
