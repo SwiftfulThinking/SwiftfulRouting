@@ -77,7 +77,6 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
-                .onChangeIfiOS15(of: presentationMode.wrappedValue.isPresented, perform: dropLastScreenFromStackForiOS16IfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -166,18 +165,6 @@ public struct RouterView<T:View>: View, Router {
     public func popToRoot() {
         self.screens = []
         self.screenStack = []
-    }
-    
-    private func dropLastScreenFromStackForiOS16IfNeeded(isPresented: Bool) {
-        // iOS 16 supports screenStack, however,
-        // if user dismisses the screen using .dismissScreen or environment modes, then the screen will dismiss without removing last item from screenStack
-        // which then leads to the next push appearing on top of existing (incorrect) stack
-        
-        // This is called when isPresented changes, and should only removeLast if isPresented = false
-        
-        if !isPresented && screenStack.count == (screenStackCount + 1) {
-            screenStack.removeLast()
-        }
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
