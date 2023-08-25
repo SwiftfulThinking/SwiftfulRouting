@@ -57,6 +57,7 @@ struct NavigationStackTransformable<Content:View>: View {
             isPushEnabled = newValue == .push
         })
         .onChange(of: screens) { newValue in
+            print("HERE IS COUNT: \(screens.count)")
             if isPushEnabled {
                 path = .init(newValue)
             }
