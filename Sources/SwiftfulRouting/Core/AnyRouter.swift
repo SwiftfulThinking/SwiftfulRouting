@@ -96,4 +96,10 @@ public struct AnyRouter: Router {
     public func dismissModal() {
         object.dismissModal()
     }
+    
+    /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
+    public func showSafari(_ url: @escaping () -> URL) {
+        object.showSafari(url)
+    }
+
 }

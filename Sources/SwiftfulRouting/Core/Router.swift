@@ -28,4 +28,6 @@ public protocol Router {
     
     func showModal<V:View>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, @ViewBuilder destination: @escaping () -> V)
     func dismissModal()
+    
+    func showSafari(_ url: @escaping () -> URL)
 }

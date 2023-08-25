@@ -33,6 +33,8 @@ struct OnFirstAppearModifier: ViewModifier {
 public struct RouterView<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.openURL) var openURL
+
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
  
@@ -41,11 +43,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination] {
-        didSet {
-            print("DID SET SCREEN STACK: \(screenStack.map({ $0.destination }))")
-        }
-    }
+    @Binding private var screenStack: [AnyDestination]
     @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
@@ -204,6 +202,10 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissModal() {
         self.modal = nil
+    }
+    
+    public func showSafari(_ url: @escaping () -> URL) {
+        openURL(url())
     }
 }
 
