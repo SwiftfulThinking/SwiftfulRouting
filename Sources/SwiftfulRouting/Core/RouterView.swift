@@ -204,19 +204,8 @@ public struct RouterView<T:View>: View, Router {
         self.modal = nil
     }
     
-    public func showUrl(_ option: UrlOption, _ url: @escaping () -> URL) {
-        
+    public func openSafari(_ url: @escaping () -> URL) {
         openURL(url())
-//        switch option {
-//        case .inAppBrowser(segue: let segueOption):
-//            showScreen(segueOption) { router in
-//                WebView(url: url())
-//            }
-//        case .safari:
-//            break
-//        case .urlSchema:
-//            break
-//        }
     }
 }
 

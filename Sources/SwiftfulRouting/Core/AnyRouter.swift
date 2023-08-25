@@ -92,18 +92,14 @@ public struct AnyRouter: Router {
             useDeviceBounds: true,
             destination: destination)
     }
-    /*
-     router.showUrl(.safari) {
-          URL("https://www.google.com")
-     }
-     */
-    
-    /// Show URL
-    public func showUrl(_ option: UrlOption, _ url: @escaping () -> URL) {
-        object.showUrl(option, url)
-    }
     
     public func dismissModal() {
         object.dismissModal()
     }
+    
+    /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
+    public func openSafari(_ url: @escaping () -> URL) {
+        object.openSafari(url)
+    }
+
 }
