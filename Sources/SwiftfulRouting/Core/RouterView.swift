@@ -41,7 +41,11 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination]
+    @Binding private var screenStack: [AnyDestination] {
+        didSet {
+            print("DID SET SCREEN STACK: \(screenStack.map({ $0.destination }))")
+        }
+    }
     @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+

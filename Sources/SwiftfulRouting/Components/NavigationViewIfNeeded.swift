@@ -38,6 +38,8 @@ struct NavigationStackTransformable<Content:View>: View {
     // Convert [AnyDestination] to NavigationPath
     // Note: it works without the conversion, but there is a warning in console.
     // "Only root-level navigation destinations are effective for a navigation stack with a homogeneous path"
+    // Since we have this conversion, we have to keep both screens and path in sync at all times
+    // We have to observe the path to monitor native screen dismissal that aren't via router.dismiss
     
     let segueOption: SegueOption
     @Binding var screens: [AnyDestination]
@@ -61,6 +63,11 @@ struct NavigationStackTransformable<Content:View>: View {
                 path = .init(newValue)
             }
         }
+        .onChange(of: path, perform: { path in
+            if path.count < screens.count {
+                screens.removeLast()
+            }
+        })
     }
     
 }
