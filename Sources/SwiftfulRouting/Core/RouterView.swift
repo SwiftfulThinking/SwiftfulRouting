@@ -204,7 +204,7 @@ public struct RouterView<T:View>: View, Router {
         self.modal = nil
     }
     
-    public func openSafari(_ url: @escaping () -> URL) {
+    public func showSafari(_ url: @escaping () -> URL) {
         openURL(url())
     }
 }

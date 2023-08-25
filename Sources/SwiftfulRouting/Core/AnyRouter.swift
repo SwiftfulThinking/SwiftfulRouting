@@ -98,8 +98,8 @@ public struct AnyRouter: Router {
     }
     
     /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
-    public func openSafari(_ url: @escaping () -> URL) {
-        object.openSafari(url)
+    public func showSafari(_ url: @escaping () -> URL) {
+        object.showSafari(url)
     }
 
 }
