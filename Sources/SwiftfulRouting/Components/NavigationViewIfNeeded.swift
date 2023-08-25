@@ -68,6 +68,8 @@ struct NavigationStackTransformable<Content:View>: View {
                 screens.removeLast()
                 print("REMOVED")
             }
+            
+            print("screens!: \(screens.count)")
         })
     }
     
