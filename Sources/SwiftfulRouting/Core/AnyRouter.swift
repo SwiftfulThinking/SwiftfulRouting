@@ -92,6 +92,16 @@ public struct AnyRouter: Router {
             useDeviceBounds: true,
             destination: destination)
     }
+    /*
+     router.showUrl(.safari) {
+          URL("https://www.google.com")
+     }
+     */
+    
+    /// Show URL
+    public func showUrl(_ option: UrlOption, _ url: @escaping () -> URL) {
+        object.showUrl(option, url)
+    }
     
     public func dismissModal() {
         object.dismissModal()

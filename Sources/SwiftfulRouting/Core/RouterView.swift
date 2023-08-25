@@ -41,11 +41,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination] {
-        didSet {
-            print("DID SET SCREEN STACK: \(screenStack.map({ $0.destination }))")
-        }
-    }
+    @Binding private var screenStack: [AnyDestination]
     @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
@@ -204,6 +200,19 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissModal() {
         self.modal = nil
+    }
+    
+    public func showUrl(_ option: UrlOption, _ url: @escaping () -> URL) {
+        switch option {
+        case .inAppBrowser(segue: let segueOption):
+            showScreen(segueOption) { router in
+                WebView(url: url())
+            }
+        case .safari:
+            break
+        case .urlSchema:
+            break
+        }
     }
 }
 
