@@ -56,8 +56,7 @@ struct NavigationStackTransformable<Content:View>: View {
         .onChange(of: segueOption, perform: { newValue in
             isPushEnabled = newValue == .push
         })
-        .onChange(of: screens) { newValue in
-            print("HERE IS COUNT: \(screens.count)")
+        .onChange(of: screens.count) { newValue in
             if isPushEnabled {
                 path = .init(newValue)
             }
