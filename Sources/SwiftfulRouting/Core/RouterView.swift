@@ -33,6 +33,8 @@ struct OnFirstAppearModifier: ViewModifier {
 public struct RouterView<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.openURL) var openURL
+
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
  
@@ -203,16 +205,18 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public func showUrl(_ option: UrlOption, _ url: @escaping () -> URL) {
-        switch option {
-        case .inAppBrowser(segue: let segueOption):
-            showScreen(segueOption) { router in
-                WebView(url: url())
-            }
-        case .safari:
-            break
-        case .urlSchema:
-            break
-        }
+        
+        openURL(url())
+//        switch option {
+//        case .inAppBrowser(segue: let segueOption):
+//            showScreen(segueOption) { router in
+//                WebView(url: url())
+//            }
+//        case .safari:
+//            break
+//        case .urlSchema:
+//            break
+//        }
     }
 }
 
