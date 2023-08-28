@@ -20,13 +20,16 @@ struct PopoverViewModifier: ViewModifier {
                 isPresented: Binding(ifNotNil: screen),
                 attachmentAnchor: option.attachmentAnchor,
                 arrowEdge: .bottom) {
-                    if let view = screen.wrappedValue?.destination {
-                        view
+//                    if let view = screen.wrappedValue?.destination {
+//                        view
+                        Text("This is a popover 😎")
+                            .padding()
+
                             .presentationCompactAdaptation(
                                 horizontal: option.horizontalAdaptation,
                                 vertical: option.verticalAdaptation
                             )
-                    }
+//                    }
                 }
     }
     
