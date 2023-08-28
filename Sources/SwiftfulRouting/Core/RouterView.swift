@@ -167,7 +167,7 @@ public struct RouterView<T:View>: View, Router {
     @available(iOS 16.4, *)
     public func showPopover<V:View>(_ option: PopoverOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.popoverOption = option
-        self.popover = AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination))
+        self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination))
     }
     
     public func dismissScreen() {

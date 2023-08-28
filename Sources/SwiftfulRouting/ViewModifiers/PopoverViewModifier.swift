@@ -20,15 +20,13 @@ struct PopoverViewModifier: ViewModifier {
                 isPresented: Binding(ifNotNil: screen),
                 attachmentAnchor: option.attachmentAnchor,
                 arrowEdge: .bottom) {
-                    ZStack {
-                        if let view = screen.wrappedValue?.destination {
-                            view
-                        }
+                    if let view = screen.wrappedValue?.destination {
+                        view
+                            .presentationCompactAdaptation(
+                                horizontal: option.horizontalAdaptation,
+                                vertical: option.verticalAdaptation
+                            )
                     }
-                    .presentationCompactAdaptation(
-                        horizontal: option.horizontalAdaptation,
-                        vertical: option.verticalAdaptation
-                    )
                 }
     }
     
