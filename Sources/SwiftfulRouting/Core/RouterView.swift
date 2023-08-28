@@ -61,6 +61,10 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
+    // Popover
+    @State private var popoverOption: PopoverOption = .popover(anchor: .point(.bottom))
+    @State private var popover: AnyDestination? = nil
+    
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
@@ -79,6 +83,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
+                .showingPopover(option: popoverOption, item: $popover)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -157,6 +162,12 @@ public struct RouterView<T:View>: View, Router {
         }
         
         self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
+    }
+    
+    @available(iOS 16.4, *)
+    public func showPopover<V:View>(_ option: PopoverOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+        self.popoverOption = option
+        self.popover = AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination))
     }
     
     public func dismissScreen() {
@@ -269,7 +280,7 @@ extension View {
             }
     }
 
-    @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
+    func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
         self
             .modifier(ConfirmationDialogViewModifier(option: option, item: item))
             .modifier(AlertViewModifier(option: option, item: item))
@@ -278,11 +289,10 @@ extension View {
     func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
         modifier(ModalViewModifier(configuration: configuration, item: item))
     }
-    
-    @ViewBuilder func onChangeIfiOS15<E:Equatable>(of value: E, perform: @escaping (E) -> Void) -> some View {
-        if #available(iOS 15, *) {
-            self
-                .onChange(of: value, perform: perform)
+   
+    @ViewBuilder func showingPopover(option: PopoverOption, item: Binding<AnyDestination?>) -> some View {
+        if #available(iOS 16.4, *) {
+            modifier(PopoverViewModifier(option: option, screen: item))
         } else {
             self
         }

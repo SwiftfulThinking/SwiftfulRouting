@@ -40,6 +40,11 @@ public struct AnyRouter: Router {
     public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
         object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, destination: destination)
     }
+    
+    @available(iOS 16.4, *)
+    public func showPopover<V:View>(_ option: PopoverOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+        object.showPopover(option, destination: destination)
+    }
         
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
     ///
