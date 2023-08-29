@@ -84,8 +84,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator,
-                    isPopoverView: isPopoverView
+                    showDragIndicator: showDragIndicator
                 )
                 .showingPopover(anchor: popoverAnchor, item: $popover)
                 .onChange(of: presentationMode.wrappedValue.isPresented) { isPresented in
@@ -181,6 +180,11 @@ public struct RouterView<T:View>: View, Router {
         self.popover = AnyDestination(destination())
     }
     
+    @available(iOS 16.4, *)
+    public func dismissPopover() {
+        self.popover = nil
+    }
+    
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
     }
@@ -253,15 +257,14 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool,
-        isPopoverView: Bool
+        showDragIndicator: Bool
     ) -> some View {
             if #available(iOS 14, *) {
                 self
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty && !isPopoverView
+                        shouldAddNavigationDestination: screenStack.isEmpty
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
@@ -280,7 +283,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty && !isPopoverView
+                        shouldAddNavigationDestination: screenStack.isEmpty
                     ))
                     .modifier(SheetViewModifier(
                         option: option,

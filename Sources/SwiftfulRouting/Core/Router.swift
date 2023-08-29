@@ -24,6 +24,8 @@ public protocol Router {
     
     @available(iOS 16.4, *)
     func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping () -> V)
+    @available(iOS 16.4, *)
+    func dismissPopover()
     
     func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?)
     

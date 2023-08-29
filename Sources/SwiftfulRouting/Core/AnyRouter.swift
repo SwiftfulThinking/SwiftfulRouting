@@ -45,6 +45,11 @@ public struct AnyRouter: Router {
     public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping () -> V) {
         object.showPopover(anchor: anchor, destination: destination)
     }
+    
+    @available(iOS 16.4, *)
+    public func dismissPopover() {
+        object.dismissPopover()
+    }
         
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
     ///
