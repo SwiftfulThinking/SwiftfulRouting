@@ -83,7 +83,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator,
-                    isShowingPopover: popover != nil
+                    isShowingPopover: false // popover != nil
                 )
                 .showingPopover(anchor: popoverAnchor, item: $popover)
                 .onChange(of: presentationMode.wrappedValue.isPresented) { isPresented in
