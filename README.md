@@ -16,7 +16,7 @@ As you segue to a new screen, the framework adds a set ViewModifers to the root 
 
 ## Architecture 🏗️
 
-Version 3.0 returns the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View. See sample project for examples of MVC, MVVM and VIPER design patterns.
+Version 3.0+ return the ViewModifiers back to the segue's call-site as AnyRouter, which further enables the developer to inject the routing logic into the View. See sample project for UI Tests and examples of MVC, MVVM and VIPER design patterns.
 
 ## Setup ☕️
 
@@ -98,7 +98,7 @@ RouterView { router in
 }
 ```
 
-Be default, your view will be wrapped in with navigation heirarchy (iOS 16+ uses a NavigationStack, iOS15 and below uses NavigationView). 
+Be default, your view will be wrapped in with navigation heirarchy (iOS 16+ uses a NavigationStack, iOS 15 and below uses NavigationView). 
 - If your view is already within a navigation heirarchy, set `addNavigationView` to `FALSE`. 
 - If your view is within a NavigationStack, use `screens` to bind to the existing stack path.
 - The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
@@ -114,8 +114,8 @@ RouterView(addNavigationView: false, screens: $existingStack) { router in
 
 ## Segues ⏩
 
-Router supports native SwiftUI segues, including .push (NavigationLink), .sheet, and .fullScreenCover. 
-- You may use `router.dismissScreen()`, `@Environment(\.presentationMode) var presentationMode` or `@Environment(\.dismiss) var dismiss` to dismiss the screen.
+Router supports native SwiftUI segues, including .push (NavigationLink), .sheet, and .fullScreenCover.
+- You may use `router.dismissScreen()` or native SwiftUI environment variables to dismiss the screen.
 
 ```swift
 router.showScreen(.push, destination: (AnyRouter) -> View)
@@ -129,6 +129,11 @@ iOS 16 also supports NavigationStack and resizable Sheets. Note that `popToRoot`
 router.pushScreens(destinations: [(AnyRouter) -> any View]
 router.popToRoot()
 router.showResizableSheeet(sheetDetents: Detent, selection: Binding<Detent>, showDragIndicator: Bool, destination: (AnyRouter) -> View)
+```
+
+Additional segues:
+```swift
+router.showSafari(_ url: () -> URL) 
 ```
 
 ## Alerts 🚨
