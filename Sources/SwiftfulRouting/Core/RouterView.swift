@@ -43,12 +43,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination] {
-        didSet {
-            // Hide any showing popover on segue
-            self.popover = nil
-        }
-    }
+    @Binding private var screenStack: [AnyDestination]
     @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
@@ -60,12 +55,7 @@ public struct RouterView<T:View>: View, Router {
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
-    @State private var alert: AnyAlert? = nil {
-        willSet {
-            // Hide any showing popover before showing
-            self.popover = nil
-        }
-    }
+    @State private var alert: AnyAlert? = nil
     
     // Modals
     @State private var modalConfiguration: ModalConfiguration = .default
@@ -94,6 +84,11 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
                 .showingPopover(anchor: popoverAnchor, item: $popover)
+                .onChange(of: presentationMode.wrappedValue.isPresented) { isPresented in
+                    if !isPresented {
+                        popover = nil
+                    }
+                }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
