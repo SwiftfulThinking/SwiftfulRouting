@@ -82,9 +82,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator,
-                    isShowingPopover: false // popover != nil
-                )
+                    showDragIndicator: showDragIndicator)
                 .showingPopover(anchor: popoverAnchor, item: $popover)
                 .onChange(of: presentationMode.wrappedValue.isPresented) { isPresented in
 //                    if !isPresented {
@@ -174,10 +172,9 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16.4, *)
-    public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping () -> V) {
         self.popoverAnchor = anchor
-//        self.popover = AnyDestination(destination())
-        self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination))
+        self.popover = AnyDestination(destination())
     }
     
     public func dismissScreen() {
@@ -252,18 +249,14 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool,
-        isShowingPopover: Bool) -> some View {
+        showDragIndicator: Bool) -> some View {
             if #available(iOS 14, *) {
                 self
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty && !isShowingPopover
+                        shouldAddNavigationDestination: screenStack.isEmpty
                     ))
-                    .onAppear {
-                        print("DID APPEAR AND SCREEN STACK : \(screenStack.isEmpty) :: IS SHOWING POP: \(isShowingPopover)")
-                    }
                     .modifier(SheetViewModifier(
                         option: option,
                         screens: screens,
@@ -281,7 +274,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty && !isShowingPopover
+                        shouldAddNavigationDestination: screenStack.isEmpty
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
