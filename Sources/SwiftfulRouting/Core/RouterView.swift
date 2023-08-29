@@ -43,7 +43,12 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination]
+    @Binding private var screenStack: [AnyDestination] {
+        didSet {
+            // Hide any showing popover on segue
+            self.popover = nil
+        }
+    }
     @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
@@ -55,7 +60,12 @@ public struct RouterView<T:View>: View, Router {
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
-    @State private var alert: AnyAlert? = nil
+    @State private var alert: AnyAlert? = nil {
+        willSet {
+            // Hide any showing popover before showing
+            self.popover = nil
+        }
+    }
     
     // Modals
     @State private var modalConfiguration: ModalConfiguration = .default
