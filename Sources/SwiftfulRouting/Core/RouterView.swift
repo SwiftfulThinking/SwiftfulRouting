@@ -175,8 +175,13 @@ public struct RouterView<T:View>: View, Router {
     public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.popoverAnchor = anchor
 //        self.popover = AnyDestination(destination())
-        self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination))
-
+        if screenStack.isEmpty {
+            // We are in the root Router and should start building on $screens
+            self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination))
+        } else {
+            // We are not in the root Router and should continue off of $screenStack
+            self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination))
+        }
     }
     
     public func dismissScreen() {
@@ -276,7 +281,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: false // screenStack.isEmpty
+                        shouldAddNavigationDestination: screenStack.isEmpty
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
