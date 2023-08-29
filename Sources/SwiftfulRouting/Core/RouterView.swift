@@ -62,7 +62,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var modal: AnyDestination? = nil
     
     // Popover
-    @State private var popoverOption: PopoverOption = .popover(anchor: .point(.bottom))
+    @State private var popoverAnchor: PopoverAttachmentAnchor = .point(.bottom)
     @State private var popover: AnyDestination? = nil
     
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
@@ -83,7 +83,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator)
-                .showingPopover(option: popoverOption, item: $popover)
+                .showingPopover(anchor: popoverAnchor, item: $popover)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -165,8 +165,8 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16.4, *)
-    public func showPopover<V:View>(_ option: PopoverOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
-        self.popoverOption = option
+    public func showPopover<V:View>(_ anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+        self.popoverAnchor = anchor
         self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination))
     }
     
@@ -290,9 +290,9 @@ extension View {
         modifier(ModalViewModifier(configuration: configuration, item: item))
     }
    
-    @ViewBuilder func showingPopover(option: PopoverOption, item: Binding<AnyDestination?>) -> some View {
+    @ViewBuilder func showingPopover(anchor: PopoverAttachmentAnchor, item: Binding<AnyDestination?>) -> some View {
         if #available(iOS 16.4, *) {
-            modifier(PopoverViewModifier(option: option, screen: item))
+            modifier(PopoverViewModifier(anchor: anchor, screen: item))
         } else {
             self
         }

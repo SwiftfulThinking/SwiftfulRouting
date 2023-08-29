@@ -11,21 +11,18 @@ import SwiftUI
 @available(iOS 16.4, *)
 struct PopoverViewModifier: ViewModifier {
     
-    let option: PopoverOption
+    let anchor: PopoverAttachmentAnchor
     let screen: Binding<AnyDestination?>
 
     func body(content: Content) -> some View {
         content
             .popover(
                 isPresented: Binding(ifNotNil: screen),
-                attachmentAnchor: option.attachmentAnchor,
+                attachmentAnchor: anchor,
                 arrowEdge: .bottom) {
                     if let view = screen.wrappedValue?.destination {
                         view
-                            .presentationCompactAdaptation(
-                                horizontal: option.horizontalAdaptation,
-                                vertical: option.verticalAdaptation
-                            )
+                            .presentationCompactAdaptation(.popover)
                     }
                 }
     }
