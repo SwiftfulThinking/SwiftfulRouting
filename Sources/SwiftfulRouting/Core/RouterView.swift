@@ -85,9 +85,10 @@ public struct RouterView<T:View>: View, Router {
                     showDragIndicator: showDragIndicator)
                 .showingPopover(anchor: popoverAnchor, item: $popover)
                 .onChange(of: presentationMode.wrappedValue.isPresented) { isPresented in
-                    if !isPresented {
-                        popover = nil
-                    }
+//                    if !isPresented {
+//                        popover = nil
+//                    }
+                    print("IS PRESENTED")
                 }
         }
         .showingAlert(option: alertOption, item: $alert)
@@ -171,9 +172,11 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16.4, *)
-    public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping () -> V) {
+    public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.popoverAnchor = anchor
-        self.popover = AnyDestination(destination())
+//        self.popover = AnyDestination(destination())
+        self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination))
+
     }
     
     public func dismissScreen() {
