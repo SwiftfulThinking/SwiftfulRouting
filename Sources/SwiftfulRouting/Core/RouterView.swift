@@ -64,12 +64,14 @@ public struct RouterView<T:View>: View, Router {
     // Popover
     @State private var popoverAnchor: PopoverAttachmentAnchor = .point(.bottom)
     @State private var popover: AnyDestination? = nil
+    let isPopoverView: Bool
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, isPopoverView: Bool = false, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.content = content
+        self.isPopoverView = isPopoverView
     }
     
     public var body: some View {
@@ -82,7 +84,9 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator)
+                    showDragIndicator: showDragIndicator,
+                    isPopoverView: isPopoverView
+                )
                 .showingPopover(anchor: popoverAnchor, item: $popover)
                 .onChange(of: presentationMode.wrappedValue.isPresented) { isPresented in
 //                    if !isPresented {
@@ -249,13 +253,15 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool) -> some View {
+        showDragIndicator: Bool,
+        isPopoverView: Bool
+    ) -> some View {
             if #available(iOS 14, *) {
                 self
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty
+                        shouldAddNavigationDestination: screenStack.isEmpty && !isPopoverView
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
@@ -274,7 +280,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty
+                        shouldAddNavigationDestination: screenStack.isEmpty && !isPopoverView
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
