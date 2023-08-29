@@ -259,7 +259,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty && !isShowingPopover
+                        shouldAddNavigationDestination: false // screenStack.isEmpty && !isShowingPopover
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
@@ -278,7 +278,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty && !isShowingPopover
+                        shouldAddNavigationDestination: false // screenStack.isEmpty && !isShowingPopover
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
