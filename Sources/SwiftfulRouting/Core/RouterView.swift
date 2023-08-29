@@ -177,8 +177,10 @@ public struct RouterView<T:View>: View, Router {
 //        self.popover = AnyDestination(destination())
         if screenStack.isEmpty {
             // We are in the root Router and should start building on $screens
+            print("THIS TRIGGERED")
             self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination))
         } else {
+            print("THAT TRIGGERED")
             // We are not in the root Router and should continue off of $screenStack
             self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination))
         }
