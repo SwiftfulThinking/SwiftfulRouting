@@ -91,6 +91,7 @@ public struct RouterView<T:View>: View, Router {
     
     public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = option
+        self.popover = nil
 
         if option != .push {
             // Add new Navigation
