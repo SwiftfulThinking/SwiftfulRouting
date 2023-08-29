@@ -165,7 +165,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16.4, *)
-    public func showPopover<V:View>(_ anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showPopover<V:View>(anchor: PopoverAttachmentAnchor, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.popoverAnchor = anchor
         self.popover = AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination))
     }
