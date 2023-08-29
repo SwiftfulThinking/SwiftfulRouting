@@ -259,8 +259,11 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty || !isShowingPopover
+                        shouldAddNavigationDestination: screenStack.isEmpty && !isShowingPopover
                     ))
+                    .onAppear {
+                        print("DID APPEAR AND SCREEN STACK : \(screenStack.isEmpty) :: IS SHOWING POP: \(isShowingPopover)")
+                    }
                     .modifier(SheetViewModifier(
                         option: option,
                         screens: screens,
@@ -278,7 +281,7 @@ extension View {
                     .modifier(NavigationLinkViewModifier(
                         option: option,
                         screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty || !isShowingPopover
+                        shouldAddNavigationDestination: screenStack.isEmpty && !isShowingPopover
                     ))
                     .modifier(SheetViewModifier(
                         option: option,
