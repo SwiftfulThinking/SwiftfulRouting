@@ -74,6 +74,7 @@ public struct RouterView<T:View>: View, Router {
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.route = route ?? AnyRoute.root
+        print("ROOT ID: \(AnyRoute.root.id)")
         self._routes = State(wrappedValue: routes ?? [])
         print("INIT ROUTE: \(route?.id ?? "n/a")")
         print("ON INIT W ROUTES: \(routes?.count ?? -999)")
