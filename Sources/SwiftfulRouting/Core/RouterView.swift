@@ -46,7 +46,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
-    @State private var routes: [AnyRoute]
+    @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
 
     // Binding to view stack from previous RouterViews
@@ -67,7 +67,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [[AnyRoute]]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
@@ -77,7 +77,7 @@ public struct RouterView<T:View>: View, Router {
         } else {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
-            self._routes = State(wrappedValue: [root])
+            self._routes = State(wrappedValue: [[root]])
             print("ROOT ID: \(root)")
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
@@ -138,18 +138,23 @@ public struct RouterView<T:View>: View, Router {
         // plus newRoutes
         
 //        var temp: [AnyRoute] = []
-//        
+//
 //        for item in routes {
 //            temp.append(item)
-//            
+//
 //            if item.id == route.id {
 //                break
 //            }
 //        }
 //        temp.append(contentsOf: newRoutes)
-//    
+        
+        // back to flows, must always insert after current flow
+        // goToNext should check if it's a new flow to go to
+        // but do not expose that to the client
+        //
+//
 //        routes = temp
-        routes.append(contentsOf: newRoutes)
+        routes.append(newRoutes)
 //        routes.insertAfter(newRoutes, after: route)
 
 //        guard let firstRoute = routes.first else {
@@ -237,22 +242,30 @@ public struct RouterView<T:View>: View, Router {
 //        print("IDS: \(routes.map({ $0.id }))")
 //        print("VALUES: \(routes.map({ $0.didSegue }))")
         
-//        guard let currentFlow = routes.last(where: { flow in
-//            return flow.contains(where: { $0.id == route.id })
-//        }) else {
-//            throw RoutableError.noNextScreenSet
-//        }
+        guard let currentFlowIndex = routes.lastIndex(where: { flow in
+            return flow.contains(where: { $0.id == route.id })
+        }) else {
+            throw RoutableError.noNextScreenSet
+        }
+        let currentFlow = routes[currentFlowIndex]
 //
 //        // If there is another route in this flow
-//        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-//            next = nextRoute
-//
-//        // The start of next flow
+        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
+            next = nextRoute
+            
+            // The start of next flow
+        } else {
+            let nextFlowIndex = currentFlowIndex + 1
+            if routes.indices.contains(nextFlowIndex) {
+                let nextFlow = routes[nextFlowIndex]
+                next = nextFlow.first
+            }
+        }
 //        } else if let nextFlow = routes.firstAfter(currentFlow),
 //           let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
 //            next = nextRoute
 //        }
-        
+//
 //        if
 //            let currentFlow = routes.last(where: { flow in
 //                return flow.contains(where: { $0.id == route.id })
@@ -267,10 +280,11 @@ public struct RouterView<T:View>: View, Router {
         print("FLOWS")
         print(route)
         print(routes)
-        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
-            print("FOUND NEXT: \(nextRoute)")
-            next = nextRoute
-        }
+        
+//        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
+//            print("FOUND NEXT: \(nextRoute)")
+//            next = nextRoute
+//        }
         
         guard let next else {
             throw RoutableError.noNextScreenSet
@@ -307,7 +321,7 @@ public struct RouterView<T:View>: View, Router {
             print("REMOVING ROUTE::::: \(index) \(item)")
             routes.remove(at: index)
             
-            if item.id == route.id {
+            if item.contains(where: { $0.id == route.id }) {
                 return
             }
         }
