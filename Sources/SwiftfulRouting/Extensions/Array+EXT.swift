@@ -8,6 +8,19 @@
 import Foundation
 
 extension Array where Element: Equatable {
+    
+    func firstAfter(_ element: Element, where condition: (Element) -> Bool) -> Element? {
+        for (index, item) in self.enumerated() {
+            if item == element && index + 1 < self.count {
+                let nextIndex = index + 1
+                if condition(self[nextIndex]) {
+                    return self[nextIndex]
+                }
+            }
+        }
+        return nil
+    }
+    
     func firstAfter(_ element: Element) -> Element? {
         if let index = self.firstIndex(of: element), index + 1 < self.count {
             return self[index + 1]
@@ -42,7 +55,7 @@ extension Array where Element: Equatable {
     }
     
     mutating func insertAfter(_ elements: [Element], after: Element) {
-        if let index = self.firstIndex(of: after), self.count > index {
+        if let index = self.firstIndex(of: after), (index + 1) < self.count {
             let nextIndex = index + 1
             self.insert(contentsOf: elements, at: nextIndex)
         } else {
@@ -59,4 +72,13 @@ extension Array where Element: Equatable {
             self.append(contentsOf: elements)
         }
     }
+    
+//    mutating func removeAllAfter(_ element: Element) {
+//        if let index = self.firstIndex(of: element), (index + 1) < self.count {
+//            let startIndex = index + 1
+//            if startIndex < self.count {
+//                self.removeSubrange(startIndex..<self.count)
+//            }
+//        }
+//    }
 }

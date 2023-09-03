@@ -199,7 +199,7 @@ public struct RouterView<T:View>: View, Router {
         var next: AnyRoute? = nil
         
         if let currentRoute = route {
-            if let nextRoute = routes.firstAfter(currentRoute) {
+            if let nextRoute = routes.firstAfter(currentRoute, where: { !$0.didSegue }) {
                 next = nextRoute
             }
         } else {
@@ -225,7 +225,11 @@ public struct RouterView<T:View>: View, Router {
         print("HERE IS MY NEW ROUTE: \(route.id)")
         
         // Remove route
-        routes.removeAll(where: { $0 == route })
+        if let index = routes.firstIndex(of: route) {
+            var route = routes[index]
+            route.setDidSegueToTrue()
+            routes[index] = route
+        }
 
         if route.segue != .push {
             // Add new Navigation

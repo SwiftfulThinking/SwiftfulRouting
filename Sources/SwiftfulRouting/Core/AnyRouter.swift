@@ -17,6 +17,7 @@ public struct AnyRoute: Equatable {
     let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
+    private(set) var didSegue: Bool = false
     
     public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
@@ -25,6 +26,10 @@ public struct AnyRoute: Equatable {
     
     public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    mutating func setDidSegueToTrue() {
+        didSegue = true
     }
 }
 
