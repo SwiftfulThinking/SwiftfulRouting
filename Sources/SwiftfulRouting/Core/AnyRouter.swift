@@ -9,19 +9,19 @@ import Foundation
 import SwiftUI
 
 public struct RoutableDelegate {
-    public let goToNextScreen: (() -> Void)?
-    public let dismissEnvironment: (() -> Void)?
-    
-    public init(goToNextScreen: (() -> Void)?, dismissEnvironment: (() -> Void)?) {
-        self.goToNextScreen = goToNextScreen
-        self.dismissEnvironment = dismissEnvironment
-    }
+    let goToNextScreen: (() -> Void)?
+    let dismissEnvironment: (() -> Void)?
 }
 
 public struct Route {
     let id = UUID().uuidString
     let segue: SegueOption
     let screen: (AnyRouter) -> any View
+    
+    public init(segue: SegueOption, screen: @escaping (AnyRouter) -> any View) {
+        self.segue = segue
+        self.screen = screen
+    }
 }
 
 /// Type-erased Router with convenience methods.
