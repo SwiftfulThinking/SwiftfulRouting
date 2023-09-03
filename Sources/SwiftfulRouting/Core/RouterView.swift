@@ -73,9 +73,16 @@ public struct RouterView<T:View>: View, Router {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
-        self._route = State(wrappedValue: route ?? AnyRoute.root)
+        
+        if let route {
+            self._route = State(wrappedValue: route)
+            self._routes = State(wrappedValue: routes ?? [])
+        } else {
+            let root = AnyRoute.root
+            self._route = State(wrappedValue: root)
+            self._routes = State(wrappedValue: [AnyRoute.root])
+        }
         print("ROOT ID: \(AnyRoute.root.id)")
-        self._routes = State(wrappedValue: routes ?? [])
         print("INIT ROUTE: \(route?.id ?? "n/a")")
         print("ON INIT W ROUTES: \(routes?.count ?? -999)")
         self._environmentRouter = State(wrappedValue: environmentRouter)
