@@ -11,6 +11,11 @@ import SwiftUI
 public struct RoutableDelegate {
     public let goToNextScreen: (() -> Void)?
     public let dismissEnvironment: (() -> Void)?
+    
+    public init(goToNextScreen: (() -> Void)?, dismissEnvironment: (() -> Void)?) {
+        self.goToNextScreen = goToNextScreen
+        self.dismissEnvironment = dismissEnvironment
+    }
 }
 
 public struct Route {
