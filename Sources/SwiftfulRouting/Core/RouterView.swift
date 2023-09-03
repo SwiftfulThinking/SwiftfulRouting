@@ -287,7 +287,7 @@ public struct RouterView<T:View>: View, Router {
         // Loop backwards, if have not yet found the current flow,
         // It's a future flow and should be removed now
         
-        for (index, item) in routes.reversed().enumerated() {
+        for (index, item) in routes.enumerated().reversed() {
             if item.id == route.id {
                 return
             } else {
