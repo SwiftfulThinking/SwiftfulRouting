@@ -86,6 +86,7 @@ public struct RouterView<T:View>: View, Router {
         
         print("INIT ROUTE: \(route?.id ?? "n/a")")
         print("INIT ROUTES: \(self.routes.map({ $0.id }))")
+        print("INIT ROUTES: \(self.routes.map({ $0.didSegue }))")
         print("ON INIT W ROUTES: \(routes?.count ?? -999)")
         print("STARTING ROUT: \(self.route.id)")
 
