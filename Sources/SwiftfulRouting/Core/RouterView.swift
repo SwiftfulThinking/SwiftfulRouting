@@ -81,11 +81,11 @@ public struct RouterView<T:View>: View, Router {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
             self._routes = State(wrappedValue: [root])
+            print("ROOT ID: \(root)")
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
         
-        print("ROOT ID: \(AnyRoute.root.id)")
         print("INIT ROUTE: \(route?.id ?? "n/a")")
         print("INIT ROUTES: \(self.routes.map({ $0.id }))")
         print("ON INIT W ROUTES: \(routes?.count ?? -999)")
