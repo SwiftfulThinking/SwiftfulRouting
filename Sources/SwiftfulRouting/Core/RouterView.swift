@@ -93,15 +93,19 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator
                 )
-                .onFirstAppear {
-                    if environmentRouter == nil {
-                        print("SETTING ENVIRONMENT ROUTER: \(route?.id ?? "nn")")
-                        environmentRouter = self
-                    }
-                }
+                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+    }
+    
+    private func setEnvironmentRouterIfNeeded() {
+        // If this is a new environnent (ie. .sheet or .fullScreenCover) then no previous environmentRouter will be passed in
+        // Therefore, this is the start of a new environment and this router will be the environmentRouter
+        // The first screen should not have one
+        if route != nil && environmentRouter == nil {
+            environmentRouter = self
+        }
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
