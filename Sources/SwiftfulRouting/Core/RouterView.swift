@@ -244,9 +244,9 @@ public struct RouterView<T:View>: View, Router {
                 localRoutes[index] = route
                 print("SET: \(route.id) to TRUEEEEE")
                 routes = []
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
+//                try? await Task.sleep(nanoseconds: 1_000_000_000)
                 routes = localRoutes
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
+//                try? await Task.sleep(nanoseconds: 1_000_000_000)
                 print(localRoutes[index])
                 print(routes[index])
                 print("HERE")
