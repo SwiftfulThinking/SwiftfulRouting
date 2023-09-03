@@ -240,6 +240,11 @@ public struct RouterView<T:View>: View, Router {
                 if index < currentIndex {
                     // before current route shouldn't get updated herein
                     routesFinal.append(element)
+                } else if index == currentIndex {
+                    // update this flow as seen
+                    var updated = element
+                    updated.setDidSegueToTrue()
+                    routesFinal.append(updated)
                 } else {
                     // update every route after current route until the next environment
                     switch element.segue {
