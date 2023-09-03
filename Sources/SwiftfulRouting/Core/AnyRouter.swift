@@ -16,44 +16,58 @@ public struct RoutableDelegate {
 public struct Route {
     let id = UUID().uuidString
     let segue: SegueOption
-    let screen: (AnyRouter) -> any View
+    let destination: (AnyRouter) -> any View
     
-    public init(segue: SegueOption, screen: @escaping (AnyRouter) -> any View) {
+    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
-        self.screen = screen
+        self.destination = destination
     }
 }
 
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
-    
     private var routable: RoutableDelegate? = nil
 
     public init(object: any Router) {
         self.object = object
     }
     
-    // Make this so that I can customize the flow each time
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen(_ route: Route) {
+        showScreens([route])
+    }
     
-    // ScreenQueue(id: UUID().uuidString, segue: SegueOption, screen: (AnyRouter) -> some View)
-    
-    public func showScreenStack(screens: [Route]) {
+    /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
+    public func showScreens(_ routes: [Route]) {
+        guard let firstRoute = routes.first else {
+            assertionFailure("There must be at least 1 route in parameter [Routes].")
+            return
+        }
+        
+        // move into delegate?
         var environmentRouter: AnyRouter? = nil
                 
         func nextScreen(id: String, router: AnyRouter) -> AnyView {
+            // We will mutate router below, so create a var copy
             var router = router
-            let index = screens.firstIndex(where: { $0.id == id }) ?? 0
-            let screenData = screens[index]
+            
+            // Keep track of current screen by id
+            guard let index = screens.firstIndex(where: { $0.id == id }) else {
+                return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
+            }
+            
+            let route = routes[index]
 
-            // Set environment router when seguing to new environment
-            switch screenData.segue {
+            // Set environment router when seguing to new environment only
+            switch route.segue {
             case .push:
                 break
             case .sheet, .fullScreenCover, .sheetDetents:
                 environmentRouter = router
             }
 
+            // Action to dismiss the environment, if available
             var dismissEnvironment: (() -> Void)?
             if let environmentRouter {
                 dismissEnvironment = {
@@ -61,24 +75,30 @@ public struct AnyRouter: Router {
                 }
             }
             
+            // Action to go to the next screen, if available
             var goToNextScreen: (() -> Void)? = nil
             if screens.indices.contains(index + 1) {
                 goToNextScreen = {
-                    let nextScreenData = screens[index + 1]
-                    router.showScreen(nextScreenData.segue) { childRouter in
-                        nextScreen(id: nextScreenData.id, router: childRouter)
+                    let nextRoute = routes[index + 1]
+                    router.showScreen(nextRoute.segue) { childRouter in
+                        nextScreen(id: nextRoute.id, router: childRouter)
                     }
                 }
             }
             
-            let delegate = RoutableDelegate(goToNextScreen: goToNextScreen, dismissEnvironment: dismissEnvironment)
+            // Update router with new Routable actions
+            let delegate = RoutableDelegate(
+                goToNextScreen: goToNextScreen,
+                dismissEnvironment: dismissEnvironment
+            )
             router.setRoutable(delegate: delegate)
             
-            return AnyView(screenData.screen(router))
+            // Return the view with its updated router
+            return AnyView(route.destination(router))
         }
         
-        showScreen(screens.first?.segue ?? .fullScreenCover) { router in
-            nextScreen(id: screens.first?.id ?? "", router: router)
+        showScreen(firstRoute.segue) { router in
+            nextScreen(id: firstRoute.id, router: router)
         }
     }
     
