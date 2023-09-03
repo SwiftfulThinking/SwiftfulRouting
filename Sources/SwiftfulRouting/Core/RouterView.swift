@@ -199,6 +199,9 @@ public struct RouterView<T:View>: View, Router {
         
         var next: AnyRoute? = nil
         
+        print("CURRENT ROUT: \(route.id)")
+        print("IDS: \(routes.map({ $0.id }))")
+        
         if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
             print("FOUND NEXT: \(nextRoute.id)")
             next = nextRoute
