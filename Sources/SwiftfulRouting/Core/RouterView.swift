@@ -200,6 +200,7 @@ public struct RouterView<T:View>: View, Router {
         
         if let currentRoute = route {
             if let nextRoute = routes.firstAfter(currentRoute, where: { !$0.didSegue }) {
+                print("FOUND NEXT: \(nextRoute.id)")
                 next = nextRoute
             }
         } else {
@@ -229,6 +230,7 @@ public struct RouterView<T:View>: View, Router {
             var route = routes[index]
             route.setDidSegueToTrue()
             routes[index] = route
+            print("SET: \(route.id) to TRUEEEEE")
         }
 
         if route.segue != .push {
