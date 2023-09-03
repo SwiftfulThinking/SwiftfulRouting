@@ -111,7 +111,9 @@ public struct RouterView<T:View>: View, Router {
             routes = newRoutes
         }
         
-        
+        if environmentRouter == nil {
+            environmentRouter = self
+        }
 
 //        guard let firstRoute = routes.first else {
 //            assertionFailure("There must be at least 1 route in parameter [Routes].")
@@ -218,10 +220,10 @@ public struct RouterView<T:View>: View, Router {
 
         if route.segue != .push {
             // Add new Navigation
-            // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
+            // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: self, content: destination)))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: nil, content: destination)))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
