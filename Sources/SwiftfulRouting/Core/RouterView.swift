@@ -223,6 +223,9 @@ public struct RouterView<T:View>: View, Router {
     public func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
         print("HERE IS MY NEW ROUTE: \(route.id)")
+        
+        // Remove route
+        routes.removeAll(where: { $0 == route })
 
         if route.segue != .push {
             // Add new Navigation
