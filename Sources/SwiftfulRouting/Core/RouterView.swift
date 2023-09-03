@@ -52,7 +52,6 @@ public struct RouterView<T:View>: View, Router {
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
-    @State private var screenStackCount: Int = 0
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
@@ -72,7 +71,6 @@ public struct RouterView<T:View>: View, Router {
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
-        self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         
         if let route {
             self._route = State(wrappedValue: route)
@@ -230,6 +228,42 @@ public struct RouterView<T:View>: View, Router {
         }
     }
     
+    private func markRoutesAsSeen(route: AnyRoute) {
+        // Marks every route in this flow (up until the next environment) as seen
+        var routesFinal: [AnyRoute] = []
+        var didFindEndOfCurrentFlow: Bool = false
+        
+        if let currentIndex = routes.firstIndex(where: { $0.id == route.id }) {
+            
+            for (index, element) in routes.enumerated() {
+                if index < currentIndex {
+                    // before current route shouldn't get updated herein
+                    routesFinal.append(element)
+                } else {
+                    // update every route after current route until the next environment
+                    switch element.segue {
+                    case .fullScreenCover, .sheet, .sheetDetents:
+                        didFindEndOfCurrentFlow = true
+                    case .push:
+                        break
+                    }
+                    
+                    if didFindEndOfCurrentFlow {
+                        // don't update the next flow
+                        routesFinal.append(element)
+                    } else {
+                        // update this flow as seen
+                        var updated = element
+                        updated.setDidSegueToTrue()
+                        routesFinal.append(updated)
+                    }
+                }
+            }
+        }
+        
+        routes = routesFinal
+    }
+    
     public func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
         print("HERE IS MY NEW ROUTE: \(route.id)")
@@ -238,20 +272,21 @@ public struct RouterView<T:View>: View, Router {
             // Remove route
             // the problem is I am updates routes data model and it's not populating
 //            var localRoutes: [AnyRoute] = routes
-            if let index = routes.firstIndex(where: { $0.id == route.id }) {
-                var route = routes[index]
-                route.setDidSegueToTrue()
-                routes[index] = route
-                print("SET: \(route.id) to TRUEEEEE")
-//                routes = []
-//                try? await Task.sleep(nanoseconds: 1_000_000_000)
-//                routes = localRoutes
-//                try? await Task.sleep(nanoseconds: 1_000_000_000)
-//                print(localRoutes[index])
-                print(route)
-                print(routes[index])
-                print("HERE")
-            }
+            markRoutesAsSeen(route: route)
+//            if let index = routes.firstIndex(where: { $0.id == route.id }) {
+//                var route = routes[index]
+//                route.setDidSegueToTrue()
+//                routes[index] = route
+//                print("SET: \(route.id) to TRUEEEEE")
+////                routes = []
+////                try? await Task.sleep(nanoseconds: 1_000_000_000)
+////                routes = localRoutes
+////                try? await Task.sleep(nanoseconds: 1_000_000_000)
+////                print(localRoutes[index])
+//                print(route)
+//                print(routes[index])
+//                print("HERE")
+//            }
 
             if route.segue != .push {
                 // Add new Navigation

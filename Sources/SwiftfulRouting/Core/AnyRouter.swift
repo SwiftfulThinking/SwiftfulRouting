@@ -13,6 +13,9 @@ public struct RoutableDelegate {
     let dismissEnvironment: (() -> Void)?
 }
 
+// Note (possible SwiftUI bug?):
+// Do not conform to Equatable here. It causes the @State property wrapper to monitor Equatable value instead of Hashable value
+// so didSegue changing value does not update the View (I think)
 public struct AnyRoute: Identifiable {
     public let id = UUID().uuidString
     let segue: SegueOption
@@ -23,14 +26,6 @@ public struct AnyRoute: Identifiable {
         self.segue = segue
         self.destination = destination
     }
-    
-//    public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
-//        lhs.id == rhs.id
-//    }
-    
-//    public func hash(into hasher: inout Hasher) {
-//        hasher.combine(id + didSegue.description)
-//    }
     
     mutating func setDidSegueToTrue() {
         didSegue = true
