@@ -10,14 +10,19 @@ import Foundation
 extension Array where Element: Equatable {
     
     func firstAfter(_ element: Element, where condition: (Element) -> Bool) -> Element? {
-        for (index, item) in self.enumerated() {
-            if item == element && index + 1 < self.count {
-                let nextIndex = index + 1
-                if condition(self[nextIndex]) {
-                    return self[nextIndex]
+        var didFindElement: Bool = false
+        for item in self {
+            if didFindElement {
+                if condition(item) {
+                    return item
                 }
             }
+            
+            if item == element {
+                didFindElement = true
+            }
         }
+        
         return nil
     }
     
