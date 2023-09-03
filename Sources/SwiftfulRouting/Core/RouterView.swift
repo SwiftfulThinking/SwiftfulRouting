@@ -93,6 +93,12 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator
                 )
+                .onFirstAppear {
+                    if environmentRouter == nil {
+                        print("SETTING ENVIRONMENT ROUTER: \(route?.id ?? "nn")")
+                        environmentRouter = self
+                    }
+                }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -111,11 +117,6 @@ public struct RouterView<T:View>: View, Router {
             routes = newRoutes
         }
         
-        if environmentRouter == nil {
-            print("SETTING ENVIRONMENT ROUTER: \(route?.id ?? "nn")")
-            environmentRouter = self
-        }
-
 //        guard let firstRoute = routes.first else {
 //            assertionFailure("There must be at least 1 route in parameter [Routes].")
 //            return
