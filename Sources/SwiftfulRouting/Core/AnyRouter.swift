@@ -23,17 +23,28 @@ public struct AnyRouter: Router {
         self.object = object
     }
     
-    public func showScreenStack(screens: [(AnyRouter) -> some View]) {
+    // Make this so that I can customize the flow each time
+    
+    public func showScreenStack(screens: [(segue: SegueOption, screen: (AnyRouter) -> some View)]) {
         var index: Int = 0
-        var firstRouter: AnyRouter? = nil
-        
+        var environmentRouter: AnyRouter? = nil
+                
         func nextScreen(router: AnyRouter) -> AnyView {
             var router = router
+            let screen = screens[index]
             
+            // Set environment router when seguing to new environment
+            switch screen.segue {
+            case .push:
+                break
+            case .sheet, .fullScreenCover, .sheetDetents:
+                environmentRouter = router
+            }
+
             var dismissEnvironment: (() -> Void)?
-            if let firstRouter {
+            if let environmentRouter {
                 dismissEnvironment = {
-                    firstRouter.dismissScreen()
+                    environmentRouter.dismissScreen()
                 }
             }
             
@@ -42,7 +53,7 @@ public struct AnyRouter: Router {
                 goToNextScreen = {
                     index += 1
                     
-                    router.showScreen(.push) { childRouter in
+                    router.showScreen(screen.segue) { childRouter in
                         nextScreen(router: childRouter)
                     }
                 }
@@ -51,13 +62,11 @@ public struct AnyRouter: Router {
             let delegate = RoutableDelegate(goToNextScreen: goToNextScreen, dismissEnvironment: dismissEnvironment)
             router.setRoutable(delegate: delegate)
             
-            let screen = screens[index]
-            return AnyView(screen(router))
+            return AnyView(screen.screen(router))
         }
         
-        showScreen(.fullScreenCover) { router in
-            firstRouter = router
-            return nextScreen(router: router)
+        showScreen(screens.first?.segue ?? .fullScreenCover) { router in
+            nextScreen(router: router)
         }
     }
     
