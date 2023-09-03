@@ -110,30 +110,33 @@ public struct RouterView<T:View>: View, Router {
         } else {
             routes = newRoutes
         }
+        
+        
 
-        guard let firstRoute = routes.first else {
-            assertionFailure("There must be at least 1 route in parameter [Routes].")
-            return
-        }
+//        guard let firstRoute = routes.first else {
+//            assertionFailure("There must be at least 1 route in parameter [Routes].")
+//            return
+//        }
                 
-        func nextScreen(id: String, router: AnyRouter) -> AnyView {
-            // We will mutate router below, so create a var copy
-//            var router = router
-            
-            // Keep track of current screen by id
-            guard let index = routes.firstIndex(where: { $0.id == id }) else {
-                return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
-            }
-            
-            let route = routes[index]
-
-            // Set environment router when seguing to new environment only
-            switch route.segue {
-            case .push:
-                break
-            case .sheet, .fullScreenCover, .sheetDetents:
-                environmentRouter = router
-            }
+        try? showNextScreen()
+//        func nextScreen(id: String, router: AnyRouter) -> AnyView {
+//            // We will mutate router below, so create a var copy
+////            var router = router
+//
+//            // Keep track of current screen by id
+//            guard let index = routes.firstIndex(where: { $0.id == id }) else {
+//                return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
+//            }
+//
+//            let route = routes[index]
+//
+//            // Set environment router when seguing to new environment only
+//            switch route.segue {
+//            case .push:
+//                break
+//            case .sheet, .fullScreenCover, .sheetDetents:
+//                environmentRouter = router
+//            }
 
             // Action to dismiss the environment, if available
 //            var dismissEnvironment: (() -> Void)?
@@ -162,13 +165,13 @@ public struct RouterView<T:View>: View, Router {
 //            router.setRoutable(delegate: delegate)
             
             // Return the view with its updated router
-            return AnyView(route.destination(router))
-        }
+//            return AnyView(route.destination(router))
+//        }
         
-        showScreen(firstRoute) { router in
-            AnyView(firstRoute.destination(router))
+//        showScreen(firstRoute) { router in
+//            AnyView(firstRoute.destination(router))
 //            nextScreen(id: firstRoute.id, router: router)
-        }
+//        }
     }
     
     public func dismissEnvironment() {
@@ -184,12 +187,29 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public func showNextScreen() throws {
-        guard let currentRoute = route, let nextRoute = routes.firstAfter(currentRoute) else {
+        
+        var next: AnyRoute? = nil
+        
+        if let currentRoute = route {
+            if let nextRoute = routes.firstAfter(currentRoute) {
+                next = nextRoute
+            }
+        } else {
+            // First screen
+            if let firstRoute = routes.first {
+                next = firstRoute
+            }
+        }
+        
+        guard let next else {
             throw RoutableError.noNextScreenSet
         }
-        print("CURRENT ROUTE: \(currentRoute.id)")
+        print("CURRENT ROUTE: \(route?.id ?? "idk")")
         print("ON SHOW NEXT:: \(routes.count ?? -999)")
-        showScreen(nextRoute)
+        
+        showScreen(next) { router in
+            AnyView(next.destination(router))
+        }
     }
     
     public func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
