@@ -39,7 +39,7 @@ public struct RouterView<T:View>: View, Router {
     let content: (AnyRouter) -> T
  
     // Routable methods
-    let route: AnyRoute?
+    let route: AnyRoute
     @State private var routable: RoutableDelegate? = nil
 
     // Segues
@@ -73,7 +73,7 @@ public struct RouterView<T:View>: View, Router {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
-        self.route = route
+        self.route = route ?? AnyRoute.root
         self._routes = State(wrappedValue: routes ?? [])
         print("INIT ROUTE: \(route?.id ?? "n/a")")
         print("ON INIT W ROUTES: \(routes?.count ?? -999)")
@@ -103,7 +103,7 @@ public struct RouterView<T:View>: View, Router {
         // If this is a new environnent (ie. .sheet or .fullScreenCover) then no previous environmentRouter will be passed in
         // Therefore, this is the start of a new environment and this router will be the environmentRouter
         // The first screen should not have one
-        if route != nil && environmentRouter == nil {
+        if environmentRouter == nil {
             environmentRouter = self
         }
     }
@@ -115,12 +115,8 @@ public struct RouterView<T:View>: View, Router {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
-        if let route {
-            routes.insertAfter(newRoutes, after: route)
-        } else {
-            routes = newRoutes
-        }
-        
+        routes.insertAfter(newRoutes, after: route)
+
 //        guard let firstRoute = routes.first else {
 //            assertionFailure("There must be at least 1 route in parameter [Routes].")
 //            return
@@ -198,22 +194,15 @@ public struct RouterView<T:View>: View, Router {
         
         var next: AnyRoute? = nil
         
-        if let currentRoute = route {
-            if let nextRoute = routes.firstAfter(currentRoute, where: { !$0.didSegue }) {
-                print("FOUND NEXT: \(nextRoute.id)")
-                next = nextRoute
-            }
-        } else {
-            // First screen
-            if let firstRoute = routes.first {
-                next = firstRoute
-            }
+        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
+            print("FOUND NEXT: \(nextRoute.id)")
+            next = nextRoute
         }
         
         guard let next else {
             throw RoutableError.noNextScreenSet
         }
-        print("CURRENT ROUTE: \(route?.id ?? "idk")")
+        print("CURRENT ROUTE: \(route.id ?? "idk")")
         print("ON SHOW NEXT:: \(routes.count ?? -999)")
         
         showScreen(next) { router in

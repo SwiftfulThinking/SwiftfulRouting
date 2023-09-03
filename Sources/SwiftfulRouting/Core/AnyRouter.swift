@@ -31,6 +31,12 @@ public struct AnyRoute: Equatable {
     mutating func setDidSegueToTrue() {
         didSegue = true
     }
+    
+    static var root: AnyRoute {
+        AnyRoute(.push) { router in
+            AnyView(Text("Root"))
+        }
+    }
 }
 
 /// Type-erased Router with convenience methods.
