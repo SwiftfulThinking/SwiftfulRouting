@@ -248,6 +248,7 @@ public struct RouterView<T:View>: View, Router {
 //                routes = localRoutes
 //                try? await Task.sleep(nanoseconds: 1_000_000_000)
 //                print(localRoutes[index])
+                print(route)
                 print(routes[index])
                 print("HERE")
             }
