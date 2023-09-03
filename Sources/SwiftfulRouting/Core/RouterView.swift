@@ -47,7 +47,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
-    @State private var routes: [AnyRoute]?
+    @State private var routes: [AnyRoute]
     @State private var environmentRouter: AnyRouter?
 
     // Binding to view stack from previous RouterViews
@@ -74,7 +74,7 @@ public struct RouterView<T:View>: View, Router {
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.route = route
-        self._routes = State(wrappedValue: routes)
+        self._routes = State(wrappedValue: routes ?? [])
         print("ON INIT W ROUTES: \(routes?.count ?? -999)")
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
@@ -103,13 +103,17 @@ public struct RouterView<T:View>: View, Router {
     }
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
-    public func showScreens(_ routes: [AnyRoute]) {
+    public func showScreens(_ newRoutes: [AnyRoute]) {
         guard let firstRoute = routes.first else {
             assertionFailure("There must be at least 1 route in parameter [Routes].")
             return
         }
         
-        self.routes = routes
+        if let route {
+            routes.insertAfter(newRoutes, after: route)
+        } else {
+            routes = newRoutes
+        }
                 
         func nextScreen(id: String, router: AnyRouter) -> AnyView {
             // We will mutate router below, so create a var copy
@@ -179,10 +183,10 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public func showNextScreen() throws {
-        guard let currentRoute = route, let nextRoute = routes?.firstAfter(currentRoute) else {
+        guard let currentRoute = route, let nextRoute = routes.firstAfter(currentRoute) else {
             throw RoutableError.noNextScreenSet
         }
-        print("ON SHOW NEXT:: \(routes?.count ?? -999)")
+        print("ON SHOW NEXT:: \(routes.count ?? -999)")
         showScreen(nextRoute)
     }
     
