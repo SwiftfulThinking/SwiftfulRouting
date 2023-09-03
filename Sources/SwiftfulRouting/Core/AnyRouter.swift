@@ -13,6 +13,12 @@ public struct RoutableDelegate {
     let dismissEnvironment: (() -> Void)?
 }
 
+public struct Route {
+    let id = UUID().uuidString
+    let segue: SegueOption
+    let screen: (AnyRouter) -> any View
+}
+
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
@@ -25,15 +31,15 @@ public struct AnyRouter: Router {
     
     // Make this so that I can customize the flow each time
     
-    public func showScreenStack(screens: [(segue: SegueOption, screen: (AnyRouter) -> some View)]) {
-        var index: Int = 0
+    // ScreenQueue(id: UUID().uuidString, segue: SegueOption, screen: (AnyRouter) -> some View)
+    
+    public func showScreenStack(screens: [Route]) {
         var environmentRouter: AnyRouter? = nil
                 
-        func nextScreen(router: AnyRouter) -> AnyView {
-            let indexThisLoop = index
+        func nextScreen(id: String, router: AnyRouter) -> AnyView {
             var router = router
-            let screenData = screens[indexThisLoop]
-            print("NEXT SCREEN RUNNING: \(index)")
+            let index = screens.firstIndex(where: { $0.id == id }) ?? 0
+            let screenData = screens[index]
 
             // Set environment router when seguing to new environment
             switch screenData.segue {
@@ -53,12 +59,9 @@ public struct AnyRouter: Router {
             var goToNextScreen: (() -> Void)? = nil
             if screens.indices.contains(index + 1) {
                 goToNextScreen = {
-                    index += 1
-                    let nextScreenData = screens[indexThisLoop + 1]
-                    
-                    print("goToNextScreen RUNNING: \(index) :: \(indexThisLoop)")
+                    let nextScreenData = screens[index + 1]
                     router.showScreen(nextScreenData.segue) { childRouter in
-                        nextScreen(router: childRouter)
+                        nextScreen(id: nextScreenData.id, router: childRouter)
                     }
                 }
             }
@@ -70,7 +73,7 @@ public struct AnyRouter: Router {
         }
         
         showScreen(screens.first?.segue ?? .fullScreenCover) { router in
-            nextScreen(router: router)
+            nextScreen(id: screens.first?.id ?? "", router: router)
         }
     }
     
