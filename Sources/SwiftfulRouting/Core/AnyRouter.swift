@@ -54,7 +54,7 @@ public struct AnyRouter: Router {
             if screens.indices.contains(index + 1) {
                 goToNextScreen = {
                     index += 1
-                    let nextScreenData = screens[index]
+                    let nextScreenData = screens[indexThisLoop + 1]
                     router.showScreen(nextScreenData.segue) { childRouter in
                         nextScreen(router: childRouter)
                     }
