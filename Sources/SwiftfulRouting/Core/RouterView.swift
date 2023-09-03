@@ -186,6 +186,7 @@ public struct RouterView<T:View>: View, Router {
         guard let currentRoute = route, let nextRoute = routes.firstAfter(currentRoute) else {
             throw RoutableError.noNextScreenSet
         }
+        print("CURRENT ROUTE: \(currentRoute.id)")
         print("ON SHOW NEXT:: \(routes.count ?? -999)")
         showScreen(nextRoute)
     }
