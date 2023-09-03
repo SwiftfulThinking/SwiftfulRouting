@@ -42,29 +42,22 @@ public struct AnyRouter: Router {
         object.showScreens(routes)
     }
     
-//    public func showNextScreen() throws {
-//        guard let routable, let nextScreen = routable.goToNextScreen else {
-//            throw RoutableError.noNextScreenSet
-//        }
-//        nextScreen()
-//    }
+    public func showNextScreen() throws {
+        try object.showNextScreen()
+    }
     
-//    public func tryGoToNextScreenOrDismissEnvironment() throws {
-//        do {
-//            try showNextScreen()
-//        } catch {
-//            try dismissEnvironment()
-//        }
-//    }
+    public func showNextScreenOrDismissEnvironment() throws {
+        do {
+            try showNextScreen()
+        } catch {
+            dismissEnvironment()
+        }
+    }
     
-    
-//    public func dismissEnvironment() throws {
-//        guard let routable, let dismiss = routable.dismissEnvironment else {
-//            throw RoutableError.noDismissEnvironmentSet
-//        }
-//        dismiss()
-//    }
-//
+    public func dismissEnvironment() {
+        object.dismissEnvironment()
+    }
+
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
         object.showScreen(AnyRoute(option, destination: destination))

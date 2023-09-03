@@ -174,7 +174,7 @@ public struct RouterView<T:View>: View, Router {
         case noNextScreenSet
     }
     
-    public func goToNextScreen() throws {
+    public func showNextScreen() throws {
         guard let nextRoute = routes?.first(where: { $0.id == route?.id }) else {
             throw RoutableError.noNextScreenSet
         }

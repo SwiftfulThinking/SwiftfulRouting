@@ -13,6 +13,8 @@ public protocol Router {
     func showScreens(_ routes: [AnyRoute])
 //    func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V)
     func dismissScreen()
+    func showNextScreen() throws
+    func dismissEnvironment()
 
     @available(iOS 16, *)
     func pushScreens(destinations: [(AnyRouter) -> any View])
