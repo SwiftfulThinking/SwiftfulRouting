@@ -39,7 +39,7 @@ public struct RouterView<T:View>: View, Router {
     let content: (AnyRouter) -> T
  
     // Routable methods
-    let route: AnyRoute
+    @State private var route: AnyRoute
     @State private var routable: RoutableDelegate? = nil
 
     // Segues
@@ -73,7 +73,7 @@ public struct RouterView<T:View>: View, Router {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
-        self.route = route ?? AnyRoute.root
+        self._route = State(wrappedValue: route ?? AnyRoute.root)
         print("ROOT ID: \(AnyRoute.root.id)")
         self._routes = State(wrappedValue: routes ?? [])
         print("INIT ROUTE: \(route?.id ?? "n/a")")
