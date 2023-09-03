@@ -288,11 +288,11 @@ public struct RouterView<T:View>: View, Router {
         // It's a future flow and should be removed now
         
         for (index, item) in routes.enumerated().reversed() {
+            print("REMOVING ROUTE::::: \(index) \(item)")
+            routes.remove(at: index)
+            
             if item.id == route.id {
                 return
-            } else {
-                print("REMOVING ROUTE::::: \(index) \(item)")
-                routes.remove(at: index)
             }
         }
         
