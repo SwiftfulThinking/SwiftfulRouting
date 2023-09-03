@@ -80,7 +80,7 @@ public struct RouterView<T:View>: View, Router {
         } else {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
-            self._routes = State(wrappedValue: [AnyRoute.root])
+            self._routes = State(wrappedValue: [root])
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
