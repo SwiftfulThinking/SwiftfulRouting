@@ -8,12 +8,88 @@
 import Foundation
 import SwiftUI
 
+public struct RoutableDelegate {
+    let goToNextScreen: (() -> Void)?
+    let dismissEnvironment: (() -> Void)?
+}
+
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
     
+    private var routable: RoutableDelegate? = nil
+
     public init(object: any Router) {
         self.object = object
+    }
+    
+    public func showScreenStack(screens: [(AnyRouter) -> some View]) {
+        var index: Int = 0
+        var firstRouter: AnyRouter? = nil
+        
+        func nextScreen(router: AnyRouter) -> AnyView {
+            var router = router
+            
+            var dismissEnvironment: (() -> Void)?
+            if let firstRouter {
+                dismissEnvironment = {
+                    firstRouter.dismissScreen()
+                }
+            }
+            
+            var goToNextScreen: (() -> Void)? = nil
+            if screens.indices.contains(index + 1) {
+                goToNextScreen = {
+                    index += 1
+                    
+                    router.showScreen(.push) { childRouter in
+                        nextScreen(router: childRouter)
+                    }
+                }
+            }
+            
+            let delegate = RoutableDelegate(goToNextScreen: goToNextScreen, dismissEnvironment: dismissEnvironment)
+            router.setRoutable(delegate: delegate)
+            
+            let screen = screens[index]
+            return AnyView(screen(router))
+        }
+        
+        showScreen(.fullScreenCover) { router in
+            firstRouter = router
+            return nextScreen(router: router)
+        }
+    }
+    
+    public func showNextScreen() throws {
+        guard let routable, let nextScreen = routable.goToNextScreen else {
+            throw RoutableError.noNextScreenSet
+        }
+        nextScreen()
+    }
+    
+    public func tryGoToNextScreenOrDismissEnvironment() throws {
+        do {
+            try showNextScreen()
+        } catch {
+            try dismissEnvironment()
+        }
+    }
+    
+    private enum RoutableError: LocalizedError {
+        case noNextScreenSet
+        case noDismissEnvironmentSet
+    }
+    
+    public func dismissEnvironment() throws {
+        guard let routable, let dismiss = routable.dismissEnvironment else {
+            throw RoutableError.noDismissEnvironmentSet
+        }
+        dismiss()
+    }
+    
+    private mutating func setRoutable(delegate: RoutableDelegate) {
+        self.routable = delegate
     }
     
     public var screens: [AnyDestination] {
