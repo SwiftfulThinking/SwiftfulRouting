@@ -13,7 +13,7 @@ public struct RoutableDelegate {
     let dismissEnvironment: (() -> Void)?
 }
 
-public struct Route {
+public struct AnyRoute {
     let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
@@ -34,12 +34,12 @@ public struct AnyRouter: Router {
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen(_ route: Route) {
+    public func showScreen(_ route: AnyRoute) {
         showScreens([route])
     }
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
-    public func showScreens(_ routes: [Route]) {
+    public func showScreens(_ routes: [AnyRoute]) {
         guard let firstRoute = routes.first else {
             assertionFailure("There must be at least 1 route in parameter [Routes].")
             return
@@ -97,7 +97,7 @@ public struct AnyRouter: Router {
             return AnyView(route.destination(router))
         }
         
-        showScreen(firstRoute.segue) { router in
+        object.showScreen(firstRoute.segue) { router in
             nextScreen(id: firstRoute.id, router: router)
         }
     }
