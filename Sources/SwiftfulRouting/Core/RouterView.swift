@@ -46,7 +46,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
-    @State private var routes: [AnyRoute]
+    @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
 
     // Binding to view stack from previous RouterViews
@@ -67,7 +67,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [[AnyRoute]]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
@@ -77,17 +77,17 @@ public struct RouterView<T:View>: View, Router {
         } else {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
-            self._routes = State(wrappedValue: [root])
+            self._routes = State(wrappedValue: [[root]])
             print("ROOT ID: \(root)")
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
         
-        print("INIT ROUTE: \(route?.id ?? "n/a")")
-        print("INIT ROUTES: \(self.routes.map({ $0.id }))")
-        print("INIT ROUTES: \(self.routes.map({ $0.didSegue }))")
-        print("ON INIT W ROUTES: \(routes?.count ?? -999)")
-        print("STARTING ROUT: \(self.route.id)")
+//        print("INIT ROUTE: \(route?.id ?? "n/a")")
+//        print("INIT ROUTES: \(self.routes.map({ $0.id }))")
+//        print("INIT ROUTES: \(self.routes.map({ $0.didSegue }))")
+//        print("ON INIT W ROUTES: \(routes?.count ?? -999)")
+//        print("STARTING ROUT: \(self.route.id)")
 
     }
     
@@ -132,7 +132,9 @@ public struct RouterView<T:View>: View, Router {
         //
         // always purge
         // always replace stack?
-        routes.insertAfter(newRoutes, after: route)
+        // routes is actually flows and it's an array of arrays [[AnyRoute]]
+        routes.append(newRoutes)
+//        routes.insertAfter(newRoutes, after: route)
 
 //        guard let firstRoute = routes.first else {
 //            assertionFailure("There must be at least 1 route in parameter [Routes].")
@@ -215,20 +217,28 @@ public struct RouterView<T:View>: View, Router {
         
         var next: AnyRoute? = nil
         
-        print("CURRENT ROUT: \(route.id)")
-        print("IDS: \(routes.map({ $0.id }))")
-        print("VALUES: \(routes.map({ $0.didSegue }))")
-
-        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
-            print("FOUND NEXT: \(nextRoute)")
+//        print("CURRENT ROUT: \(route.id)")
+//        print("IDS: \(routes.map({ $0.id }))")
+//        print("VALUES: \(routes.map({ $0.didSegue }))")
+        
+        if
+            let currentFlow = routes.last(where: { flow in
+                return flow.contains(where: { $0.id == route.id })
+            }),
+            let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
             next = nextRoute
         }
+
+//        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
+//            print("FOUND NEXT: \(nextRoute)")
+//            next = nextRoute
+//        }
         
         guard let next else {
             throw RoutableError.noNextScreenSet
         }
-        print("CURRENT ROUTE: \(route.id ?? "idk")")
-        print("ON SHOW NEXT:: \(routes.count ?? -999)")
+//        print("CURRENT ROUTE: \(route.id ?? "idk")")
+//        print("ON SHOW NEXT:: \(routes.count ?? -999)")
         
         showScreen(next) { router in
             AnyView(next.destination(router))
@@ -237,44 +247,53 @@ public struct RouterView<T:View>: View, Router {
     
     private func markRoutesAsSeen(route: AnyRoute) {
         // Marks every route in this flow (up until the next environment) as seen
-        var routesFinal: [AnyRoute] = []
-        var didFindEndOfCurrentFlow: Bool = false
+//        var routesFinal: [AnyRoute] = []
+//        var didFindEndOfCurrentFlow: Bool = false
         
-        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
-            
-            for (index, element) in routes.enumerated() {
-                if index < currentIndex {
-                    // before current route shouldn't get updated herein
-                    routesFinal.append(element)
-                } else if index == currentIndex {
-                    // update this flow as seen
-//                    var updated = element
-//                    updated.setDidSegueToTrue()
-//                    routesFinal.append(updated)
-                } else {
-                    // update every route after current route until the next environment
-//                    switch element.segue {
-//                    case .fullScreenCover, .sheet, .sheetDetents:
-//                        didFindEndOfCurrentFlow = true
-//                    case .push:
-//                        break
-//                    }
-//
-//                    if didFindEndOfCurrentFlow {
-//                        // don't update the next flow
-//                        routesFinal.append(element)
-//                    } else {
-//                        // update this flow as seen
-////                        var updated = element
-////                        updated.setDidSegueToTrue()
-////                        routesFinal.append(updated)
-//                        print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
-//                    }
-                }
-            }
+        
+        // remove all flows after this one
+        if
+            let currentFlowIndex = routes.lastIndex(where: { flow in
+                return flow.contains(where: { $0.id == route.id })
+            }) {
+            routes.remove(at: currentFlowIndex)
         }
-        print("SETTING NEW ROUTE FINAL: \(routesFinal.map({$0.didSegue }))")
-        routes = routesFinal
+        
+//        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
+//
+//            for (index, element) in routes.enumerated() {
+//                if index < currentIndex {
+//                    // before current route shouldn't get updated herein
+//                    routesFinal.append(element)
+//                } else if index == currentIndex {
+//                    // update this flow as seen
+////                    var updated = element
+////                    updated.setDidSegueToTrue()
+////                    routesFinal.append(updated)
+//                } else {
+//                    // update every route after current route until the next environment
+////                    switch element.segue {
+////                    case .fullScreenCover, .sheet, .sheetDetents:
+////                        didFindEndOfCurrentFlow = true
+////                    case .push:
+////                        break
+////                    }
+////
+////                    if didFindEndOfCurrentFlow {
+////                        // don't update the next flow
+////                        routesFinal.append(element)
+////                    } else {
+////                        // update this flow as seen
+//////                        var updated = element
+//////                        updated.setDidSegueToTrue()
+//////                        routesFinal.append(updated)
+////                        print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
+////                    }
+//                }
+//            }
+//        }
+//        print("SETTING NEW ROUTE FINAL: \(routesFinal.map({$0.didSegue }))")
+//        routes = routesFinal
     }
     
     public func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
