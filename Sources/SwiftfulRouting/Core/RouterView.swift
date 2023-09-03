@@ -160,7 +160,8 @@ public struct RouterView<T:View>: View, Router {
         }
         
         showScreen(firstRoute) { router in
-            nextScreen(id: firstRoute.id, router: router)
+            AnyView(firstRoute.destination(router))
+//            nextScreen(id: firstRoute.id, router: router)
         }
     }
     
