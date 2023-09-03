@@ -246,8 +246,11 @@ public struct RouterView<T:View>: View, Router {
 //        }
 
         
+        
+        
         print("FLOWS")
         print(route)
+        print(routes)
         if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
             print("FOUND NEXT: \(nextRoute)")
             next = nextRoute
