@@ -46,7 +46,7 @@ public struct RouterView<T:View>: View, Router {
     @State public var screens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
-    @State private var routes: [[AnyRoute]]
+    @State private var routes: [AnyRoute]
     @State private var environmentRouter: Router?
 
     // Binding to view stack from previous RouterViews
@@ -67,7 +67,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [[AnyRoute]]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
@@ -77,7 +77,7 @@ public struct RouterView<T:View>: View, Router {
         } else {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
-            self._routes = State(wrappedValue: [[root]])
+            self._routes = State(wrappedValue: [root])
             print("ROOT ID: \(root)")
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
@@ -133,7 +133,7 @@ public struct RouterView<T:View>: View, Router {
         // always purge
         // always replace stack?
         // routes is actually flows and it's an array of arrays [[AnyRoute]]
-        routes.append(newRoutes)
+        routes.append(contentsOf: newRoutes)
 //        routes.insertAfter(newRoutes, after: route)
 
 //        guard let firstRoute = routes.first else {
@@ -221,21 +221,37 @@ public struct RouterView<T:View>: View, Router {
 //        print("IDS: \(routes.map({ $0.id }))")
 //        print("VALUES: \(routes.map({ $0.didSegue }))")
         
-        if
-            let currentFlow = routes.last(where: { flow in
-                return flow.contains(where: { $0.id == route.id })
-            }),
-            let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-            next = nextRoute
-        }
+//        guard let currentFlow = routes.last(where: { flow in
+//            return flow.contains(where: { $0.id == route.id })
+//        }) else {
+//            throw RoutableError.noNextScreenSet
+//        }
+//
+//        // If there is another route in this flow
+//        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
+//            next = nextRoute
+//
+//        // The start of next flow
+//        } else if let nextFlow = routes.firstAfter(currentFlow),
+//           let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
+//            next = nextRoute
+//        }
+        
+//        if
+//            let currentFlow = routes.last(where: { flow in
+//                return flow.contains(where: { $0.id == route.id })
+//            }),
+//            let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
+//            next = nextRoute
+//        }
 
         
         print("FLOWS")
-        print(routes)
-//        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
-//            print("FOUND NEXT: \(nextRoute)")
-//            next = nextRoute
-//        }
+        print(route)
+        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
+            print("FOUND NEXT: \(nextRoute)")
+            next = nextRoute
+        }
         
         guard let next else {
             throw RoutableError.noNextScreenSet
@@ -268,13 +284,13 @@ public struct RouterView<T:View>: View, Router {
         // Loop backwards, if have not yet found the current flow,
         // It's a future flow and should be removed now
         
-//        for (index, array) in routes.reversed().enumerated() {
-//            if array.contains(where: { $0.id == route.id }) {
-//                return
-//            } else {
-//                routes.remove(at: index)
-//            }
-//        }
+        for (index, item) in routes.reversed().enumerated() {
+            if item.id == route.id {
+                return
+            } else {
+                routes.remove(at: index)
+            }
+        }
         
 //        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
 //
