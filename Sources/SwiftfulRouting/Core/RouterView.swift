@@ -264,13 +264,14 @@ public struct RouterView<T:View>: View, Router {
         
         // Loop backwards, if have not yet found the current flow,
         // It's a future flow and should be removed now
-        for (index, array) in routes.reversed().enumerated() {
-            if array.contains(where: { $0.id == route.id }) {
-                return
-            } else {
-                routes.remove(at: index)
-            }
-        }
+        
+//        for (index, array) in routes.reversed().enumerated() {
+//            if array.contains(where: { $0.id == route.id }) {
+//                return
+//            } else {
+//                routes.remove(at: index)
+//            }
+//        }
         
 //        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
 //
