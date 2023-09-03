@@ -13,8 +13,8 @@ public struct RoutableDelegate {
     let dismissEnvironment: (() -> Void)?
 }
 
-public struct AnyRoute: Equatable, Hashable {
-    let id = UUID().uuidString
+public struct AnyRoute: Identifiable {
+    public let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
     private(set) var didSegue: Bool = false
@@ -24,13 +24,13 @@ public struct AnyRoute: Equatable, Hashable {
         self.destination = destination
     }
     
-    public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
-        lhs.id == rhs.id
-    }
+//    public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
+//        lhs.id == rhs.id
+//    }
     
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id + didSegue.description)
-    }
+//    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(id + didSegue.description)
+//    }
     
     mutating func setDidSegueToTrue() {
         didSegue = true

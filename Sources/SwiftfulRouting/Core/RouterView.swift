@@ -238,7 +238,7 @@ public struct RouterView<T:View>: View, Router {
             // Remove route
             // the problem is I am updates routes data model and it's not populating
 //            var localRoutes: [AnyRoute] = routes
-            if let index = routes.firstIndex(of: route) {
+            if let index = routes.firstIndex(where: { $0.id == route.id }) {
                 var route = routes[index]
                 route.setDidSegueToTrue()
                 routes[index] = route
