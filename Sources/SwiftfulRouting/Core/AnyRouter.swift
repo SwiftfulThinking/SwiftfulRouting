@@ -55,6 +55,8 @@ public struct AnyRouter: Router {
                 goToNextScreen = {
                     index += 1
                     let nextScreenData = screens[indexThisLoop + 1]
+                    
+                    print("goToNextScreen RUNNING: \(index) :: \(indexThisLoop)")
                     router.showScreen(nextScreenData.segue) { childRouter in
                         nextScreen(router: childRouter)
                     }
