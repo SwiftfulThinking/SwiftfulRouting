@@ -233,45 +233,50 @@ public struct RouterView<T:View>: View, Router {
         self.segueOption = route.segue
         print("HERE IS MY NEW ROUTE: \(route.id)")
         
-        // Remove route
-        var localRoutes: [AnyRoute] = routes
-        if let index = localRoutes.firstIndex(of: route) {
-            var route = localRoutes[index]
-            route.setDidSegueToTrue()
-            localRoutes[index] = route
-            print("SET: \(route.id) to TRUEEEEE")
-            routes = []
-            routes = localRoutes
-            print(localRoutes[index])
-            print(routes[index])
-            print("HERE")
-        }
+        Task {
+            // Remove route
+            // the problem is I am updates routes data model and it's not populating
+            var localRoutes: [AnyRoute] = routes
+            if let index = localRoutes.firstIndex(of: route) {
+                var route = localRoutes[index]
+                route.setDidSegueToTrue()
+                localRoutes[index] = route
+                print("SET: \(route.id) to TRUEEEEE")
+                routes = []
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                routes = localRoutes
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                print(localRoutes[index])
+                print(routes[index])
+                print("HERE")
+            }
 
-        if route.segue != .push {
-            // Add new Navigation
-            // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
-            self.sheetDetents = [.large]
-            self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: localRoutes, environmentRouter: nil, content: destination)))
-        } else {
-            // Using existing Navigation
-            // Push continues in the existing Environment and uses the existing Navigation
-            
-            
-            // iOS 16 uses NavigationStack and can push additional views onto an existing view stack
-            if #available(iOS 16, *) {
-                if screenStack.isEmpty {
-                    // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: localRoutes, environmentRouter: environmentRouter, content: destination)))
-                } else {
-                    // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: localRoutes, environmentRouter: environmentRouter, content: destination)))
-                }
-                
-            // iOS 14/15 uses NavigationView and can only push 1 view at a time
+            if route.segue != .push {
+                // Add new Navigation
+                // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
+                self.sheetDetents = [.large]
+                self.sheetSelectionEnabled = false
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: localRoutes, environmentRouter: nil, content: destination)))
             } else {
-                // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: localRoutes, environmentRouter: environmentRouter, content: destination)))
+                // Using existing Navigation
+                // Push continues in the existing Environment and uses the existing Navigation
+                
+                
+                // iOS 16 uses NavigationStack and can push additional views onto an existing view stack
+                if #available(iOS 16, *) {
+                    if screenStack.isEmpty {
+                        // We are in the root Router and should start building on $screens
+                        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: localRoutes, environmentRouter: environmentRouter, content: destination)))
+                    } else {
+                        // We are not in the root Router and should continue off of $screenStack
+                        self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: localRoutes, environmentRouter: environmentRouter, content: destination)))
+                    }
+                    
+                // iOS 14/15 uses NavigationView and can only push 1 view at a time
+                } else {
+                    // Push a new screen and don't pass view stack to child view (screens == nil)
+                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: localRoutes, environmentRouter: environmentRouter, content: destination)))
+                }
             }
         }
     }
