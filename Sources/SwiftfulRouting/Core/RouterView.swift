@@ -123,6 +123,9 @@ public struct RouterView<T:View>: View, Router {
         showScreens([route])
     }
     
+    // showNextScreen is only for showing next screen and should not be calleg when setting?
+    
+    
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
         // Need to avoid duplicates herein
@@ -133,7 +136,11 @@ public struct RouterView<T:View>: View, Router {
         // always purge
         // always replace stack?
         // routes is actually flows and it's an array of arrays [[AnyRoute]]
-        
+        guard let route = newRoutes.first else {
+            fatalError()
+            return
+        }
+
         // routes is current routes up to current point
         // plus newRoutes
         
@@ -162,6 +169,10 @@ public struct RouterView<T:View>: View, Router {
 //            return
 //        }
                 
+        
+        // should always segue to first screen in showScreens!
+        // So it's not "show next" it's show this flow now
+        
         do {
             try showNextScreen()
         } catch {
@@ -220,6 +231,11 @@ public struct RouterView<T:View>: View, Router {
 //            AnyView(firstRoute.destination(router))
 //            nextScreen(id: firstRoute.id, router: router)
 //        }
+        
+        
+        showScreen(route) { router in
+            AnyView(route.destination(router))
+        }
     }
     
     public func dismissEnvironment() {
@@ -248,19 +264,25 @@ public struct RouterView<T:View>: View, Router {
             throw RoutableError.noNextScreenSet
         }
         let currentFlow = routes[currentFlowIndex]
+////
+////        // If there is another route in this flow
+//        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
+//            next = nextRoute
 //
-//        // If there is another route in this flow
-        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-            next = nextRoute
-            
-            // The start of next flow
-        } else {
-            let nextFlowIndex = currentFlowIndex + 1
-            if routes.indices.contains(nextFlowIndex) {
-                let nextFlow = routes[nextFlowIndex]
-                next = nextFlow.first
-            }
-        }
+//            // The start of next flow
+//        } else {
+//            let nextFlowIndex = currentFlowIndex + 1
+//            if routes.indices.contains(nextFlowIndex) {
+//                let nextFlow = routes[nextFlowIndex]
+//                next = nextFlow.first
+//            }
+//        }
+        
+//        if let lastFlow = routes.last {
+//            if let nextRoute
+//        }
+        
+        
 //        } else if let nextFlow = routes.firstAfter(currentFlow),
 //           let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
 //            next = nextRoute
