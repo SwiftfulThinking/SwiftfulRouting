@@ -240,7 +240,7 @@ public struct RouterView<T:View>: View, Router {
         var routesFinal: [AnyRoute] = []
         var didFindEndOfCurrentFlow: Bool = false
         
-        if let currentIndex = routes.firstIndex(where: { $0.id == route.id }) {
+        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
             
             for (index, element) in routes.enumerated() {
                 if index < currentIndex {
@@ -259,7 +259,7 @@ public struct RouterView<T:View>: View, Router {
 //                    case .push:
 //                        break
 //                    }
-//                    
+//
 //                    if didFindEndOfCurrentFlow {
 //                        // don't update the next flow
 //                        routesFinal.append(element)
