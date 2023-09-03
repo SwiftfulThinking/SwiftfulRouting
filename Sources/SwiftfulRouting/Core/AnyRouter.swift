@@ -13,7 +13,7 @@ public struct RoutableDelegate {
     let dismissEnvironment: (() -> Void)?
 }
 
-public struct AnyRoute {
+public struct AnyRoute: Equatable {
     let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
@@ -21,6 +21,10 @@ public struct AnyRoute {
     public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
         self.destination = destination
+    }
+    
+    public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
+        lhs.id == rhs.id
     }
 }
 
