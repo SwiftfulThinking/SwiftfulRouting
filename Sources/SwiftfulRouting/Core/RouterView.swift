@@ -137,19 +137,19 @@ public struct RouterView<T:View>: View, Router {
         // routes is current routes up to current point
         // plus newRoutes
         
-        var temp: [AnyRoute] = []
-        
-        for item in routes {
-            temp.append(item)
-            
-            if item.id == route.id {
-                break
-            }
-        }
-        temp.append(contentsOf: newRoutes)
-    
-        routes = temp
-//        routes.append(contentsOf: newRoutes)
+//        var temp: [AnyRoute] = []
+//        
+//        for item in routes {
+//            temp.append(item)
+//            
+//            if item.id == route.id {
+//                break
+//            }
+//        }
+//        temp.append(contentsOf: newRoutes)
+//    
+//        routes = temp
+        routes.append(contentsOf: newRoutes)
 //        routes.insertAfter(newRoutes, after: route)
 
 //        guard let firstRoute = routes.first else {
