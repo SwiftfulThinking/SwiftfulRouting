@@ -75,6 +75,7 @@ public struct RouterView<T:View>: View, Router {
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
         self.route = route
         self._routes = State(wrappedValue: routes)
+        print("ON INIT W ROUTES: \(routes?.count ?? -999)")
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
     }
