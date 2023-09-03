@@ -214,7 +214,7 @@ public struct RouterView<T:View>: View, Router {
         print("IDS: \(routes.map({ $0.id }))")
         
         if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
-            print("FOUND NEXT: \(nextRoute.id)")
+            print("FOUND NEXT: \(nextRoute)")
             next = nextRoute
         }
         

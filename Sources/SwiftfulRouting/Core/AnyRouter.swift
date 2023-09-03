@@ -32,11 +32,13 @@ public struct AnyRoute: Equatable {
         didSegue = true
     }
     
-    static var root: AnyRoute {
-        AnyRoute(.push) { router in
+    static var root: AnyRoute = {
+        var route = AnyRoute(.push) { router in
             AnyView(Text("Root"))
         }
-    }
+        route.setDidSegueToTrue()
+        return route
+    }()
 }
 
 /// Type-erased Router with convenience methods.
