@@ -291,6 +291,7 @@ public struct RouterView<T:View>: View, Router {
             if item.id == route.id {
                 return
             } else {
+                print("REMOVING ROUTE::::: \(index) \(item)")
                 routes.remove(at: index)
             }
         }
