@@ -253,23 +253,23 @@ public struct RouterView<T:View>: View, Router {
 //                    routesFinal.append(updated)
                 } else {
                     // update every route after current route until the next environment
-                    switch element.segue {
-                    case .fullScreenCover, .sheet, .sheetDetents:
-                        didFindEndOfCurrentFlow = true
-                    case .push:
-                        break
-                    }
-                    
-                    if didFindEndOfCurrentFlow {
-                        // don't update the next flow
-                        routesFinal.append(element)
-                    } else {
-                        // update this flow as seen
-//                        var updated = element
-//                        updated.setDidSegueToTrue()
-//                        routesFinal.append(updated)
-                        print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
-                    }
+//                    switch element.segue {
+//                    case .fullScreenCover, .sheet, .sheetDetents:
+//                        didFindEndOfCurrentFlow = true
+//                    case .push:
+//                        break
+//                    }
+//                    
+//                    if didFindEndOfCurrentFlow {
+//                        // don't update the next flow
+//                        routesFinal.append(element)
+//                    } else {
+//                        // update this flow as seen
+////                        var updated = element
+////                        updated.setDidSegueToTrue()
+////                        routesFinal.append(updated)
+//                        print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
+//                    }
                 }
             }
         }
