@@ -112,6 +112,7 @@ public struct RouterView<T:View>: View, Router {
         }
         
         if environmentRouter == nil {
+            print("SETTING ENVIRONMENT ROUTER: \(route?.id ?? "nn")")
             environmentRouter = self
         }
 
