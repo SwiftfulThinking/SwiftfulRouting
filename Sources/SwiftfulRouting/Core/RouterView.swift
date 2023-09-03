@@ -266,11 +266,12 @@ public struct RouterView<T:View>: View, Router {
         let currentFlow = routes[currentFlowIndex]
 ////
 ////        // If there is another route in this flow
-//        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-//            next = nextRoute
-//
-//            // The start of next flow
-//        } else {
+        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
+            next = nextRoute
+
+            // The start of next flow
+        }
+        // else {
 //            let nextFlowIndex = currentFlowIndex + 1
 //            if routes.indices.contains(nextFlowIndex) {
 //                let nextFlow = routes[nextFlowIndex]
