@@ -28,6 +28,7 @@ public struct AnyRouter: Router {
     public func showScreenStack(screens: [(segue: SegueOption, screen: (AnyRouter) -> some View)]) {
         var index: Int = 0
         var environmentRouter: AnyRouter? = nil
+        print("SHOW STACK RUNNING: \(index)")
                 
         func nextScreen(router: AnyRouter) -> AnyView {
             var router = router
