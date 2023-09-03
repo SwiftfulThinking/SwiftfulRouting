@@ -104,15 +104,15 @@ public struct RouterView<T:View>: View, Router {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
-        guard let firstRoute = routes.first else {
-            assertionFailure("There must be at least 1 route in parameter [Routes].")
-            return
-        }
-        
         if let route {
             routes.insertAfter(newRoutes, after: route)
         } else {
             routes = newRoutes
+        }
+
+        guard let firstRoute = routes.first else {
+            assertionFailure("There must be at least 1 route in parameter [Routes].")
+            return
         }
                 
         func nextScreen(id: String, router: AnyRouter) -> AnyView {
