@@ -240,7 +240,7 @@ public struct RouterView<T:View>: View, Router {
             route.setDidSegueToTrue()
             localRoutes[index] = route
             print("SET: \(route.id) to TRUEEEEE")
-            routes = []
+            routes = localRoutes
             print(routes[index])
         }
 
