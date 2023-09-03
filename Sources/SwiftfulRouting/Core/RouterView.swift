@@ -241,7 +241,9 @@ public struct RouterView<T:View>: View, Router {
             localRoutes[index] = route
             print("SET: \(route.id) to TRUEEEEE")
             routes = localRoutes
+            print(localRoutes[index])
             print(routes[index])
+            print("HERE")
         }
 
         if route.segue != .push {
