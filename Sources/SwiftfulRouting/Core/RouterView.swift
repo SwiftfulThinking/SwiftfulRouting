@@ -123,7 +123,11 @@ public struct RouterView<T:View>: View, Router {
 //            return
 //        }
                 
-        try? showNextScreen()
+        do {
+            try showNextScreen()
+        } catch {
+            print(error)
+        }
 //        func nextScreen(id: String, router: AnyRouter) -> AnyView {
 //            // We will mutate router below, so create a var copy
 ////            var router = router
