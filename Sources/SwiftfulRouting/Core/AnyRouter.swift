@@ -30,7 +30,6 @@ public struct AnyRoute: Equatable {
     
     mutating func setDidSegueToTrue() {
         didSegue = true
-        print("DID SEGUE BRUH")
     }
     
     static var root: AnyRoute = {
