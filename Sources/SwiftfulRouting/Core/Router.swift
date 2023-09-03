@@ -9,7 +9,6 @@ import SwiftUI
 import Combine
 
 public protocol Router {
-    var screens: [AnyDestination] { get }
     func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V)
     func dismissScreen()
 

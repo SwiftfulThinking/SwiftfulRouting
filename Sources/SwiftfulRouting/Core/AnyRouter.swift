@@ -53,7 +53,7 @@ public struct AnyRouter: Router {
             var router = router
             
             // Keep track of current screen by id
-            guard let index = screens.firstIndex(where: { $0.id == id }) else {
+            guard let index = routes.firstIndex(where: { $0.id == id }) else {
                 return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
             }
             
@@ -77,7 +77,7 @@ public struct AnyRouter: Router {
             
             // Action to go to the next screen, if available
             var goToNextScreen: (() -> Void)? = nil
-            if screens.indices.contains(index + 1) {
+            if routes.indices.contains(index + 1) {
                 goToNextScreen = {
                     let nextRoute = routes[index + 1]
                     router.showScreen(nextRoute.segue) { childRouter in
@@ -131,10 +131,6 @@ public struct AnyRouter: Router {
     
     private mutating func setRoutable(delegate: RoutableDelegate) {
         self.routable = delegate
-    }
-    
-    public var screens: [AnyDestination] {
-        object.screens
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
