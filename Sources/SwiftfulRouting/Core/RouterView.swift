@@ -48,7 +48,7 @@ public struct RouterView<T:View>: View, Router {
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [AnyRoute]
-    @State private var environmentRouter: AnyRouter?
+    @State private var environmentRouter: Router?
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -69,7 +69,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: AnyRouter? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
@@ -221,7 +221,7 @@ public struct RouterView<T:View>: View, Router {
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: nil, content: destination)))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: self, content: destination)))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
