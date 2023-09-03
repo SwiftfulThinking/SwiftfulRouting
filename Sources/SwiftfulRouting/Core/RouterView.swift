@@ -239,6 +239,7 @@ public struct RouterView<T:View>: View, Router {
             route.setDidSegueToTrue()
             routes[index] = route
             print("SET: \(route.id) to TRUEEEEE")
+            print(routes[index])
         }
 
         if route.segue != .push {
