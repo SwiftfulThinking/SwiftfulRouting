@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 public struct RoutableDelegate {
-    let goToNextScreen: (() -> Void)?
-    let dismissEnvironment: (() -> Void)?
+    public let goToNextScreen: (() -> Void)?
+    public let dismissEnvironment: (() -> Void)?
 }
 
 public struct Route {
