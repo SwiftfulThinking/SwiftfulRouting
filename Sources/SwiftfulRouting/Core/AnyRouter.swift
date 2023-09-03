@@ -27,7 +27,6 @@ public struct AnyRoute {
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
-    private var routable: RoutableDelegate? = nil
 
     public init(object: any Router) {
         self.object = object
@@ -35,107 +34,40 @@ public struct AnyRouter: Router {
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen(_ route: AnyRoute) {
-        showScreens([route])
+        object.showScreen(route)
     }
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ routes: [AnyRoute]) {
-        guard let firstRoute = routes.first else {
-            assertionFailure("There must be at least 1 route in parameter [Routes].")
-            return
-        }
-        
-        // move into delegate?
-        var environmentRouter: AnyRouter? = nil
-                
-        func nextScreen(id: String, router: AnyRouter) -> AnyView {
-            // We will mutate router below, so create a var copy
-            var router = router
-            
-            // Keep track of current screen by id
-            guard let index = routes.firstIndex(where: { $0.id == id }) else {
-                return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
-            }
-            
-            let route = routes[index]
-
-            // Set environment router when seguing to new environment only
-            switch route.segue {
-            case .push:
-                break
-            case .sheet, .fullScreenCover, .sheetDetents:
-                environmentRouter = router
-            }
-
-            // Action to dismiss the environment, if available
-            var dismissEnvironment: (() -> Void)?
-            if let environmentRouter {
-                dismissEnvironment = {
-                    environmentRouter.dismissScreen()
-                }
-            }
-            
-            // Action to go to the next screen, if available
-            var goToNextScreen: (() -> Void)? = nil
-            if routes.indices.contains(index + 1) {
-                goToNextScreen = {
-                    let nextRoute = routes[index + 1]
-                    router.showScreen(nextRoute.segue) { childRouter in
-                        nextScreen(id: nextRoute.id, router: childRouter)
-                    }
-                }
-            }
-            
-            // Update router with new Routable actions
-            let delegate = RoutableDelegate(
-                goToNextScreen: goToNextScreen,
-                dismissEnvironment: dismissEnvironment
-            )
-            router.setRoutable(delegate: delegate)
-            
-            // Return the view with its updated router
-            return AnyView(route.destination(router))
-        }
-        
-        object.showScreen(firstRoute.segue) { router in
-            nextScreen(id: firstRoute.id, router: router)
-        }
+        object.showScreens(routes)
     }
     
-    public func showNextScreen() throws {
-        guard let routable, let nextScreen = routable.goToNextScreen else {
-            throw RoutableError.noNextScreenSet
-        }
-        nextScreen()
-    }
+//    public func showNextScreen() throws {
+//        guard let routable, let nextScreen = routable.goToNextScreen else {
+//            throw RoutableError.noNextScreenSet
+//        }
+//        nextScreen()
+//    }
     
-    public func tryGoToNextScreenOrDismissEnvironment() throws {
-        do {
-            try showNextScreen()
-        } catch {
-            try dismissEnvironment()
-        }
-    }
+//    public func tryGoToNextScreenOrDismissEnvironment() throws {
+//        do {
+//            try showNextScreen()
+//        } catch {
+//            try dismissEnvironment()
+//        }
+//    }
     
-    private enum RoutableError: LocalizedError {
-        case noNextScreenSet
-        case noDismissEnvironmentSet
-    }
     
-    public func dismissEnvironment() throws {
-        guard let routable, let dismiss = routable.dismissEnvironment else {
-            throw RoutableError.noDismissEnvironmentSet
-        }
-        dismiss()
-    }
-    
-    private mutating func setRoutable(delegate: RoutableDelegate) {
-        self.routable = delegate
-    }
-    
+//    public func dismissEnvironment() throws {
+//        guard let routable, let dismiss = routable.dismissEnvironment else {
+//            throw RoutableError.noDismissEnvironmentSet
+//        }
+//        dismiss()
+//    }
+//
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreen(option, destination: destination)
+        object.showScreen(AnyRoute(option, destination: destination))
     }
     
     /// Dismiss the top-most presented screen in the current Environment. Same as calling presentationMode.wrappedValue.dismiss().

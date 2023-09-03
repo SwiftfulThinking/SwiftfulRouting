@@ -38,10 +38,18 @@ public struct RouterView<T:View>: View, Router {
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
  
+    // Routable methods
+    let route: AnyRoute?
+    @State private var routable: RoutableDelegate? = nil
+
     // Segues
     @State private var segueOption: SegueOption = .push
     @State public var screens: [AnyDestination] = []
     
+    /// routes are all routes set on heirarchy, included ones that are in front of current screen
+    @State private var routes: [AnyRoute]?
+    @State private var environmentRouter: AnyRouter?
+
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
     @State private var screenStackCount: Int = 0
@@ -61,10 +69,13 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [AnyRoute]? = nil, environmentRouter: AnyRouter? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
+        self.route = route
+        self._routes = State(wrappedValue: routes)
+        self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
     }
     
@@ -78,21 +89,108 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator)
+                    showDragIndicator: showDragIndicator
+                )
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
-    public func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
-        self.segueOption = option
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen(_ route: AnyRoute) {
+        showScreens([route])
+    }
+    
+    /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
+    public func showScreens(_ routes: [AnyRoute]) {
+        guard let firstRoute = routes.first else {
+            assertionFailure("There must be at least 1 route in parameter [Routes].")
+            return
+        }
+                
+        func nextScreen(id: String, router: AnyRouter) -> AnyView {
+            // We will mutate router below, so create a var copy
+//            var router = router
+            
+            // Keep track of current screen by id
+            guard let index = routes.firstIndex(where: { $0.id == id }) else {
+                return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
+            }
+            
+            let route = routes[index]
 
-        if option != .push {
+            // Set environment router when seguing to new environment only
+            switch route.segue {
+            case .push:
+                break
+            case .sheet, .fullScreenCover, .sheetDetents:
+                environmentRouter = router
+            }
+
+            // Action to dismiss the environment, if available
+//            var dismissEnvironment: (() -> Void)?
+//            if let environmentRouter {
+//                dismissEnvironment = {
+//                    environmentRouter.dismissScreen()
+//                }
+//            }
+//
+//            // Action to go to the next screen, if available
+//            var goToNextScreen: (() -> Void)? = nil
+//            if routes.indices.contains(index + 1) {
+//                goToNextScreen = {
+//                    let nextRoute = routes[index + 1]
+//                    router.showScreen(nextRoute.segue) { childRouter in
+//                        nextScreen(id: nextRoute.id, router: childRouter)
+//                    }
+//                }
+//            }
+            
+            // Update router with new Routable actions
+//            let delegate = RoutableDelegate(
+//                goToNextScreen: goToNextScreen,
+//                dismissEnvironment: dismissEnvironment
+//            )
+//            router.setRoutable(delegate: delegate)
+            
+            // Return the view with its updated router
+            return AnyView(route.destination(router))
+        }
+        
+        showScreen(firstRoute, routes: routes, environmentRouter: environmentRouter) { router in
+            nextScreen(id: firstRoute.id, router: router)
+        }
+    }
+    
+    public func dismissEnvironment() {
+        if let environmentRouter {
+            environmentRouter.dismissScreen()
+        } else {
+            dismissScreen()
+        }
+    }
+    
+    private enum RoutableError: LocalizedError {
+        case noNextScreenSet
+    }
+    
+    public func goToNextScreen() throws {
+        guard let nextRoute = routes?.first(where: { $0.id == route?.id }) else {
+            throw RoutableError.noNextScreenSet
+        }
+        
+        showScreen(nextRoute)
+    }
+    
+    public func showScreen<V:View>(_ route: AnyRoute, routes: [AnyRoute], environmentRouter: AnyRouter?, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+        self.segueOption = route.segue
+
+        if route.segue != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -102,16 +200,16 @@ public struct RouterView<T:View>: View, Router {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, content: destination)))
+                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
                 } else {
                     // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, content: destination)))
+                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, content: destination)))
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
             }
         }
     }
@@ -125,21 +223,22 @@ public struct RouterView<T:View>: View, Router {
         // If screenStack.isEmpty, we are in the root Router and should start building on $screens
         // Else, we are not in the root Router and should continue off of $screenStack
 
-        var localStack: [AnyDestination] = []
-        let bindingStack = screenStack.isEmpty ? $screens : $screenStack
-
-        destinations.forEach { destination in
-            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, content: { router in
-                AnyView(destination(router))
-            }))
-            localStack.append(view)
-        }
-        
-        if screenStack.isEmpty {
-            self.screens.append(contentsOf: localStack)
-        } else {
-            self.screenStack.append(contentsOf: localStack)
-        }
+        fatalError("FIX ME LATER")
+//        var localStack: [AnyDestination] = []
+//        let bindingStack = screenStack.isEmpty ? $screens : $screenStack
+//
+//        destinations.forEach { destination in
+//            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, content: { router in
+//                AnyView(destination(router))
+//            }))
+//            localStack.append(view)
+//        }
+//
+//        if screenStack.isEmpty {
+//            self.screens.append(contentsOf: localStack)
+//        } else {
+//            self.screenStack.append(contentsOf: localStack)
+//        }
     }
     
     @available(iOS 16, *)
@@ -156,7 +255,8 @@ public struct RouterView<T:View>: View, Router {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
+        fatalError()
+//        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
     }
     
     public func dismissScreen() {
