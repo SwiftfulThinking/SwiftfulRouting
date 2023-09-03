@@ -30,12 +30,13 @@ public struct AnyRouter: Router {
         var environmentRouter: AnyRouter? = nil
                 
         func nextScreen(router: AnyRouter) -> AnyView {
+            let indexThisLoop = index
             var router = router
-            let screen = screens[index]
+            let screenData = screens[indexThisLoop]
             print("NEXT SCREEN RUNNING: \(index)")
 
             // Set environment router when seguing to new environment
-            switch screen.segue {
+            switch screenData.segue {
             case .push:
                 break
             case .sheet, .fullScreenCover, .sheetDetents:
@@ -53,8 +54,8 @@ public struct AnyRouter: Router {
             if screens.indices.contains(index + 1) {
                 goToNextScreen = {
                     index += 1
-                    let segue = screens[index].segue
-                    router.showScreen(segue) { childRouter in
+                    let nextScreenData = screens[index]
+                    router.showScreen(nextScreenData.segue) { childRouter in
                         nextScreen(router: childRouter)
                     }
                 }
@@ -63,7 +64,7 @@ public struct AnyRouter: Router {
             let delegate = RoutableDelegate(goToNextScreen: goToNextScreen, dismissEnvironment: dismissEnvironment)
             router.setRoutable(delegate: delegate)
             
-            return AnyView(screen.screen(router))
+            return AnyView(screenData.screen(router))
         }
         
         showScreen(screens.first?.segue ?? .fullScreenCover) { router in
