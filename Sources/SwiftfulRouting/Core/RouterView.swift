@@ -235,10 +235,12 @@ public struct RouterView<T:View>: View, Router {
         
         // Remove route
         if let index = routes.firstIndex(of: route) {
+            var localRoutes = routes
             var route = routes[index]
             route.setDidSegueToTrue()
-            routes[index] = route
+            localRoutes[index] = route
             print("SET: \(route.id) to TRUEEEEE")
+            routes = localRoutes
             print(routes[index])
         }
 
