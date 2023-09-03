@@ -262,6 +262,7 @@ public struct RouterView<T:View>: View, Router {
                         var updated = element
                         updated.setDidSegueToTrue()
                         routesFinal.append(updated)
+                        print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
                     }
                 }
             }
