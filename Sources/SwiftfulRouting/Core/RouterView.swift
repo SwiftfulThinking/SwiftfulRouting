@@ -251,12 +251,25 @@ public struct RouterView<T:View>: View, Router {
 //        var didFindEndOfCurrentFlow: Bool = false
         
         
-        // remove all flows after this one
-        if
-            let currentFlowIndex = routes.lastIndex(where: { flow in
-                return flow.contains(where: { $0.id == route.id })
-            }) {
-            routes.remove(at: currentFlowIndex)
+        // remove all flows AFTER this one
+//        if
+//            let currentFlowIndex = routes.lastIndex(where: { flow in
+//                return flow.contains(where: { $0.id == route.id })
+//            }) {
+//
+//            for route in routes {
+//
+//            }
+//        }
+        
+        // Loop backwards, if have not yet found the current flow,
+        // It's a future flow and should be removed now
+        for (index, array) in routes.reversed().enumerated() {
+            if array.contains(where: { $0.id == route.id }) {
+                return
+            } else {
+                routes.remove(at: index)
+            }
         }
         
 //        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
@@ -296,7 +309,7 @@ public struct RouterView<T:View>: View, Router {
 //        routes = routesFinal
     }
     
-    public func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
         print("HERE IS MY NEW ROUTE: \(route.id)")
         
