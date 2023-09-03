@@ -40,7 +40,6 @@ public struct RouterView<T:View>: View, Router {
  
     // Routable methods
     @State private var route: AnyRoute
-    @State private var routable: RoutableDelegate? = nil
 
     // Segues
     @State private var segueOption: SegueOption = .push
@@ -126,6 +125,13 @@ public struct RouterView<T:View>: View, Router {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
+        // Need to avoid duplicates herein
+        // prioritize these new routes, so existing duplicates should be
+        // 1 - purged
+        // 2 - marked as seen
+        //
+        // always purge
+        // always replace stack?
         routes.insertAfter(newRoutes, after: route)
 
 //        guard let firstRoute = routes.first else {
@@ -242,9 +248,9 @@ public struct RouterView<T:View>: View, Router {
                     routesFinal.append(element)
                 } else if index == currentIndex {
                     // update this flow as seen
-                    var updated = element
-                    updated.setDidSegueToTrue()
-                    routesFinal.append(updated)
+//                    var updated = element
+//                    updated.setDidSegueToTrue()
+//                    routesFinal.append(updated)
                 } else {
                     // update every route after current route until the next environment
                     switch element.segue {
@@ -259,9 +265,9 @@ public struct RouterView<T:View>: View, Router {
                         routesFinal.append(element)
                     } else {
                         // update this flow as seen
-                        var updated = element
-                        updated.setDidSegueToTrue()
-                        routesFinal.append(updated)
+//                        var updated = element
+//                        updated.setDidSegueToTrue()
+//                        routesFinal.append(updated)
                         print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
                     }
                 }
@@ -325,11 +331,10 @@ public struct RouterView<T:View>: View, Router {
         }
         
         markRoutesAsSeen(route: route)
-
     }
     
     @available(iOS 16, *)
-    public func pushScreens(destinations: [(AnyRouter) -> any View]) {
+    public func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
         // iOS 16 supports NavigationStack, which can push a stack of views and increment an existing view stack
         self.segueOption = .push
         

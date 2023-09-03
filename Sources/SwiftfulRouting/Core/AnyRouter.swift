@@ -8,11 +8,6 @@
 import Foundation
 import SwiftUI
 
-public struct RoutableDelegate {
-    let goToNextScreen: (() -> Void)?
-    let dismissEnvironment: (() -> Void)?
-}
-
 // Note (possible SwiftUI bug?):
 // Do not conform to Equatable here. It causes the @State property wrapper to monitor Equatable value instead of Hashable value
 // so didSegue changing value does not update the View (I think)
@@ -87,8 +82,8 @@ public struct AnyRouter: Router {
 
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
     @available(iOS 16, *)
-    public func pushScreens(destinations: [(AnyRouter) -> any View]) {
-        object.pushScreens(destinations: destinations)
+    public func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
+        object.pushScreenStack(destinations: destinations)
     }
     
     @available(iOS 16, *)

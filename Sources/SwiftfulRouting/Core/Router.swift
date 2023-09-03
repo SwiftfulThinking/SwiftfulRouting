@@ -17,7 +17,7 @@ public protocol Router {
     func dismissEnvironment()
 
     @available(iOS 16, *)
-    func pushScreens(destinations: [(AnyRouter) -> any View])
+    func pushScreenStack(destinations: [(AnyRouter) -> any View])
     
     @available(iOS 16, *)
     func popToRoot()
