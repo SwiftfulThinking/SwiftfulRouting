@@ -107,6 +107,8 @@ public struct RouterView<T:View>: View, Router {
             assertionFailure("There must be at least 1 route in parameter [Routes].")
             return
         }
+        
+        self.routes = routes
                 
         func nextScreen(id: String, router: AnyRouter) -> AnyView {
             // We will mutate router below, so create a var copy
@@ -157,7 +159,7 @@ public struct RouterView<T:View>: View, Router {
             return AnyView(route.destination(router))
         }
         
-        showScreen(firstRoute, routes: routes, environmentRouter: environmentRouter) { router in
+        showScreen(firstRoute) { router in
             nextScreen(id: firstRoute.id, router: router)
         }
     }
@@ -182,7 +184,7 @@ public struct RouterView<T:View>: View, Router {
         showScreen(nextRoute)
     }
     
-    public func showScreen<V:View>(_ route: AnyRoute, routes: [AnyRoute], environmentRouter: AnyRouter?, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
 
         if route.segue != .push {
