@@ -261,7 +261,7 @@ public struct RouterView<T:View>: View, Router {
                 }
             }
         }
-        print("SETTING NEW ROUTE FINAL: \(routesFinal.map({$0.id }))")
+        print("SETTING NEW ROUTE FINAL: \(routesFinal.map({$0.didSegue }))")
         routes = routesFinal
     }
     
