@@ -43,18 +43,7 @@ public struct RouterView<T:View>: View, Router {
 
     // Segues
     @State private var segueOption: SegueOption = .push
-    @State public var screens: [AnyDestination] = [] {
-        didSet {
-            print("DID SET TRIGGERED: \(screens.count) :: \(oldValue.count)")
-            
-            for value in oldValue {
-                if !screens.contains(value) {
-                    print("THIS SCREEN IS NO LONGER PRESENTED")
-                    value.onDismiss?()
-                }
-            }
-        }
-    }
+    @State public var screens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
@@ -62,7 +51,18 @@ public struct RouterView<T:View>: View, Router {
     @State private var onDismiss: (() -> Void)? = nil
 
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination]
+    @Binding private var screenStack: [AnyDestination] {
+        didSet {
+            print("DID SET TRIGGERED: \(screenStack.count) :: \(oldValue.count)")
+            
+            for value in oldValue {
+                if !screenStack.contains(value) {
+                    print("THIS SCREEN IS NO LONGER PRESENTED")
+                    value.onDismiss?()
+                }
+            }
+        }
+    }
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
