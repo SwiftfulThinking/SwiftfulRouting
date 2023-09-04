@@ -99,6 +99,8 @@ public struct RouterView<T:View>: View, Router {
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
                 .onChange(of: presentationMode.wrappedValue.isPresented, perform: { newValue in
+                    print("IS PRESENTED: \(newValue)")
+
                     if isEnvironmentRouter {
                         print("IS ENVIRONMENT AND IS PRESENTED: \(newValue)")
                     }
