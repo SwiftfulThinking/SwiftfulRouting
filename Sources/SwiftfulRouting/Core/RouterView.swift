@@ -44,6 +44,7 @@ public struct RouterView<T:View>: View, Router {
     // Segues
     @State private var segueOption: SegueOption = .push
     @State public var screens: [AnyDestination] = []
+    @State private var previousScreens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
@@ -105,8 +106,17 @@ public struct RouterView<T:View>: View, Router {
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
-        .onChange(of: screens.count, perform: { newValue in
+        .onChange(of: screens, perform: { newValue in
             print("SCREENS COUNT CHANGED: \(newValue)")
+            // If new value doesn't have a screen from previous value, it is dismissed
+            for screen in newValue {
+                if !previousScreens.contains(screen) {
+                    print("THIS ONE IS GONE")
+                    screen.onDismiss?()
+                }
+            }
+            
+            previousScreens = newValue
         })
     }
     
