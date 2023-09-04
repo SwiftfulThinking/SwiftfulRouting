@@ -208,22 +208,27 @@ public struct RouterView<T:View>: View, Router {
         // If screenStack.isEmpty, we are in the root Router and should start building on $screens
         // Else, we are not in the root Router and should continue off of $screenStack
 
-        fatalError("FIX ME LATER")
-//        var localStack: [AnyDestination] = []
-//        let bindingStack = screenStack.isEmpty ? $screens : $screenStack
-//
-//        destinations.forEach { destination in
-//            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, content: { router in
-//                AnyView(destination(router))
-//            }))
-//            localStack.append(view)
-//        }
-//
-//        if screenStack.isEmpty {
-//            self.screens.append(contentsOf: localStack)
-//        } else {
-//            self.screenStack.append(contentsOf: localStack)
-//        }
+        var localStack: [AnyDestination] = []
+        let bindingStack = screenStack.isEmpty ? $screens : $screenStack
+        var localRoutes: [AnyRoute] = []
+
+        destinations.forEach { destination in
+            let route = AnyRoute(.push, destination: destination)
+            localRoutes.append(route)
+            
+            let allRoutes: [[AnyRoute]] = routes + [localRoutes]
+            
+            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: allRoutes, environmentRouter: environmentRouter, content: { router in
+                AnyView(destination(router))
+            }))
+            localStack.append(view)
+        }
+
+        if screenStack.isEmpty {
+            self.screens.append(contentsOf: localStack)
+        } else {
+            self.screenStack.append(contentsOf: localStack)
+        }
     }
     
     @available(iOS 16, *)
