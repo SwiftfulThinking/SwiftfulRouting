@@ -112,7 +112,7 @@ public struct RouterView<T:View>: View, Router {
             
             // Every screen has this onChange, but they all bind to the same array
             // We only need to trigger this on the environment router
-            if isEnvironmentRouter {
+//            if isEnvironmentRouter {
                 print("SCREENS COUNT CHANGED: \(newValue)")
 
                 for screen in previousScreens {
@@ -123,7 +123,7 @@ public struct RouterView<T:View>: View, Router {
                 }
                 
                 previousScreens = newValue
-            }
+//            }
         })
     }
     
