@@ -147,110 +147,27 @@ public struct RouterView<T:View>: View, Router {
             throw RoutableError.noNextScreenSet
         }
         
-//        guard let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) else {
-//            throw RoutableError.noNextScreenSet
-//        }
-//
-//        guard let next else {
-//            throw RoutableError.noNextScreenSet
-//        }
         showScreen(nextRoute) { router in
             AnyView(nextRoute.destination(router))
         }
     }
     
-    private func markRoutesAsSeen(route: AnyRoute) {
-        // Marks every route in this flow (up until the next environment) as seen
-//        var routesFinal: [AnyRoute] = []
-//        var didFindEndOfCurrentFlow: Bool = false
-        
-        
-        // remove all flows AFTER this one
-//        if
-//            let currentFlowIndex = routes.lastIndex(where: { flow in
-//                return flow.contains(where: { $0.id == route.id })
-//            }) {
-//
-//            for route in routes {
-//
-//            }
-//        }
-        
-        // Loop backwards, if have not yet found the current flow,
-        // It's a future flow and should be removed now
-        
+    private func removeRoutes(route: AnyRoute) {
+        // After segueing, remove that flow from local routes
+        // Loop backwards, if have not yet found the current flow...
+        // it's a future flow or the current flow and should be removed now
         for (index, item) in routes.enumerated().reversed() {
-            print("REMOVING ROUTE::::: \(index) \(item)")
             routes.remove(at: index)
             
             if item.contains(where: { $0.id == route.id }) {
-                print("DID FINISH REMOVING")
                 return
             }
         }
-        
-//        if let currentIndex = routes.lastIndex(where: { $0.id == route.id }) {
-//
-//            for (index, element) in routes.enumerated() {
-//                if index < currentIndex {
-//                    // before current route shouldn't get updated herein
-//                    routesFinal.append(element)
-//                } else if index == currentIndex {
-//                    // update this flow as seen
-////                    var updated = element
-////                    updated.setDidSegueToTrue()
-////                    routesFinal.append(updated)
-//                } else {
-//                    // update every route after current route until the next environment
-////                    switch element.segue {
-////                    case .fullScreenCover, .sheet, .sheetDetents:
-////                        didFindEndOfCurrentFlow = true
-////                    case .push:
-////                        break
-////                    }
-////
-////                    if didFindEndOfCurrentFlow {
-////                        // don't update the next flow
-////                        routesFinal.append(element)
-////                    } else {
-////                        // update this flow as seen
-//////                        var updated = element
-//////                        updated.setDidSegueToTrue()
-//////                        routesFinal.append(updated)
-////                        print("DID UPDATED THIS FLOW: \(index) :: \(currentIndex)")
-////                    }
-//                }
-//            }
-//        }
-//        print("SETTING NEW ROUTE FINAL: \(routesFinal.map({$0.didSegue }))")
-//        routes = routesFinal
     }
     
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
-        print("HERE IS MY NEW ROUTE: \(route.id)")
-        
-//        Task {
-            // Remove route
-            // the problem is I am updates routes data model and it's not populating
-//            var localRoutes: [AnyRoute] = routes
-//            if let index = routes.firstIndex(where: { $0.id == route.id }) {
-//                var route = routes[index]
-//                route.setDidSegueToTrue()
-//                routes[index] = route
-//                print("SET: \(route.id) to TRUEEEEE")
-////                routes = []
-////                try? await Task.sleep(nanoseconds: 1_000_000_000)
-////                routes = localRoutes
-////                try? await Task.sleep(nanoseconds: 1_000_000_000)
-////                print(localRoutes[index])
-//                print(route)
-//                print(routes[index])
-//                print("HERE")
-//            }
 
-            
-//        }
         if route.segue != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
@@ -279,7 +196,7 @@ public struct RouterView<T:View>: View, Router {
             }
         }
         
-        markRoutesAsSeen(route: route)
+        removeRoutes(route: route)
     }
     
     @available(iOS 16, *)
