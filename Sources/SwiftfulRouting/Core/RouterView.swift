@@ -49,6 +49,7 @@ public struct RouterView<T:View>: View, Router {
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
+    @State private var isEnvironmentRouter: Bool = false
     @State private var onDismiss: (() -> Void)? = nil
 
     // Binding to view stack from previous RouterViews
@@ -109,14 +110,19 @@ public struct RouterView<T:View>: View, Router {
         .onChange(of: screens, perform: { newValue in
 //            print("SCREENS COUNT CHANGED: \(newValue)")
             // If new value doesn't have a screen from previous value, it is dismissed
-            for screen in previousScreens {
-                if !newValue.contains(screen) {
-//                    print("THIS ONE IS GONE")
-                    screen.onDismiss?()
-                }
-            }
             
-            previousScreens = newValue
+            // Every screen has this onChange, but they all bind to the same array
+            // We only need to trigger this on the environment router
+            if isEnvironmentRouter {
+                for screen in previousScreens {
+                    if !newValue.contains(screen) {
+    //                    print("THIS ONE IS GONE")
+                        screen.onDismiss?()
+                    }
+                }
+                
+                previousScreens = newValue
+            }
         })
     }
     
@@ -126,6 +132,7 @@ public struct RouterView<T:View>: View, Router {
         // The first screen should not have one
         if environmentRouter == nil {
             environmentRouter = self
+            isEnvironmentRouter = true
         }
     }
     
