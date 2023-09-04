@@ -105,6 +105,9 @@ public struct RouterView<T:View>: View, Router {
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+        .onChange(of: screens.count, perform: { newValue in
+            print("SCREENS COUNT CHANGED: \(newValue)")
+        })
     }
     
     private func setEnvironmentRouterIfNeeded() {
