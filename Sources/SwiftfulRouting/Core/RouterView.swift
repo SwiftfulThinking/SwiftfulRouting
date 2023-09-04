@@ -108,12 +108,13 @@ public struct RouterView<T:View>: View, Router {
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
         .onChange(of: screens, perform: { newValue in
-//            print("SCREENS COUNT CHANGED: \(newValue)")
             // If new value doesn't have a screen from previous value, it is dismissed
             
             // Every screen has this onChange, but they all bind to the same array
             // We only need to trigger this on the environment router
             if isEnvironmentRouter {
+                print("SCREENS COUNT CHANGED: \(newValue)")
+
                 for screen in previousScreens {
                     if !newValue.contains(screen) {
     //                    print("THIS ONE IS GONE")
