@@ -58,7 +58,7 @@ public struct AnyRouter: Router {
     }
     
     /// If there is a next screen in the current screen flow, go to it. Otherwise, flow is complete and dismiss the environment.
-    public func showNextScreenOrDismissEnvironment() throws {
+    public func showNextScreenOrDismissEnvironment() {
         do {
             try showNextScreen()
         } catch {
