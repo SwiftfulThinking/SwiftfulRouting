@@ -98,16 +98,14 @@ public struct RouterView<T:View>: View, Router {
                     showDragIndicator: showDragIndicator
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                .onChange(of: presentationMode.wrappedValue.isPresented, perform: { newValue in
-                    print("IS PRESENTED: \(newValue)")
-
-                    if isEnvironmentRouter {
-                        print("IS ENVIRONMENT AND IS PRESENTED: \(newValue)")
-                    }
-                })
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+        .onChange(of: presentationMode.wrappedValue.isPresented, perform: { newValue in
+            if !newValue {
+                print("IS NO LONGER PRESENTED AND IS ENV: \(isEnvironmentRouter.description)")
+            }
+        })
     }
     
     private func setEnvironmentRouterIfNeeded() {
