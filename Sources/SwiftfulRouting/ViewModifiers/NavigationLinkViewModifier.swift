@@ -45,3 +45,16 @@ struct NavigationLinkViewModifier: ViewModifier {
         }
     }
 }
+
+struct OnDisappearViewWrapper: View {
+    
+    @Environment(\.presentationMode) var presentationMode
+    let value: AnyDestination
+    
+    var body: some View {
+        value.destination
+            .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
+                print("HI NICK WE HAVE A NEW VALUE HERE: \(newValue) for destination : \(value.id)")
+            }
+    }
+}
