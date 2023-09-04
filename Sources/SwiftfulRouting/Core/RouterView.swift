@@ -110,6 +110,7 @@ public struct RouterView<T:View>: View, Router {
     
     private func handleScreenDismissalsIfNeeded(newValue: [AnyDestination]) {
         // If there was a screen previously but it is no longer in the new array, it has dismissed
+        print("PREVIOUS: \(previousScreens.count) :: NEW \(newValue.count)")
         for screen in previousScreens {
             if !newValue.contains(screen) {
                 screen.onDismiss?()
