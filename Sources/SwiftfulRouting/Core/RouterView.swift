@@ -100,6 +100,7 @@ public struct RouterView<T:View>: View, Router {
                     onDismissOfEnvironment: {
                         // If the environment dismisses (sheet or full screen cover)
                         // Then all screens herein are removed, so set array to nil so that dismissal onChange can trigger
+                        print("ALL SCREENS REMOVED ON: \(route.id)")
                         screens = []
                     }
                 )
