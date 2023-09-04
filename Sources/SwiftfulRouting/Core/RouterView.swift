@@ -96,7 +96,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator
                 )
-                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                .onAppear(perform: setEnvironmentRouterIfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -110,6 +110,7 @@ public struct RouterView<T:View>: View, Router {
             environmentRouter = self
         }
     }
+    //onDidDismissFlow: @MainActor () -> Void
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
