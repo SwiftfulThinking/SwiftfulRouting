@@ -98,7 +98,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator,
                     onDismiss: {
-                        print("WE KNOW IT DISMISSED: \(route.id)")
+//                        print("WE KNOW IT DISMISSED: \(route.id)")
 //                        onDismiss?()
                     }
                 )
@@ -107,11 +107,11 @@ public struct RouterView<T:View>: View, Router {
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
         .onChange(of: screens, perform: { newValue in
-            print("SCREENS COUNT CHANGED: \(newValue)")
+//            print("SCREENS COUNT CHANGED: \(newValue)")
             // If new value doesn't have a screen from previous value, it is dismissed
             for screen in previousScreens {
                 if !newValue.contains(screen) {
-                    print("THIS ONE IS GONE")
+//                    print("THIS ONE IS GONE")
                     screen.onDismiss?()
                 }
             }
