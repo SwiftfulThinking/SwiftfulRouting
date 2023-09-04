@@ -102,9 +102,9 @@ public struct RouterView<T:View>: View, Router {
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
-        .onChange(of: screens, perform: handleScreenDismissalsIfNeeded)
+        .onChange(of: screenStack, perform: handleScreenDismissalsIfNeeded)
         .onFirstAppear(perform: {
-            handleScreenDismissalsIfNeeded(newValue: screens)
+            handleScreenDismissalsIfNeeded(newValue: screenStack)
         })
     }
     
