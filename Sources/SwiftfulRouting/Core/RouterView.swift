@@ -48,6 +48,7 @@ public struct RouterView<T:View>: View, Router {
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
+    @State private var isEnvironmentRouter: Bool = false
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -96,7 +97,12 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator
                 )
-                .onAppear(perform: setEnvironmentRouterIfNeeded)
+                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                .onChange(of: presentationMode.wrappedValue.isPresented, perform: { newValue in
+                    if isEnvironmentRouter {
+                        print("IS ENVIRONMENT AND IS PRESENTED: \(newValue)")
+                    }
+                })
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -108,10 +114,11 @@ public struct RouterView<T:View>: View, Router {
         // The first screen should not have one
         if environmentRouter == nil {
             environmentRouter = self
+            isEnvironmentRouter = true
         }
     }
-    //onDidDismissFlow: @MainActor () -> Void
     
+    // onDidDismissFlow: (@MainActor () -> Void)? = nil
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
         guard let route = newRoutes.first else {
