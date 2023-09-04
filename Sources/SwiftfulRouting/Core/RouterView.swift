@@ -105,6 +105,11 @@ public struct RouterView<T:View>: View, Router {
                     }
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                .onDisappear {
+                    if isEnvironmentRouter {
+                        print("ENV R: SCREENS: \(screens.count) IS PRESENTED: \(presentationMode.wrappedValue.isPresented)")
+                    }
+                }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
