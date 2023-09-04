@@ -78,16 +78,9 @@ public struct RouterView<T:View>: View, Router {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
             self._routes = State(wrappedValue: [[root]])
-            print("ROOT ID: \(root)")
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
-        
-//        print("INIT ROUTE: \(route?.id ?? "n/a")")
-//        print("INIT ROUTES: \(self.routes.map({ $0.id }))")
-//        print("INIT ROUTES: \(self.routes.map({ $0.didSegue }))")
-//        print("ON INIT W ROUTES: \(routes?.count ?? -999)")
-//        print("STARTING ROUT: \(self.route.id)")
 
     }
     
@@ -118,121 +111,14 @@ public struct RouterView<T:View>: View, Router {
         }
     }
     
-    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-//    public func showScreen(_ route: AnyRoute) {
-//        showScreens([route])
-//    }
-    
-    // showNextScreen is only for showing next screen and should not be calleg when setting?
-    
-    
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
-        print("HI NICK SHOW SCREENS: \(newRoutes.map({ $0.id }))")
-        // Need to avoid duplicates herein
-        // prioritize these new routes, so existing duplicates should be
-        // 1 - purged
-        // 2 - marked as seen
-        //
-        // always purge
-        // always replace stack?
-        // routes is actually flows and it's an array of arrays [[AnyRoute]]
         guard let route = newRoutes.first else {
-            fatalError()
+            assertionFailure("SwiftfulRouting: No routes found.")
             return
         }
-
-        // routes is current routes up to current point
-        // plus newRoutes
         
-//        var temp: [AnyRoute] = []
-//
-//        for item in routes {
-//            temp.append(item)
-//
-//            if item.id == route.id {
-//                break
-//            }
-//        }
-//        temp.append(contentsOf: newRoutes)
-        
-        // back to flows, must always insert after current flow
-        // goToNext should check if it's a new flow to go to
-        // but do not expose that to the client
-        //
-//
-//        routes = temp
         routes.append(newRoutes)
-//        routes.insertAfter(newRoutes, after: route)
-
-//        guard let firstRoute = routes.first else {
-//            assertionFailure("There must be at least 1 route in parameter [Routes].")
-//            return
-//        }
-                
-        
-        // should always segue to first screen in showScreens!
-        // So it's not "show next" it's show this flow now
-        
-//        do {
-//            try showNextScreen()
-//        } catch {
-//            print(error)
-//        }
-//        func nextScreen(id: String, router: AnyRouter) -> AnyView {
-//            // We will mutate router below, so create a var copy
-////            var router = router
-//
-//            // Keep track of current screen by id
-//            guard let index = routes.firstIndex(where: { $0.id == id }) else {
-//                return AnyView(Text("Error SwiftfulRouting AnyRouter.nextScreen index"))
-//            }
-//
-//            let route = routes[index]
-//
-//            // Set environment router when seguing to new environment only
-//            switch route.segue {
-//            case .push:
-//                break
-//            case .sheet, .fullScreenCover, .sheetDetents:
-//                environmentRouter = router
-//            }
-
-            // Action to dismiss the environment, if available
-//            var dismissEnvironment: (() -> Void)?
-//            if let environmentRouter {
-//                dismissEnvironment = {
-//                    environmentRouter.dismissScreen()
-//                }
-//            }
-//
-//            // Action to go to the next screen, if available
-//            var goToNextScreen: (() -> Void)? = nil
-//            if routes.indices.contains(index + 1) {
-//                goToNextScreen = {
-//                    let nextRoute = routes[index + 1]
-//                    router.showScreen(nextRoute.segue) { childRouter in
-//                        nextScreen(id: nextRoute.id, router: childRouter)
-//                    }
-//                }
-//            }
-            
-            // Update router with new Routable actions
-//            let delegate = RoutableDelegate(
-//                goToNextScreen: goToNextScreen,
-//                dismissEnvironment: dismissEnvironment
-//            )
-//            router.setRoutable(delegate: delegate)
-            
-            // Return the view with its updated router
-//            return AnyView(route.destination(router))
-//        }
-        
-//        showScreen(firstRoute) { router in
-//            AnyView(firstRoute.destination(router))
-//            nextScreen(id: firstRoute.id, router: router)
-//        }
-        
         
         showScreen(route) { router in
             AnyView(route.destination(router))
@@ -252,72 +138,24 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public func showNextScreen() throws {
-        
-        var next: AnyRoute? = nil
-        
-//        print("CURRENT ROUT: \(route.id)")
-//        print("IDS: \(routes.map({ $0.id }))")
-//        print("VALUES: \(routes.map({ $0.didSegue }))")
-        
-        guard let currentFlowIndex = routes.lastIndex(where: { flow in
-            return flow.contains(where: { $0.id == route.id })
-        }) else {
+        guard
+            let currentFlow = routes.last(where: { flow in
+                return flow.contains(where: { $0.id == route.id })
+            }),
+            let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue })
+        else {
             throw RoutableError.noNextScreenSet
         }
-        let currentFlow = routes[currentFlowIndex]
-////
-////        // If there is another route in this flow
-        if let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-            next = nextRoute
-
-            // The start of next flow
-        }
-        // else {
-//            let nextFlowIndex = currentFlowIndex + 1
-//            if routes.indices.contains(nextFlowIndex) {
-//                let nextFlow = routes[nextFlowIndex]
-//                next = nextFlow.first
-//            }
-//        }
         
-//        if let lastFlow = routes.last {
-//            if let nextRoute
-//        }
-        
-        
-//        } else if let nextFlow = routes.firstAfter(currentFlow),
-//           let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-//            next = nextRoute
+//        guard let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) else {
+//            throw RoutableError.noNextScreenSet
 //        }
 //
-//        if
-//            let currentFlow = routes.last(where: { flow in
-//                return flow.contains(where: { $0.id == route.id })
-//            }),
-//            let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue }) {
-//            next = nextRoute
+//        guard let next else {
+//            throw RoutableError.noNextScreenSet
 //        }
-
-        
-        
-        
-        print("FLOWS")
-        print(route)
-        print(routes)
-        
-//        if let nextRoute = routes.firstAfter(route, where: { !$0.didSegue }) {
-//            print("FOUND NEXT: \(nextRoute)")
-//            next = nextRoute
-//        }
-        
-        guard let next else {
-            throw RoutableError.noNextScreenSet
-        }
-//        print("CURRENT ROUTE: \(route.id ?? "idk")")
-//        print("ON SHOW NEXT:: \(routes.count ?? -999)")
-        print("SHOW NEXT SCREEN TRIGGERED")
-        showScreen(next) { router in
-            AnyView(next.destination(router))
+        showScreen(nextRoute) { router in
+            AnyView(nextRoute.destination(router))
         }
     }
     
