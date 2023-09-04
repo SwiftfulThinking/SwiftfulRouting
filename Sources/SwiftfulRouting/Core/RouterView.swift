@@ -97,6 +97,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator,
                     onDismiss: {
+                        print("WE KNOW IT DISMISSED: \(route.id)")
                         onDismiss?()
                     }
                 )
@@ -144,7 +145,8 @@ public struct RouterView<T:View>: View, Router {
         case noNextScreenSet
     }
     
-    public func showNextScreen(onDismiss: (() -> Void)? = nil) throws {
+    // onDismiss: (() -> Void)? = nil
+    public func showNextScreen() throws {
         guard
             let currentFlow = routes.last(where: { flow in
                 return flow.contains(where: { $0.id == route.id })
@@ -158,7 +160,7 @@ public struct RouterView<T:View>: View, Router {
             AnyView(nextRoute.destination(router))
         }
         
-        showScreen(nextRoute, destination: destination, onDismiss: onDismiss)
+        showScreen(nextRoute, destination: destination, onDismiss: nextRoute.onDismiss)
     }
     
     private func removeRoutes(route: AnyRoute) {
