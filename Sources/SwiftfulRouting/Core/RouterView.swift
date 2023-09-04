@@ -49,6 +49,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
     @State private var isEnvironmentRouter: Bool = false
+    @State private var didDismissEnvironment: (() -> Void)? = nil
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -95,17 +96,16 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator
+                    showDragIndicator: showDragIndicator,
+                    onDismiss: {
+                        print("DID DISMISS THE ENVIRONMENT BROOOOOOOOOOOOOOOO")
+                        didDismissEnvironment?()
+                    }
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
-        .onChange(of: presentationMode.wrappedValue.isPresented, perform: { newValue in
-            if !newValue {
-                print("IS NO LONGER PRESENTED AND IS ENV: \(isEnvironmentRouter.description)")
-            }
-        })
     }
     
     private func setEnvironmentRouterIfNeeded() {
@@ -172,6 +172,8 @@ public struct RouterView<T:View>: View, Router {
             }
         }
     }
+    
+    // if isEnvironmentRouter & screens no longer includes this screen, then environment did dismiss?
     
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
@@ -328,7 +330,9 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool) -> some View {
+        showDragIndicator: Bool,
+        onDismiss: @escaping () -> Void
+    ) -> some View {
             if #available(iOS 14, *) {
                 self
                     .modifier(NavigationLinkViewModifier(
@@ -342,11 +346,13 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
                     ))
                     .modifier(FullScreenCoverViewModifier(
                         option: option,
-                        screens: screens
+                        screens: screens,
+                        onDismiss: onDismiss
                     ))
             } else {
                 self
@@ -361,7 +367,8 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
                     ))
             }
     }
