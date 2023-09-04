@@ -15,12 +15,10 @@ public struct AnyRoute: Identifiable {
     public let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
-    let onDismiss: (() -> Void)?
     
-    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View, onDismiss: (() -> Void)? = nil) {
+    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
         self.destination = destination
-        self.onDismiss = onDismiss
     }
     
     static var root: AnyRoute = {

@@ -11,11 +11,9 @@ import SwiftUI
 public struct AnyDestination: Identifiable, Hashable {
     public let id = UUID().uuidString
     public let destination: AnyView
-    public let onDismiss: (() -> Void)?
 
-    public init<T:View>(_ destination: T, onDismiss: (() -> Void)? = nil) {
+    public init<T:View>(_ destination: T) {
         self.destination = AnyView(destination)
-        self.onDismiss = onDismiss
     }
     
     public func hash(into hasher: inout Hasher) {
