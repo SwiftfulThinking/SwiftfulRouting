@@ -109,8 +109,8 @@ public struct RouterView<T:View>: View, Router {
         .onChange(of: screens, perform: { newValue in
             print("SCREENS COUNT CHANGED: \(newValue)")
             // If new value doesn't have a screen from previous value, it is dismissed
-            for screen in newValue {
-                if !previousScreens.contains(screen) {
+            for screen in previousScreens {
+                if !newValue.contains(screen) {
                     print("THIS ONE IS GONE")
                     screen.onDismiss?()
                 }
