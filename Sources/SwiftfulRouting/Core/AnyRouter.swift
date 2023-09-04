@@ -46,7 +46,7 @@ public struct AnyRouter: Router {
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen(_ route: AnyRoute) {
-        object.showScreen(route)
+        object.showScreens([route])
     }
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
@@ -72,7 +72,7 @@ public struct AnyRouter: Router {
 
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreen(AnyRoute(option, destination: destination))
+        object.showScreens([AnyRoute(option, destination: destination)])
     }
     
     /// Dismiss the top-most presented screen in the current Environment. Same as calling presentationMode.wrappedValue.dismiss().

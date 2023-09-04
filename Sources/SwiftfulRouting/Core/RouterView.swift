@@ -119,9 +119,9 @@ public struct RouterView<T:View>: View, Router {
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen(_ route: AnyRoute) {
-        showScreens([route])
-    }
+//    public func showScreen(_ route: AnyRoute) {
+//        showScreens([route])
+//    }
     
     // showNextScreen is only for showing next screen and should not be calleg when setting?
     
@@ -345,6 +345,7 @@ public struct RouterView<T:View>: View, Router {
             routes.remove(at: index)
             
             if item.contains(where: { $0.id == route.id }) {
+                print("DID FINISH REMOVING")
                 return
             }
         }
