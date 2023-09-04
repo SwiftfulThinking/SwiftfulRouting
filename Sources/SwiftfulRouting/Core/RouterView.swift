@@ -45,6 +45,8 @@ public struct RouterView<T:View>: View, Router {
     @State private var segueOption: SegueOption = .push
     @State public var screens: [AnyDestination] = [] {
         didSet {
+            print("DID SET TRIGGERED: \(screens.count) :: \(oldValue.count)")
+            
             for value in oldValue {
                 if !screens.contains(value) {
                     print("THIS SCREEN IS NO LONGER PRESENTED")
