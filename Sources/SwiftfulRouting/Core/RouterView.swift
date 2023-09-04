@@ -181,6 +181,8 @@ public struct RouterView<T:View>: View, Router {
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V, onDismiss: (() -> Void)?) {
         self.segueOption = route.segue
         self.onDismiss = onDismiss
+        print("SHOWING NEW SCREEN: \(route.id)")
+        print("BASE SCREEN: \(self.route.id)")
 
         if route.segue != .push {
             // Add new Navigation
