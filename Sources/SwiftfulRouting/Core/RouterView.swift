@@ -49,7 +49,6 @@ public struct RouterView<T:View>: View, Router {
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
-    @State private var isEnvironmentRouter: Bool = false
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -96,39 +95,12 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator,
-                    onDismissOfEnvironment: {
-                        // If the environment dismisses (sheet or full screen cover)
-                        // Then all screens herein are removed, so set array to nil so that dismissal onChange can trigger
-                        print("ALL SCREENS REMOVED ON: \(route.id)")
-                        screens = []
-                    }
+                    showDragIndicator: showDragIndicator
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                .onDisappear {
-                    if isEnvironmentRouter {
-                        print("ENV R: SCREENS: \(screens.count) IS PRESENTED: \(presentationMode.wrappedValue.isPresented)")
-                    }
-                }
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
-        .onChange(of: screens, perform: handleScreenDismissalsIfNeeded)
-        .onFirstAppear(perform: {
-            handleScreenDismissalsIfNeeded(newValue: screens)
-        })
-    }
-    
-    private func handleScreenDismissalsIfNeeded(newValue: [AnyDestination]) {
-        // If there was a screen previously but it is no longer in the new array, it has dismissed
-        print("PREVIOUS: \(previousScreens.count) :: NEW \(newValue.count) :: on \(route.id)")
-        for screen in previousScreens {
-            if !newValue.contains(screen) {
-                screen.onDismiss?()
-            }
-        }
-        
-        previousScreens = newValue
     }
     
     private func setEnvironmentRouterIfNeeded() {
@@ -137,7 +109,6 @@ public struct RouterView<T:View>: View, Router {
         // The first screen should not have one
         if environmentRouter == nil {
             environmentRouter = self
-            isEnvironmentRouter = true
         }
     }
     
@@ -357,8 +328,7 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool,
-        onDismissOfEnvironment: @escaping () -> Void
+        showDragIndicator: Bool
     ) -> some View {
             if #available(iOS 14, *) {
                 self
@@ -373,13 +343,11 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator,
-                        onDismiss: onDismissOfEnvironment
+                        showDragIndicator: showDragIndicator
                     ))
                     .modifier(FullScreenCoverViewModifier(
                         option: option,
-                        screens: screens,
-                        onDismiss: onDismissOfEnvironment
+                        screens: screens
                     ))
             } else {
                 self
@@ -394,8 +362,7 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator,
-                        onDismiss: onDismissOfEnvironment
+                        showDragIndicator: showDragIndicator
                     ))
             }
     }
