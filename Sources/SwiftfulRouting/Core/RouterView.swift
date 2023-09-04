@@ -107,24 +107,18 @@ public struct RouterView<T:View>: View, Router {
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
-        .onChange(of: screens, perform: { newValue in
-            // If new value doesn't have a screen from previous value, it is dismissed
-            
-            // Every screen has this onChange, but they all bind to the same array
-            // We only need to trigger this on the environment router
-//            if isEnvironmentRouter {
-                print("SCREENS COUNT CHANGED: \(newValue)")
-
-                for screen in previousScreens {
-                    if !newValue.contains(screen) {
-    //                    print("THIS ONE IS GONE")
-                        screen.onDismiss?()
-                    }
-                }
-                
-                previousScreens = newValue
-//            }
-        })
+        .onChange(of: screens, perform: handleScreenDismissalsIfNeeded)
+    }
+    
+    private func handleScreenDismissalsIfNeeded(newValue: [AnyDestination]) {
+        // If there was a screen previously but it is no longer in the new array, it has dismissed
+        for screen in previousScreens {
+            if !newValue.contains(screen) {
+                screen.onDismiss?()
+            }
+        }
+        
+        previousScreens = newValue
     }
     
     private func setEnvironmentRouterIfNeeded() {
