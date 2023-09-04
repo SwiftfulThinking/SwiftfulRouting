@@ -50,7 +50,6 @@ public struct RouterView<T:View>: View, Router {
     @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
     @State private var isEnvironmentRouter: Bool = false
-    @State private var onDismiss: (() -> Void)? = nil
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -97,11 +96,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator,
-                    onDismiss: {
-//                        print("WE KNOW IT DISMISSED: \(route.id)")
-//                        onDismiss?()
-                    }
+                    showDragIndicator: showDragIndicator
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
         }
@@ -160,7 +155,6 @@ public struct RouterView<T:View>: View, Router {
         case noNextScreenSet
     }
     
-    // onDismiss: (() -> Void)? = nil
     public func showNextScreen() throws {
         guard
             let currentFlow = routes.last(where: { flow in
@@ -195,7 +189,6 @@ public struct RouterView<T:View>: View, Router {
     
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V, onDismiss: (() -> Void)?) {
         self.segueOption = route.segue
-        self.onDismiss = onDismiss
 
         if route.segue != .push {
             // Add new Navigation
@@ -349,8 +342,7 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool,
-        onDismiss: @escaping () -> Void
+        showDragIndicator: Bool
     ) -> some View {
             if #available(iOS 14, *) {
                 self
@@ -365,13 +357,11 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator,
-                        onDismiss: onDismiss
+                        showDragIndicator: showDragIndicator
                     ))
                     .modifier(FullScreenCoverViewModifier(
                         option: option,
-                        screens: screens,
-                        onDismiss: onDismiss
+                        screens: screens
                     ))
             } else {
                 self
@@ -386,8 +376,7 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator,
-                        onDismiss: onDismiss
+                        showDragIndicator: showDragIndicator
                     ))
             }
     }
