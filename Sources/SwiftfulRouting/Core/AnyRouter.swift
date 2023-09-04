@@ -8,21 +8,67 @@
 import Foundation
 import SwiftUI
 
+// Note (possible SwiftUI bug?):
+// Do not conform to Equatable here. It causes the @State property wrapper to monitor Equatable value instead of Hashable value
+// so didSegue changing value does not update the View (I think)
+public struct AnyRoute: Identifiable {
+    public let id = UUID().uuidString
+    let segue: SegueOption
+    let destination: (AnyRouter) -> any View
+    
+    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
+        self.segue = segue
+        self.destination = destination
+    }
+    
+    static var root: AnyRoute = {
+        var route = AnyRoute(.push) { router in
+            AnyView(Text("Root"))
+        }
+        return route
+    }()
+}
+
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
-    
+
     public init(object: any Router) {
         self.object = object
     }
     
-    public var screens: [AnyDestination] {
-        object.screens
-    }
-    
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreen(option, destination: destination)
+        object.showScreens([AnyRoute(option, destination: destination)])
+    }
+
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen(_ route: AnyRoute) {
+        object.showScreens([route])
+    }
+    
+    /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
+    public func showScreens(_ routes: [AnyRoute]) {
+        object.showScreens(routes)
+    }
+    
+    /// Shows the next screen set in the current screen flow. This would have been set previously via showScreens().
+    public func showNextScreen() throws {
+        try object.showNextScreen()
+    }
+    
+    /// If there is a next screen in the current screen flow, go to it. Otherwise, flow is complete and dismiss the environment.
+    public func showNextScreenOrDismissEnvironment() {
+        do {
+            try showNextScreen()
+        } catch {
+            dismissEnvironment()
+        }
+    }
+    
+    /// Dismiss the top-most presented environment (this would be the top-most sheet or fullScreenCover).
+    public func dismissEnvironment() {
+        object.dismissEnvironment()
     }
     
     /// Dismiss the top-most presented screen in the current Environment. Same as calling presentationMode.wrappedValue.dismiss().
@@ -30,12 +76,13 @@ public struct AnyRouter: Router {
         object.dismissScreen()
     }
 
-    /// Dismiss all NavigationLinks in NavigationStack heirarchy.
+    /// Push a stack of screens and show the last one immediately.
     @available(iOS 16, *)
-    public func pushScreens(destinations: [(AnyRouter) -> any View]) {
-        object.pushScreens(destinations: destinations)
+    public func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
+        object.pushScreenStack(destinations: destinations)
     }
     
+    /// Show a resizeable sheet on top of the current context.
     @available(iOS 16, *)
     public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
         object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, destination: destination)
@@ -45,8 +92,8 @@ public struct AnyRouter: Router {
     ///
     ///  WARNING: Does not dismiss Sheet or FullScreenCover.
     @available(iOS 16, *)
-    public func popToRoot() {
-        object.popToRoot()
+    public func dismissScreenStack() {
+        object.dismissScreenStack()
     }
     
     /// Show any Alert or ConfirmationDialog.

@@ -9,15 +9,16 @@ import SwiftUI
 import Combine
 
 public protocol Router {
-    var screens: [AnyDestination] { get }
-    func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V)
+    func showScreens(_ routes: [AnyRoute])
+    func showNextScreen() throws
     func dismissScreen()
+    func dismissEnvironment()
+    @available(iOS 16, *)
+    func dismissScreenStack()
 
     @available(iOS 16, *)
-    func pushScreens(destinations: [(AnyRouter) -> any View])
+    func pushScreenStack(destinations: [(AnyRouter) -> any View])
     
-    @available(iOS 16, *)
-    func popToRoot()
     
     @available(iOS 16, *)
     func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, @ViewBuilder destination: @escaping (AnyRouter) -> V)
