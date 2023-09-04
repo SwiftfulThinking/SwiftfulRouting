@@ -48,8 +48,7 @@ public struct RouterView<T:View>: View, Router {
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
     @State private var environmentRouter: Router?
-    @State private var isEnvironmentRouter: Bool = false
-    @State private var didDismissEnvironment: (() -> Void)? = nil
+    @State private var onDismiss: (() -> Void)? = nil
 
     // Binding to view stack from previous RouterViews
     @Binding private var screenStack: [AnyDestination]
@@ -98,8 +97,7 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator,
                     onDismiss: {
-                        print("DID DISMISS THE ENVIRONMENT BROOOOOOOOOOOOOOOO")
-                        didDismissEnvironment?()
+                        onDismiss?()
                     }
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
@@ -114,7 +112,6 @@ public struct RouterView<T:View>: View, Router {
         // The first screen should not have one
         if environmentRouter == nil {
             environmentRouter = self
-            isEnvironmentRouter = true
         }
     }
     
@@ -128,9 +125,11 @@ public struct RouterView<T:View>: View, Router {
         
         routes.append(newRoutes)
         
-        showScreen(route) { router in
+        let destination = { router in
             AnyView(route.destination(router))
         }
+        
+        showScreen(route, destination: destination, onDismiss: route.onDismiss)
     }
     
     public func dismissEnvironment() {
@@ -145,7 +144,7 @@ public struct RouterView<T:View>: View, Router {
         case noNextScreenSet
     }
     
-    public func showNextScreen() throws {
+    public func showNextScreen(onDismiss: (() -> Void)? = nil) throws {
         guard
             let currentFlow = routes.last(where: { flow in
                 return flow.contains(where: { $0.id == route.id })
@@ -155,9 +154,11 @@ public struct RouterView<T:View>: View, Router {
             throw RoutableError.noNextScreenSet
         }
         
-        showScreen(nextRoute) { router in
+        let destination = { router in
             AnyView(nextRoute.destination(router))
         }
+        
+        showScreen(nextRoute, destination: destination, onDismiss: onDismiss)
     }
     
     private func removeRoutes(route: AnyRoute) {
@@ -175,8 +176,9 @@ public struct RouterView<T:View>: View, Router {
     
     // if isEnvironmentRouter & screens no longer includes this screen, then environment did dismiss?
     
-    private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V, onDismiss: (() -> Void)?) {
         self.segueOption = route.segue
+        self.onDismiss = onDismiss
 
         if route.segue != .push {
             // Add new Navigation

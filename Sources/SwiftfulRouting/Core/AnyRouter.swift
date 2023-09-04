@@ -15,10 +15,12 @@ public struct AnyRoute: Identifiable {
     public let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
+    let onDismiss: (() -> Void)?
     
-    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
+    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View, onDismiss: (() -> Void)? = nil) {
         self.segue = segue
         self.destination = destination
+        self.onDismiss = onDismiss
     }
     
     static var root: AnyRoute = {
@@ -53,8 +55,8 @@ public struct AnyRouter: Router {
     }
     
     /// Shows the next screen set in the current screen flow. This would have been set previously via showScreens().
-    public func showNextScreen() throws {
-        try object.showNextScreen()
+    public func showNextScreen(onDismiss: (() -> Void)? = nil) throws {
+        try object.showNextScreen(onDismiss: onDismiss)
     }
     
     /// If there is a next screen in the current screen flow, go to it. Otherwise, flow is complete and dismiss the environment.

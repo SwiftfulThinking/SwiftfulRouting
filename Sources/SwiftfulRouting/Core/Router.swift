@@ -10,7 +10,7 @@ import Combine
 
 public protocol Router {
     func showScreens(_ routes: [AnyRoute])
-    func showNextScreen() throws
+    func showNextScreen(onDismiss: (() -> Void)?) throws
     func dismissScreen()
     func dismissEnvironment()
     @available(iOS 16, *)
