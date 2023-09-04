@@ -43,7 +43,16 @@ public struct RouterView<T:View>: View, Router {
 
     // Segues
     @State private var segueOption: SegueOption = .push
-    @State public var screens: [AnyDestination] = []
+    @State public var screens: [AnyDestination] = [] {
+        didSet {
+            for value in oldValue {
+                if !screens.contains(value) {
+                    print("THIS SCREEN IS NO LONGER PRESENTED")
+                    value.onDismiss?()
+                }
+            }
+        }
+    }
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
@@ -98,7 +107,7 @@ public struct RouterView<T:View>: View, Router {
                     showDragIndicator: showDragIndicator,
                     onDismiss: {
                         print("WE KNOW IT DISMISSED: \(route.id)")
-                        onDismiss?()
+//                        onDismiss?()
                     }
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
@@ -187,7 +196,7 @@ public struct RouterView<T:View>: View, Router {
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: nil, content: destination)))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: nil, content: destination), onDismiss: route.onDismiss))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -197,16 +206,16 @@ public struct RouterView<T:View>: View, Router {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
+                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: routes, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 } else {
                     // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
+                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routes, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
             }
         }
         
@@ -234,7 +243,7 @@ public struct RouterView<T:View>: View, Router {
             
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: allRoutes, environmentRouter: environmentRouter, content: { router in
                 AnyView(destination(router))
-            }))
+            }), onDismiss: route.onDismiss)
             localStack.append(view)
         }
 
@@ -259,7 +268,7 @@ public struct RouterView<T:View>: View, Router {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
+        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
     }
     
     public func dismissScreen() {
