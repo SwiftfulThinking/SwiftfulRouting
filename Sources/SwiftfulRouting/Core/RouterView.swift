@@ -315,10 +315,10 @@ public struct RouterView<T:View>: View, Router {
         }
 //        print("CURRENT ROUTE: \(route.id ?? "idk")")
 //        print("ON SHOW NEXT:: \(routes.count ?? -999)")
-        
-//        showScreen(next) { router in
-//            AnyView(next.destination(router))
-//        }
+        print("SHOW NEXT SCREEN TRIGGERED")
+        showScreen(next) { router in
+            AnyView(next.destination(router))
+        }
     }
     
     private func markRoutesAsSeen(route: AnyRoute) {
