@@ -387,12 +387,4 @@ extension View {
         modifier(ModalViewModifier(configuration: configuration, item: item))
     }
     
-    @ViewBuilder func onChangeIfiOS15<E:Equatable>(of value: E, perform: @escaping (E) -> Void) -> some View {
-        if #available(iOS 15, *) {
-            self
-                .onChange(of: value, perform: perform)
-        } else {
-            self
-        }
-    }
 }

@@ -21,7 +21,7 @@ struct NavigationLinkViewModifier: ViewModifier {
             // If we are continuing an existing stack, don't need to add another .navigationDestination modifier
             if shouldAddNavigationDestination {
                 ZStack {
-                    content
+                    OnDisappearViewWrapper(content: content)
                 }
                 .navigationDestination(for: AnyDestination.self) { value in
                     value.destination
@@ -46,15 +46,15 @@ struct NavigationLinkViewModifier: ViewModifier {
     }
 }
 
-struct OnDisappearViewWrapper: View {
+struct OnDisappearViewWrapper<Content:View>: View {
     
     @Environment(\.presentationMode) var presentationMode
-    let value: AnyDestination
+    let content: Content
     
     var body: some View {
-        value.destination
+        content
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                print("HI NICK WE HAVE A NEW VALUE HERE: \(newValue) for destination : \(value.id)")
+                print("HI NICK WE HAVE A NEW VALUE HERE: \(newValue) for destination")
             }
     }
 }
