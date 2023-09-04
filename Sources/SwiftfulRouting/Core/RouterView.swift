@@ -142,7 +142,7 @@ public struct RouterView<T:View>: View, Router {
             let currentFlow = routes.last(where: { flow in
                 return flow.contains(where: { $0.id == route.id })
             }),
-            let nextRoute = currentFlow.firstAfter(route, where: { !$0.didSegue })
+            let nextRoute = currentFlow.firstAfter(route)
         else {
             throw RoutableError.noNextScreenSet
         }

@@ -15,23 +15,16 @@ public struct AnyRoute: Identifiable {
     public let id = UUID().uuidString
     let segue: SegueOption
     let destination: (AnyRouter) -> any View
-    private(set) var didSegue: Bool = false
     
     public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
         self.destination = destination
     }
     
-    mutating func setDidSegueToTrue() {
-        didSegue = true
-        print("I AM: \(id) :: \(didSegue)")
-    }
-    
     static var root: AnyRoute = {
         var route = AnyRoute(.push) { router in
             AnyView(Text("Root"))
         }
-        route.setDidSegueToTrue()
         return route
     }()
 }
