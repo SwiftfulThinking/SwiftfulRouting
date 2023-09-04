@@ -27,7 +27,7 @@ struct NavigationLinkViewModifier: ViewModifier {
                     value.destination
                 }
             } else {
-                content
+                OnDisappearViewWrapper(content: content)
             }
         } else {
             content
@@ -35,7 +35,7 @@ struct NavigationLinkViewModifier: ViewModifier {
                     ZStack {
                         NavigationLink(isActive: Binding(ifNotNil: Binding(if: option, is: .push, value: Binding(toLastElementIn: screens)))) {
                             if let view = screens.wrappedValue.last?.destination {
-                                view
+                                OnDisappearViewWrapper(content: view)
                             }
                         } label: {
                             EmptyView()
