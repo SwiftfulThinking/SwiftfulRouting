@@ -65,6 +65,8 @@ struct NavigationStackTransformable<Content:View>: View {
         }
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
+                print("DID REMOVE ONE")
+                screens.last?.onDismiss?()
                 screens.removeLast()
             }
         })

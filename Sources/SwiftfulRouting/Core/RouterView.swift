@@ -51,18 +51,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var onDismiss: (() -> Void)? = nil
 
     // Binding to view stack from previous RouterViews
-    @Binding private var screenStack: [AnyDestination] {
-        didSet {
-            print("DID SET TRIGGERED: \(screenStack.count) :: \(oldValue.count)")
-            
-            for value in oldValue {
-                if !screenStack.contains(value) {
-                    print("THIS SCREEN IS NO LONGER PRESENTED")
-                    value.onDismiss?()
-                }
-            }
-        }
-    }
+    @Binding private var screenStack: [AnyDestination]
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
