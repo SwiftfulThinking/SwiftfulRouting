@@ -240,8 +240,7 @@ public struct RouterView<T:View>: View, Router {
             self.sheetSelectionEnabled = false
         }
         
-        fatalError()
-//        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, content: destination)))
+        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
     }
     
     public func dismissScreen() {
