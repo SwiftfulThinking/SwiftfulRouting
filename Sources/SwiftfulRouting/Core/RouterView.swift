@@ -128,6 +128,7 @@ public struct RouterView<T:View>: View, Router {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
+        print("HI NICK SHOW SCREENS: \(newRoutes.map({ $0.id }))")
         // Need to avoid duplicates herein
         // prioritize these new routes, so existing duplicates should be
         // 1 - purged
