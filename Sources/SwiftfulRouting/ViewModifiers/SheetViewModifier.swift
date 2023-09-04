@@ -16,10 +16,11 @@ struct SheetViewModifier: ViewModifier {
     @Binding var sheetSelection: PresentationDetentTransformable
     let sheetSelectionEnabled: Bool
     let showDragIndicator: Bool
+    let onDismiss: () -> Void
 
     func body(content: Content) -> some View {
         content
-            .sheet(item: Binding(if: option, is: .sheet, value: Binding(toLastElementIn: screens)), onDismiss: nil) { destination in
+            .sheet(item: Binding(if: option, is: .sheet, value: Binding(toLastElementIn: screens)), onDismiss: onDismiss) { destination in
                 if let view = screens.wrappedValue.last?.destination {
                     view
                         .presentationDetentsIfNeeded(

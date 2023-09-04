@@ -96,7 +96,12 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator
+                    showDragIndicator: showDragIndicator,
+                    onDismissOfEnvironment: {
+                        // If the environment dismisses (sheet or full screen cover)
+                        // Then all screens herein are removed, so set array to nil so that dismissal onChange can trigger
+                        screens = []
+                    }
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
         }
@@ -346,7 +351,8 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool
+        showDragIndicator: Bool,
+        onDismissOfEnvironment: @escaping () -> Void
     ) -> some View {
             if #available(iOS 14, *) {
                 self
@@ -361,11 +367,13 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismissOfEnvironment
                     ))
                     .modifier(FullScreenCoverViewModifier(
                         option: option,
-                        screens: screens
+                        screens: screens,
+                        onDismiss: onDismissOfEnvironment
                     ))
             } else {
                 self
@@ -380,7 +388,8 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismissOfEnvironment
                     ))
             }
     }
