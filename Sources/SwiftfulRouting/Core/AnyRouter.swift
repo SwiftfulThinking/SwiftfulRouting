@@ -45,6 +45,11 @@ public struct AnyRouter: Router {
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
+        object.showScreens([AnyRoute(option, destination: destination)])
+    }
+
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen(_ route: AnyRoute) {
         object.showScreens([route])
     }
@@ -54,10 +59,12 @@ public struct AnyRouter: Router {
         object.showScreens(routes)
     }
     
+    /// Shows the next screen set in the current screen flow. This would have been set previously via showScreens().
     public func showNextScreen() throws {
         try object.showNextScreen()
     }
     
+    /// If there is a next screen in the current screen flow, go to it. Otherwise, flow is complete and dismiss the environment.
     public func showNextScreenOrDismissEnvironment() throws {
         do {
             try showNextScreen()
@@ -66,13 +73,9 @@ public struct AnyRouter: Router {
         }
     }
     
+    /// Dismiss the top-most presented environment (this would be the top-most sheet or fullScreenCover).
     public func dismissEnvironment() {
         object.dismissEnvironment()
-    }
-
-    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreens([AnyRoute(option, destination: destination)])
     }
     
     /// Dismiss the top-most presented screen in the current Environment. Same as calling presentationMode.wrappedValue.dismiss().
@@ -80,12 +83,13 @@ public struct AnyRouter: Router {
         object.dismissScreen()
     }
 
-    /// Dismiss all NavigationLinks in NavigationStack heirarchy.
+    /// Push a stack of screens and show the last one immediately.
     @available(iOS 16, *)
     public func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
         object.pushScreenStack(destinations: destinations)
     }
     
+    /// Show a resizeable sheet on top of the current context.
     @available(iOS 16, *)
     public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
         object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, destination: destination)
@@ -95,8 +99,8 @@ public struct AnyRouter: Router {
     ///
     ///  WARNING: Does not dismiss Sheet or FullScreenCover.
     @available(iOS 16, *)
-    public func popToRoot() {
-        object.popToRoot()
+    public func dismissScreenStack() {
+        object.dismissScreenStack()
     }
     
     /// Show any Alert or ConfirmationDialog.

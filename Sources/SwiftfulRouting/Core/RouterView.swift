@@ -253,7 +253,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func popToRoot() {
+    public func dismissScreenStack() {
         self.screens = []
         self.screenStack = []
     }
