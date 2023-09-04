@@ -174,11 +174,11 @@ public struct RouterView<T:View>: View, Router {
         // should always segue to first screen in showScreens!
         // So it's not "show next" it's show this flow now
         
-        do {
-            try showNextScreen()
-        } catch {
-            print(error)
-        }
+//        do {
+//            try showNextScreen()
+//        } catch {
+//            print(error)
+//        }
 //        func nextScreen(id: String, router: AnyRouter) -> AnyView {
 //            // We will mutate router below, so create a var copy
 ////            var router = router
