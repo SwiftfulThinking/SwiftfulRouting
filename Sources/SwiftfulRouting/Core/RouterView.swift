@@ -37,6 +37,8 @@ public struct RouterView<T:View>: View, Router {
 
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
+    
+    let onDismiss: (() -> Void)?
  
     // Segues
     @State private var segueOption: SegueOption = .push
@@ -61,10 +63,11 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         self._screenStackCount = State(wrappedValue: (screens?.wrappedValue.count ?? 0))
+        self.onDismiss = onDismiss
         self.content = content
     }
     
@@ -78,7 +81,8 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator)
+                    showDragIndicator: showDragIndicator,
+                    onDismiss: onDismiss)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
@@ -231,7 +235,8 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool) -> some View {
+        showDragIndicator: Bool,
+        onDismiss: (() -> Void)?) -> some View {
             if #available(iOS 14, *) {
                 self
                     .modifier(NavigationLinkViewModifier(
@@ -245,11 +250,13 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
                     ))
                     .modifier(FullScreenCoverViewModifier(
                         option: option,
-                        screens: screens
+                        screens: screens,
+                        onDismiss: onDismiss
                     ))
             } else {
                 self
@@ -264,7 +271,8 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
                     ))
             }
     }
