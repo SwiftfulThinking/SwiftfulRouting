@@ -51,7 +51,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var sheetDetents: Set<PresentationDetentTransformable> = [.large]
     @State private var sheetSelection: Binding<PresentationDetentTransformable> = .constant(.large)
     @State private var sheetSelectionEnabled: Bool = false
-    @State private var showDragIndicator: Bool = true
+    @State private var showDragIndicator: Bool = false
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -143,7 +143,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool = true, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool = false, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
