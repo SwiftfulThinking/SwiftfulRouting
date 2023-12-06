@@ -8,6 +8,17 @@
 import Foundation
 import SwiftUI
 
+private struct RouterEnvironmentKey: EnvironmentKey {
+    static let defaultValue: AnyRouter = AnyRouter(object: MockRouter())
+}
+
+extension EnvironmentValues {
+    var router: AnyRouter {
+        get { self[RouterEnvironmentKey.self] }
+        set { self[RouterEnvironmentKey.self] = newValue }
+    }
+}
+
 // Note (possible SwiftUI bug?):
 // Do not conform to Equatable here. It causes the @State property wrapper to monitor Equatable value instead of Hashable value
 // so didSegue changing value does not update the View (I think)
@@ -154,4 +165,61 @@ public struct AnyRouter: Router {
         object.showSafari(url)
     }
 
+}
+
+struct MockRouter: Router {
+    
+    private func printError() {
+        print("Routing failure: Attempt to use AnyRouter without first adding RouterView to the View heirarchy!")
+    }
+    
+    func showScreens(_ routes: [AnyRoute]) {
+        printError()
+    }
+    
+    func showNextScreen() throws {
+        printError()
+    }
+    
+    func dismissScreen() {
+        printError()
+    }
+    
+    func dismissEnvironment() {
+        printError()
+    }
+    
+    func dismissScreenStack() {
+        printError()
+    }
+    
+    func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
+        printError()
+    }
+    
+    func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
+        printError()
+    }
+    
+    func showAlert<T>(_ option: AlertOption, title: String, subtitle: String?, alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) where T : View {
+        printError()
+    }
+    
+    func dismissAlert() {
+        printError()
+    }
+    
+    func showModal<V>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, destination: @escaping () -> V) where V : View {
+        printError()
+    }
+    
+    func dismissModal() {
+        printError()
+    }
+    
+    func showSafari(_ url: @escaping () -> URL) {
+        printError()
+    }
+    
+    
 }

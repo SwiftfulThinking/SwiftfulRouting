@@ -87,7 +87,9 @@ public struct RouterView<T:View>: View, Router {
     
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
-            content(AnyRouter(object: self))
+            let router = AnyRouter(object: self)
+            content(router)
+                .environment(\.router, router)
                 .showingScreen(
                     option: segueOption,
                     screens: $screens,
