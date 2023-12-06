@@ -8,11 +8,11 @@
 import Foundation
 import SwiftUI
 
-private struct RouterEnvironmentKey: EnvironmentKey {
-    static let defaultValue: AnyRouter = AnyRouter(object: MockRouter())
+public struct RouterEnvironmentKey: EnvironmentKey {
+    public static let defaultValue: AnyRouter = AnyRouter(object: MockRouter())
 }
 
-extension EnvironmentValues {
+public extension EnvironmentValues {
     var router: AnyRouter {
         get { self[RouterEnvironmentKey.self] }
         set { self[RouterEnvironmentKey.self] = newValue }
