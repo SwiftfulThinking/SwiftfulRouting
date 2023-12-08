@@ -89,7 +89,6 @@ public struct RouterView<T:View>: View, Router {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             let router = AnyRouter(object: self)
             content(router)
-                .environment(\.router, router)
                 .showingScreen(
                     option: segueOption,
                     screens: $screens,
@@ -100,9 +99,10 @@ public struct RouterView<T:View>: View, Router {
                     showDragIndicator: showDragIndicator
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                .showingAlert(option: alertOption, item: $alert)
+                .showingModal(configuration: modalConfiguration, item: $modal)
+                .environment(\.router, router)
         }
-        .showingAlert(option: alertOption, item: $alert)
-        .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
     private func setEnvironmentRouterIfNeeded() {
