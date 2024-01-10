@@ -99,7 +99,7 @@ public struct RouterView<T:View>: View, Router {
                     if didTransition {
                         if let view = transitionDestination?.destination {
                             view
-                                .transition(transitionConfiguration.insertingNext.transition)
+                                .transition(AnyTransition.move(edge: .leading))
                         } else {
                             EmptyView()
                         }
@@ -118,7 +118,7 @@ public struct RouterView<T:View>: View, Router {
                             .showingAlert(option: alertOption, item: $alert)
                             .showingModal(configuration: modalConfiguration, item: $modal)
                             .environment(\.router, router)
-                            .transition(transitionConfiguration.removingCurrent.transition)
+                            .transition(AnyTransition.move(edge: .trailing))
                     }
                 }
             )
