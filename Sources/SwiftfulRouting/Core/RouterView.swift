@@ -97,12 +97,12 @@ public struct RouterView<T:View>: View, Router {
                 selection: transitionDestination != nil,
                 view: { (didTransition: Bool) in
                     if didTransition {
-                        if let view = transitionDestination?.destination {
-                            view
-                                .transition(AnyTransition.move(edge: .leading))
-                        } else {
-                            EmptyView()
+                        ZStack {
+                            if let view = transitionDestination?.destination {
+                                view
+                            }
                         }
+                        .transition(AnyTransition.move(edge: .leading))
                     } else {
                         content(router)
                             .showingScreen(
