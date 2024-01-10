@@ -120,6 +120,7 @@ public struct RouterView<T:View>: View, Router {
                                 .showingModal(configuration: modalConfiguration, item: $modal)
                                 .environment(\.router, router)
                                 .transition(transitionConfiguration.removingCurrent)
+                                .id(transitionConfiguration.id)
                         }
                     }
                 )

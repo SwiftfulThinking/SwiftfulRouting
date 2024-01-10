@@ -36,6 +36,7 @@ public struct BackgroundEffect {
 }
 
 public struct TransitionConfiguration {
+    let id = UUID().uuidString
     let removingCurrent: AnyTransition
     let insertingNext: AnyTransition
     let animation: Animation
