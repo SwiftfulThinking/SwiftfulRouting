@@ -103,8 +103,7 @@ public struct RouterView<T:View>: View, Router {
                                     view
                                 }
                             }
-                            .transition(transitionConfiguration.insertingNext.transition)
-                            .animation(transitionConfiguration.insertingNext.animation, value: transitionDestination != nil)
+                            .transition(transitionConfiguration.insertingNext)
                         } else {
                             content(router)
                                 .showingScreen(
@@ -120,12 +119,11 @@ public struct RouterView<T:View>: View, Router {
                                 .showingAlert(option: alertOption, item: $alert)
                                 .showingModal(configuration: modalConfiguration, item: $modal)
                                 .environment(\.router, router)
-                                .transition(transitionConfiguration.removingCurrent.transition)
-                                .animation(transitionConfiguration.removingCurrent.animation, value: transitionDestination != nil)
+                                .transition(transitionConfiguration.removingCurrent)
                         }
                     }
                 )
-                //.animation(.linear, value: transitionDestination == nil)
+                .animation(transitionConfiguration.animation, value: transitionDestination == nil)
             }
         }
     }
@@ -327,13 +325,13 @@ public struct RouterView<T:View>: View, Router {
         self.modal = nil
     }
     
-    public func showTransition<Destination:View>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, @ViewBuilder destination: @escaping () -> Destination) {
+    public func showTransition<Destination:View>(removingCurrent: AnyTransition, insertingNext: AnyTransition, animation: Animation, @ViewBuilder destination: @escaping () -> Destination) {
         guard self.transitionDestination == nil else {
             dismissTransition()
             return
         }
         
-        self.transitionConfiguration = TransitionConfiguration(removingCurrent: removingCurrent, insertingNext: insertingNext)
+        self.transitionConfiguration = TransitionConfiguration(removingCurrent: removingCurrent, insertingNext: insertingNext, animation: animation)
         self.transitionDestination = AnyDestination(destination())
     }
     

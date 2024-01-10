@@ -160,8 +160,12 @@ public struct AnyRouter: Router {
         object.dismissModal()
     }
     
-    public func showTransition<Destination:View>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, @ViewBuilder destination: @escaping () -> Destination) {
-        object.showTransition(removingCurrent: removingCurrent, insertingNext: insertingNext, destination: destination)
+    public func showTransition<Destination:View>(
+        removingCurrent: AnyTransition = AnyTransition.move(edge: .leading),
+        insertingNext: AnyTransition = AnyTransition.move(edge: .trailing),
+        animation: Animation = .linear,
+        @ViewBuilder destination: @escaping () -> Destination) {
+        object.showTransition(removingCurrent: removingCurrent, insertingNext: insertingNext, animation: animation, destination: destination)
     }
     
     public func dismissTransition() {
@@ -225,7 +229,7 @@ struct MockRouter: Router {
         printError()
     }
     
-    func showTransition<Destination>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, destination: @escaping () -> Destination) where Destination : View {
+    func showTransition<Destination>(removingCurrent: AnyTransition, insertingNext: AnyTransition, animation: Animation, destination: @escaping () -> Destination) where Destination : View {
         printError()
     }
     

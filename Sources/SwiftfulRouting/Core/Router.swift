@@ -30,7 +30,7 @@ public protocol Router {
     func showModal<V:View>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, @ViewBuilder destination: @escaping () -> V)
     func dismissModal()
     
-    func showTransition<Destination:View>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, @ViewBuilder destination: @escaping () -> Destination)
+    func showTransition<Destination:View>(removingCurrent: AnyTransition, insertingNext: AnyTransition, animation: Animation, @ViewBuilder destination: @escaping () -> Destination)
     func dismissTransition()
     
     func showSafari(_ url: @escaping () -> URL)

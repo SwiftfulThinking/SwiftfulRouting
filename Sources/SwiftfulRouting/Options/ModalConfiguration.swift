@@ -35,22 +35,20 @@ public struct BackgroundEffect {
     }
 }
 
-public struct AnimatedTransition {
-    let transition: AnyTransition
+public struct TransitionConfiguration {
+    let removingCurrent: AnyTransition
+    let insertingNext: AnyTransition
     let animation: Animation
     
-    public init(transition: AnyTransition, animation: Animation) {
-        self.transition = transition
+    public init(removingCurrent: AnyTransition, insertingNext: AnyTransition, animation: Animation = .linear) {
+        self.removingCurrent = removingCurrent
+        self.insertingNext = insertingNext
         self.animation = animation
     }
-}
-
-public struct TransitionConfiguration {
-    let removingCurrent: AnimatedTransition
-    let insertingNext: AnimatedTransition
     
     static let `default` = TransitionConfiguration(
-        removingCurrent: AnimatedTransition(transition: .move(edge: .leading), animation: .linear),
-        insertingNext: AnimatedTransition(transition: .move(edge: .trailing), animation: .linear)
+        removingCurrent: .move(edge: .leading),
+        insertingNext: .move(edge: .trailing),
+        animation: .linear
     )
 }
