@@ -93,36 +93,38 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             let router = AnyRouter(object: self)
-            LazyZStack(
-                selection: transitionDestination != nil,
-                view: { (didTransition: Bool) in
-//                    if didTransition {
-//                        ZStack {
-//                            if let view = transitionDestination?.destination {
-//                                view
-//                            }
-//                        }
-//                        .transition(AnyTransition.move(edge: .leading))
-//                    } else {
-                        content(router)
-                            .showingScreen(
-                                option: segueOption,
-                                screens: $screens,
-                                screenStack: screenStack,
-                                sheetDetents: sheetDetents,
-                                sheetSelection: sheetSelection,
-                                sheetSelectionEnabled: sheetSelectionEnabled,
-                                showDragIndicator: showDragIndicator
-                            )
-                            .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                            .showingAlert(option: alertOption, item: $alert)
-                            .showingModal(configuration: modalConfiguration, item: $modal)
-                            .environment(\.router, router)
-                            .transition(AnyTransition.move(edge: .trailing))
-//                    }
-                }
-            )
-            .animation(.linear, value: transitionDestination == nil)
+            ZStack {
+                LazyZStack(
+                    selection: transitionDestination != nil,
+                    view: { (didTransition: Bool) in
+                        if didTransition {
+                            ZStack {
+                                if let view = transitionDestination?.destination {
+                                    view
+                                }
+                            }
+                            .transition(AnyTransition.move(edge: .leading))
+                        } else {
+                            content(router)
+                                .showingScreen(
+                                    option: segueOption,
+                                    screens: $screens,
+                                    screenStack: screenStack,
+                                    sheetDetents: sheetDetents,
+                                    sheetSelection: sheetSelection,
+                                    sheetSelectionEnabled: sheetSelectionEnabled,
+                                    showDragIndicator: showDragIndicator
+                                )
+                                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                                .showingAlert(option: alertOption, item: $alert)
+                                .showingModal(configuration: modalConfiguration, item: $modal)
+                                .environment(\.router, router)
+                                .transition(AnyTransition.move(edge: .trailing))
+                        }
+                    }
+                )
+                .animation(.linear, value: transitionDestination == nil)
+            }
         }
     }
     
