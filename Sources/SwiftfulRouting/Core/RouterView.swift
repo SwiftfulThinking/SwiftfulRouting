@@ -96,7 +96,14 @@ public struct RouterView<T:View>: View, Router {
             LazyZStack(
                 selection: transitionDestination != nil,
                 view: { (didTransition: Bool) in
-                    ZStack {
+                    if didTransition {
+                        if let view = transitionDestination?.destination {
+                            view
+                                .transition(transitionConfiguration.insertingNext.transition)
+                        } else {
+                            EmptyView()
+                        }
+                    } else {
                         content(router)
                             .showingScreen(
                                 option: segueOption,
@@ -112,16 +119,10 @@ public struct RouterView<T:View>: View, Router {
                             .showingModal(configuration: modalConfiguration, item: $modal)
                             .environment(\.router, router)
                             .transition(transitionConfiguration.removingCurrent.transition)
-                            .animation(transitionConfiguration.removingCurrent.animation, value: transitionDestination == nil)
-
-                        if didTransition, let view = transitionDestination?.destination {
-                            view
-                                .transition(transitionConfiguration.insertingNext.transition)
-                                .animation(transitionConfiguration.insertingNext.animation, value: transitionDestination == nil)
-                        }
                     }
                 }
             )
+            .animation(.linear, value: transitionDestination == nil)
         }
     }
     
