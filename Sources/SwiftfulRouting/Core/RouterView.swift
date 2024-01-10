@@ -104,6 +104,7 @@ public struct RouterView<T:View>: View, Router {
                                 }
                             }
                             .transition(transitionConfiguration.insertingNext.transition)
+                            .animation(transitionConfiguration.insertingNext.animation, value: transitionDestination != nil)
                         } else {
                             content(router)
                                 .showingScreen(
@@ -120,6 +121,7 @@ public struct RouterView<T:View>: View, Router {
                                 .showingModal(configuration: modalConfiguration, item: $modal)
                                 .environment(\.router, router)
                                 .transition(transitionConfiguration.removingCurrent.transition)
+                                .animation(transitionConfiguration.removingCurrent.animation, value: transitionDestination != nil)
                         }
                     }
                 )
