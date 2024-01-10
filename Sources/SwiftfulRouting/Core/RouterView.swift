@@ -93,38 +93,26 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             let router = AnyRouter(object: self)
-            ZStack {
-                LazyZStack(
-                    selection: transitionDestination != nil,
-                    view: { (didTransition: Bool) in
-                        if didTransition {
-                            ZStack {
-                                if let view = transitionDestination?.destination {
-                                    view
-                                }
-                            }
-                            .transition(transitionConfiguration.insertingNext)
-                        } else {
-                            content(router)
-                                .showingScreen(
-                                    option: segueOption,
-                                    screens: $screens,
-                                    screenStack: screenStack,
-                                    sheetDetents: sheetDetents,
-                                    sheetSelection: sheetSelection,
-                                    sheetSelectionEnabled: sheetSelectionEnabled,
-                                    showDragIndicator: showDragIndicator
-                                )
-                                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                                .showingAlert(option: alertOption, item: $alert)
-                                .showingModal(configuration: modalConfiguration, item: $modal)
-                                .environment(\.router, router)
-                                .transition(transitionConfiguration.removingCurrent)
-                        }
-                    }
-                )
-                .animation(transitionConfiguration.animation, value: transitionDestination == nil)
-            }
+            TransitionSupportViewWrapper(
+                configuration: transitionConfiguration,
+                destination: transitionDestination,
+                content: {
+                    content(router)
+                        .showingScreen(
+                            option: segueOption,
+                            screens: $screens,
+                            screenStack: screenStack,
+                            sheetDetents: sheetDetents,
+                            sheetSelection: sheetSelection,
+                            sheetSelectionEnabled: sheetSelectionEnabled,
+                            showDragIndicator: showDragIndicator
+                        )
+                        .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                        .showingAlert(option: alertOption, item: $alert)
+                        .showingModal(configuration: modalConfiguration, item: $modal)
+                        .environment(\.router, router)
+                }
+            )
         }
     }
     
