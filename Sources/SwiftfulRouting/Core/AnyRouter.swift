@@ -160,6 +160,14 @@ public struct AnyRouter: Router {
         object.dismissModal()
     }
     
+    public func showTransition<Destination:View>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, @ViewBuilder destination: @escaping () -> Destination) {
+        object.showTransition(removingCurrent: removingCurrent, insertingNext: insertingNext, destination: destination)
+    }
+    
+    public func dismissTransition() {
+        object.dismissTransition()
+    }
+    
     /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
     public func showSafari(_ url: @escaping () -> URL) {
         object.showSafari(url)
@@ -214,6 +222,14 @@ struct MockRouter: Router {
     }
     
     func dismissModal() {
+        printError()
+    }
+    
+    func showTransition<Destination>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, destination: @escaping () -> Destination) where Destination : View {
+        printError()
+    }
+    
+    func dismissTransition() {
         printError()
     }
     

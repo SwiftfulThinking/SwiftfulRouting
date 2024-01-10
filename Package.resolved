@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftfulUI",
+        "repositoryURL": "https://github.com/SwiftfulThinking/SwiftfulUI.git",
+        "state": {
+          "branch": null,
+          "revision": "fcddffd5b911a667e6987556ebbae724f036837e",
+          "version": "1.0.2"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

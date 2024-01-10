@@ -34,3 +34,18 @@ public struct BackgroundEffect {
         self.opacity = opacity
     }
 }
+
+public struct AnimatedTransition {
+    let transition: AnyTransition
+    let animation: Animation
+}
+
+public struct TransitionConfiguration {
+    let removingCurrent: AnimatedTransition
+    let insertingNext: AnimatedTransition
+    
+    static let `default` = TransitionConfiguration(
+        removingCurrent: AnimatedTransition(transition: .move(edge: .leading), animation: .linear),
+        insertingNext: AnimatedTransition(transition: .move(edge: .trailing), animation: .linear)
+    )
+}

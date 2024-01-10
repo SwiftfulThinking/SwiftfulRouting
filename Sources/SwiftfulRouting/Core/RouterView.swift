@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftfulUI
 
 extension View {
     func onFirstAppear(perform action: @escaping () -> Void) -> some View {
@@ -68,6 +69,10 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
+    // Transitions
+    @State private var transitionConfiguration: TransitionConfiguration = .default
+    @State private var transitionDestination: AnyDestination? = nil
+
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [[AnyRoute]]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
@@ -88,20 +93,37 @@ public struct RouterView<T:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
             let router = AnyRouter(object: self)
-            content(router)
-                .showingScreen(
-                    option: segueOption,
-                    screens: $screens,
-                    screenStack: screenStack,
-                    sheetDetents: sheetDetents,
-                    sheetSelection: sheetSelection,
-                    sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator
-                )
-                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                .showingAlert(option: alertOption, item: $alert)
-                .showingModal(configuration: modalConfiguration, item: $modal)
-                .environment(\.router, router)
+            LazyZStack(
+                selection: transitionDestination != nil,
+                view: { (didTransition: Bool) in
+                    if didTransition {
+                        if let view = transitionDestination?.destination {
+                            view
+                                .transition(transitionConfiguration.insertingNext.transition)
+                                .animation(transitionConfiguration.insertingNext.animation, value: transitionDestination == nil)
+                        } else {
+                            EmptyView()
+                        }
+                    } else {
+                        content(router)
+                            .showingScreen(
+                                option: segueOption,
+                                screens: $screens,
+                                screenStack: screenStack,
+                                sheetDetents: sheetDetents,
+                                sheetSelection: sheetSelection,
+                                sheetSelectionEnabled: sheetSelectionEnabled,
+                                showDragIndicator: showDragIndicator
+                            )
+                            .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                            .showingAlert(option: alertOption, item: $alert)
+                            .showingModal(configuration: modalConfiguration, item: $modal)
+                            .environment(\.router, router)
+                            .transition(transitionConfiguration.removingCurrent.transition)
+                            .animation(transitionConfiguration.removingCurrent.animation, value: transitionDestination == nil)
+                    }
+                }
+            )
         }
     }
     
@@ -267,7 +289,7 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
+    public func showAlert<Buttons:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> Buttons, buttonsiOS13: [Alert.Button]?) {
         guard self.alert == nil else {
             dismissAlert()
             return
@@ -281,14 +303,14 @@ public struct RouterView<T:View>: View, Router {
         self.alert = nil
     }
     
-    public func showModal<T:View>(
+    public func showModal<Destination:View>(
         transition: AnyTransition,
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?,
         backgroundEffect: BackgroundEffect?,
         useDeviceBounds: Bool,
-        @ViewBuilder destination: @escaping () -> T) {
+        @ViewBuilder destination: @escaping () -> Destination) {
             guard self.modal == nil else {
                 dismissModal()
                 return
@@ -300,6 +322,20 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissModal() {
         self.modal = nil
+    }
+    
+    public func showTransition<Destination:View>(removingCurrent: AnimatedTransition, insertingNext: AnimatedTransition, @ViewBuilder destination: @escaping () -> Destination) {
+        guard self.transitionDestination == nil else {
+            dismissTransition()
+            return
+        }
+        
+        self.transitionConfiguration = TransitionConfiguration(removingCurrent: removingCurrent, insertingNext: insertingNext)
+        self.transitionDestination = AnyDestination(destination())
+    }
+    
+    public func dismissTransition() {
+        self.transitionDestination = nil
     }
     
     public func showSafari(_ url: @escaping () -> URL) {
