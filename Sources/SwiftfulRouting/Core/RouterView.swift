@@ -123,7 +123,7 @@ public struct RouterView<T:View>: View, Router {
                         }
                     }
                 )
-                .animation(.linear, value: transitionDestination == nil)
+                //.animation(.linear, value: transitionDestination == nil)
             }
         }
     }
