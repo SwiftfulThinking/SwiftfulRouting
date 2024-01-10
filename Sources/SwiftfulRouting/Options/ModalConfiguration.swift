@@ -36,8 +36,13 @@ public struct BackgroundEffect {
 }
 
 public struct AnimatedTransition {
-    public let transition: AnyTransition
-    public let animation: Animation
+    let transition: AnyTransition
+    let animation: Animation
+    
+    public init(transition: AnyTransition, animation: Animation) {
+        self.transition = transition
+        self.animation = animation
+    }
 }
 
 public struct TransitionConfiguration {
