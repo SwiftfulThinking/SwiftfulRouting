@@ -41,8 +41,8 @@ public struct AnimatedTransition {
 }
 
 public struct TransitionConfiguration {
-    let removingCurrent: AnimatedTransition
-    let insertingNext: AnimatedTransition
+    public let removingCurrent: AnimatedTransition
+    public let insertingNext: AnimatedTransition
     
     static let `default` = TransitionConfiguration(
         removingCurrent: AnimatedTransition(transition: .move(edge: .leading), animation: .linear),
