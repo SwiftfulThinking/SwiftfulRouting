@@ -96,7 +96,7 @@ public struct RouterView<T:View>: View, Router {
             LazyZStack(
                 selection: transitionDestination != nil,
                 view: { (didTransition: Bool) in
-                    Group {
+                    ZStack {
                         content(router)
                             .showingScreen(
                                 option: segueOption,
