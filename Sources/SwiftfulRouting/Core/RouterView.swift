@@ -120,7 +120,6 @@ public struct RouterView<T:View>: View, Router {
                                 .showingModal(configuration: modalConfiguration, item: $modal)
                                 .environment(\.router, router)
                                 .transition(transitionConfiguration.removingCurrent)
-                                .id(transitionConfiguration.id)
                         }
                     }
                 )
@@ -333,7 +332,11 @@ public struct RouterView<T:View>: View, Router {
         }
         
         self.transitionConfiguration = TransitionConfiguration(removingCurrent: removingCurrent, insertingNext: insertingNext, animation: animation)
-        self.transitionDestination = AnyDestination(destination())
+        
+        // 0.01 delay gives the view time to render the removingCurrent transition (to fix?)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01, execute: {
+            self.transitionDestination = AnyDestination(destination())
+        })
     }
     
     public func dismissTransition() {
