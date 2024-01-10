@@ -34,22 +34,3 @@ public struct BackgroundEffect {
         self.opacity = opacity
     }
 }
-
-public struct TransitionConfiguration {
-    let id = UUID().uuidString
-    let removingCurrent: AnyTransition
-    let insertingNext: AnyTransition
-    let animation: Animation
-    
-    public init(removingCurrent: AnyTransition, insertingNext: AnyTransition, animation: Animation = .linear) {
-        self.removingCurrent = removingCurrent
-        self.insertingNext = insertingNext
-        self.animation = animation
-    }
-    
-    static let `default` = TransitionConfiguration(
-        removingCurrent: .move(edge: .leading),
-        insertingNext: .move(edge: .trailing),
-        animation: .linear
-    )
-}
