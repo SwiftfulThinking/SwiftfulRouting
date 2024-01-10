@@ -103,7 +103,7 @@ public struct RouterView<T:View>: View, Router {
                                     view
                                 }
                             }
-                            .transition(AnyTransition.move(edge: .leading))
+                            .transition(transitionConfiguration.insertingNext.transition)
                         } else {
                             content(router)
                                 .showingScreen(
@@ -119,7 +119,7 @@ public struct RouterView<T:View>: View, Router {
                                 .showingAlert(option: alertOption, item: $alert)
                                 .showingModal(configuration: modalConfiguration, item: $modal)
                                 .environment(\.router, router)
-                                .transition(AnyTransition.move(edge: .trailing))
+                                .transition(transitionConfiguration.removingCurrent.transition)
                         }
                     }
                 )
