@@ -36,13 +36,13 @@ public struct BackgroundEffect {
 }
 
 public struct AnimatedTransition {
-    let transition: AnyTransition
-    let animation: Animation
+    public let transition: AnyTransition
+    public let animation: Animation
 }
 
 public struct TransitionConfiguration {
-    public let removingCurrent: AnimatedTransition
-    public let insertingNext: AnimatedTransition
+    let removingCurrent: AnimatedTransition
+    let insertingNext: AnimatedTransition
     
     static let `default` = TransitionConfiguration(
         removingCurrent: AnimatedTransition(transition: .move(edge: .leading), animation: .linear),
