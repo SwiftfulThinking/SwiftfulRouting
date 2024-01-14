@@ -26,11 +26,15 @@ struct NavigationViewIfNeeded<Content:View>: View {
                 NavigationView {
                     content
                 }
-                //.onChangeOfPresentationMode(onDismiss: onDismiss)
             }
         } else {
-            content
-                .onChangeOfPresentationMode(screens: $screens, onDismiss: onDismiss)
+            if #available(iOS 16.0, *) {
+                // onChangeOfPresentationMode is NOT required for iOS 16 bc onDismiss will trigger within NavigationStackTransformable
+                content
+            } else {
+                content
+                    .onChangeOfPresentationMode(screens: $screens, onDismiss: onDismiss)
+            }
         }
     }
 }
@@ -96,8 +100,8 @@ struct NavigationStackTransformable<Content:View>: View {
         }
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
+                screens.last?.onDismiss?()
                 screens.removeLast()
-                print("DID REMOVE LAST SCREEN: \(screens.count)")
             }
         })
     }
