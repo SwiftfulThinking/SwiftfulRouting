@@ -115,6 +115,7 @@ public struct RouterView<T:View>: View, Router {
         print("dismissing sheet")
         print("screens: \(screens.count)")
         print("screenstack: \(screenStack.count)")
+        print("routes: \(routes.count)")
     }
     
     private func setEnvironmentRouterIfNeeded() {
