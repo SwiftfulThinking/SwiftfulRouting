@@ -158,7 +158,7 @@ public struct RouterView<T:View>: View, Router {
         }
         
 //        routes.append(newRoutes)
-        appendRoutes(routes: newRoutes)
+        appendRoutes(newRoutes: newRoutes)
         
         let destination = { router in
             AnyView(route.destination(router))
@@ -219,14 +219,14 @@ public struct RouterView<T:View>: View, Router {
         return $rootRoutes
     }
     
-    func appendRoutes(routes: [AnyRoute]) {
+    func appendRoutes(newRoutes: [AnyRoute]) {
         if !routes.isEmpty {
-            print("appending: \(routes.count) to ROUTES")
-            self.routes.append(routes)
+            print("appending: \(newRoutes.count) to ROUTES")
+            self.routes.append(newRoutes)
         } else {
-            print("appending: \(routes.count) to ROOT ROUTES")
+            print("appending: \(newRoutes.count) to ROOT ROUTES")
 
-            self.rootRoutes.append(routes)
+            self.rootRoutes.append(newRoutes)
         }
     }
     
@@ -294,7 +294,7 @@ public struct RouterView<T:View>: View, Router {
             
 //            let allRoutes: [[AnyRoute]] = routes + [localRoutes]
 //            self.routes.append(localRoutes)
-            appendRoutes(routes: localRoutes)
+            appendRoutes(newRoutes: localRoutes)
             
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
