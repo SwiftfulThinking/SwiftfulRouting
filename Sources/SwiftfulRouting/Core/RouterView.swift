@@ -131,6 +131,7 @@ public struct RouterView<T:View>: View, Router {
         
         let routes = (!routes.isEmpty ? routes : rootRoutes)
         if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
             for route in allRoutesInFrontOfCurrent.reversed() {
                 route.onDismiss?()
             }
@@ -355,7 +356,7 @@ public struct RouterView<T:View>: View, Router {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismissPush: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: nil))
+        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismissPush: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
     }
     
     public func dismissScreen() {
