@@ -123,9 +123,9 @@ public struct RouterView<T:View>: View, Router {
         print("routes: \(routes.count)")
         
         print("printing routes:")
-        for route in routes {
+        for (index, route) in routes.enumerated() {
             for route2 in route {
-                print(route2)
+                print("\(index) :: \(route2.segue)")
             }
         }
         
