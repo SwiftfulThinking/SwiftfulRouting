@@ -102,12 +102,19 @@ public struct RouterView<T:View>: View, Router {
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
                     showDragIndicator: showDragIndicator,
-                    onDismiss: onDismissSheets
+                    onDismiss: onDismissOfSheet
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+    }
+    
+    private func onDismissOfSheet() {
+        onDismissSheets?()
+        print("dismissing sheet")
+        print("screens: \(screens.count)")
+        print("screenstack: \(screenStack.count)")
     }
     
     private func setEnvironmentRouterIfNeeded() {
