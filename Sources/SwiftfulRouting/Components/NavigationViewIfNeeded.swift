@@ -26,7 +26,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
                 NavigationView {
                     content
                 }
-                .onChangeOfPresentationMode(onDismiss: onDismiss)
+                //.onChangeOfPresentationMode(onDismiss: onDismiss)
             }
         } else {
             content
