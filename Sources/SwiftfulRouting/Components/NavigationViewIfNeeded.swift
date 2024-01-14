@@ -30,7 +30,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
             }
         } else {
             content
-                .onChangeOfPresentationMode(onDismiss: onDismiss)
+                .onChangeOfPresentationMode(segueOption: segueOption, onDismiss: onDismiss)
         }
     }
 }
@@ -38,12 +38,13 @@ struct NavigationViewIfNeeded<Content:View>: View {
 struct OnChangeOfPresentationModeViewModifier: ViewModifier {
     
     @Environment(\.presentationMode) var presentationMode
+    let segueOption: SegueOption
     let onDismiss: (() -> Void)?
 
     func body(content: Content) -> some View {
         content
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                if !newValue {
+                if segueOption == .push, !newValue {
                     onDismiss?()
                 }
             }
@@ -52,8 +53,8 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
 
 extension View {
     
-    func onChangeOfPresentationMode(onDismiss: (() -> Void)?) -> some View {
-        modifier(OnChangeOfPresentationModeViewModifier(onDismiss: onDismiss))
+    func onChangeOfPresentationMode(segueOption: SegueOption, onDismiss: (() -> Void)?) -> some View {
+        modifier(OnChangeOfPresentationModeViewModifier(segueOption: segueOption, onDismiss: onDismiss))
     }
 }
 
