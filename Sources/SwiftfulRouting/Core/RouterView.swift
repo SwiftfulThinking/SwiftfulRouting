@@ -125,10 +125,11 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfSheet() {
-        onDismissSheets?()
+        // HOLD?
+//        onDismissSheets?()
         
         
-        var routes = (!routes.isEmpty ? routes : rootRoutes)
+        let routes = (!routes.isEmpty ? routes : rootRoutes)
         if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
             for route in allRoutesInFrontOfCurrent.reversed() {
                 route.onDismiss?()
@@ -154,7 +155,7 @@ public struct RouterView<T:View>: View, Router {
 //            }
 //        }
         
-//        removeRoutes(route: self.route)
+        removeRoutes(route: self.route)
     }
     
     private func setEnvironmentRouterIfNeeded() {
@@ -216,32 +217,33 @@ public struct RouterView<T:View>: View, Router {
         // After segueing, remove that flow from local routes
         // Loop backwards, if have not yet found the current flow...
         // it's a future flow or the current flow and should be removed now
-        for (index, item) in routes.enumerated().reversed() {
-            routes.remove(at: index)
-            
-            if item.contains(where: { $0.id == route.id }) {
-                return
-            }
+//        for (index, item) in routes.enumerated().reversed() {
+//            routes.remove(at: index)
+//            
+//            if item.contains(where: { $0.id == route.id }) {
+//                return
+//            }
+//        }
+        
+        
+        print("REMOVING ROUTES")
+        let routes = !routes.isEmpty ? routes : rootRoutes
+        for route in routes {
+            print(route)
         }
     }
     
     var routeBinding: Binding<[[AnyRoute]]> {
         if !routes.isEmpty {
-            print("USING ROUTES!")
             return $routes
         }
-        print("USING ROOT ROUTES!")
-        print(rootRoutes)
         return $rootRoutes
     }
     
     func appendRoutes(newRoutes: [AnyRoute]) {
         if !routes.isEmpty {
-            print("appending: \(newRoutes.count) to ROUTES")
             self.routes.append(newRoutes)
         } else {
-            print("appending: \(newRoutes.count) to ROOT ROUTES")
-
             self.rootRoutes.append(newRoutes)
         }
     }
@@ -257,12 +259,12 @@ public struct RouterView<T:View>: View, Router {
             self.onDismissSheets = route.onDismiss
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            print("PASSING ROUTES TO SHEET FORM SHEET ROUTER")
-            for route in routes {
-                for route2 in route {
-                    print(route2)
-                }
-            }
+//            print("PASSING ROUTES TO SHEET FORM SHEET ROUTER")
+//            for route in routes {
+//                for route2 in route {
+//                    print(route2)
+//                }
+//            }
             self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismissPush: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
