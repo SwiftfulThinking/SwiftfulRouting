@@ -210,9 +210,10 @@ public struct RouterView<T:View>: View, Router {
     
     var routeBinding: Binding<[[AnyRoute]]> {
         if !routes.isEmpty {
+            print("USING ROUTES!")
             return $routes
         }
-        
+        print("USING ROOT ROUTES!")
         return $rootRoutes
     }
     
