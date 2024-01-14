@@ -225,11 +225,11 @@ public struct RouterView<T:View>: View, Router {
 //            }
 //        }
         
-        print("REMOVING ROUTES withing : \(route.id)")
-        let printRoutes = !routes.isEmpty ? routes : rootRoutes
-        for route in printRoutes {
-            print(route)
-        }
+//        print("REMOVING ROUTES withing : \(route.id)")
+//        let printRoutes = !routes.isEmpty ? routes : rootRoutes
+//        for route in printRoutes {
+//            print(route)
+//        }
 
         // Remove all flows after current
         if !routes.isEmpty {
@@ -238,11 +238,11 @@ public struct RouterView<T:View>: View, Router {
             rootRoutes.removeArraysAfter(arrayThatIncludesId: route.id)
         }
         
-        print("RESULT FOR : \(route.id)")
-        let printRoutes2 = !routes.isEmpty ? routes : rootRoutes
-        for route in printRoutes2 {
-            print(route)
-        }
+//        print("RESULT FOR : \(route.id)")
+//        let printRoutes2 = !routes.isEmpty ? routes : rootRoutes
+//        for route in printRoutes2 {
+//            print(route)
+//        }
 
     }
     
