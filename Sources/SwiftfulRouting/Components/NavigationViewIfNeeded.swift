@@ -50,6 +50,7 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
                 // (ie. this occurs iOS 15 via sheet, push, push, push...
                 if !newValue, screens.isEmpty {
                     onDismiss?()
+                    print(screens.count)
                 }
             }
     }
