@@ -22,28 +22,34 @@ struct NavigationViewIfNeeded<Content:View>: View {
                     content
                 }
             } else {
-                NavigationViewTransformable {
+                NavigationView {
                     content
+                        .onChangeOfPresentationMode()
                 }
             }
         } else {
             content
+                .onChangeOfPresentationMode()
         }
     }
 }
 
-struct NavigationViewTransformable<Content:View>: View {
+struct OnChangeOfPresentationModeViewModifier: ViewModifier {
     
-    @ViewBuilder var content: Content
     @Environment(\.presentationMode) var presentationMode
 
-    var body: some View {
-        NavigationView {
-            content
-                .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                    print("CONTENT IS PRESENTED: \(newValue)")
-                }
-        }
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
+                print("CONTENT IS PRESENTED: \(newValue)")
+            }
+    }
+}
+
+extension View {
+    
+    func onChangeOfPresentationMode() -> some View {
+        modifier(OnChangeOfPresentationModeViewModifier())
     }
 }
 
