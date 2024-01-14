@@ -137,12 +137,12 @@ public struct RouterView<T:View>: View, Router {
             }
         } else {
             print("ROOT ROUTES CONTAINS")
-            for (index, route) in routes.enumerated() {
+            for (index, route) in rootRoutes.enumerated() {
                 for route2 in route {
                     print("\(index) :: \(route2.segue)")
                 }
             }
-        }        
+        }
         
 //        removeRoutes(route: self.route)
     }
