@@ -23,11 +23,11 @@ struct SheetViewModifier: ViewModifier {
             .sheet(item: Binding(if: option, is: .sheet, value: Binding(toLastElementIn: screens)), onDismiss: onDismiss) { destination in
                 if let view = screens.wrappedValue.last?.destination {
                     view
-                        .presentationDetentsIfNeeded(
-                            sheetDetents: sheetDetents,
-                            sheetSelection: $sheetSelection,
-                            sheetSelectionEnabled: sheetSelectionEnabled,
-                            showDragIndicator: showDragIndicator)
+//                        .presentationDetentsIfNeeded(
+//                            sheetDetents: sheetDetents,
+//                            sheetSelection: $sheetSelection,
+//                            sheetSelectionEnabled: sheetSelectionEnabled,
+//                            showDragIndicator: showDragIndicator)
                 }
             }
     }

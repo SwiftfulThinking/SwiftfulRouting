@@ -127,7 +127,7 @@ public struct RouterView<T:View>: View, Router {
     private func onDismissOfSheet() {
         // HOLD?
 //        onDismissSheets?()
-        
+        print("ON DISMISS OF SHEET")
         
         let routes = (!routes.isEmpty ? routes : rootRoutes)
         if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
@@ -346,8 +346,6 @@ public struct RouterView<T:View>: View, Router {
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
         self.onDismissSheets = onDismiss
-        print("ADDING ON DISMISS:::: ")
-        onDismiss?()
 
         // If selection == nil, then need to avoid using sheetSelection modifier
         if let selection {
