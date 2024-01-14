@@ -126,17 +126,23 @@ public struct RouterView<T:View>: View, Router {
     
     private func onDismissOfSheet() {
         onDismissSheets?()
-        print("dismissing sheet")
-        print("screens: \(screens.count)")
-        print("screenstack: \(screenStack.count)")
-        print("routes: \(routes.count)")
         
-        print("printing routes:")
-        for (index, route) in routes.enumerated() {
-            for route2 in route {
-                print("\(index) :: \(route2.segue)")
+        
+        if !routes.isEmpty {
+            print("ROUTES CONTAINS")
+            for (index, route) in routes.enumerated() {
+                for route2 in route {
+                    print("\(index) :: \(route2.segue)")
+                }
             }
-        }
+        } else {
+            print("ROOT ROUTES CONTAINS")
+            for (index, route) in routes.enumerated() {
+                for route2 in route {
+                    print("\(index) :: \(route2.segue)")
+                }
+            }
+        }        
         
 //        removeRoutes(route: self.route)
     }
