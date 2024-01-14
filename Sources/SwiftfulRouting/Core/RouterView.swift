@@ -157,7 +157,8 @@ public struct RouterView<T:View>: View, Router {
             return
         }
         
-        routes.append(newRoutes)
+//        routes.append(newRoutes)
+        appendRoutes(routes: newRoutes)
         
         let destination = { router in
             AnyView(route.destination(router))
@@ -214,7 +215,16 @@ public struct RouterView<T:View>: View, Router {
             return $routes
         }
         print("USING ROOT ROUTES!")
+        print(rootRoutes)
         return $rootRoutes
+    }
+    
+    func appendRoutes(routes: [AnyRoute]) {
+        if !routes.isEmpty {
+            self.routes.append(routes)
+        } else {
+            self.rootRoutes.append(routes)
+        }
     }
     
     // if isEnvironmentRouter & screens no longer includes this screen, then environment did dismiss?
@@ -280,7 +290,8 @@ public struct RouterView<T:View>: View, Router {
             localRoutes.append(route)
             
 //            let allRoutes: [[AnyRoute]] = routes + [localRoutes]
-            self.routes.append(localRoutes)
+//            self.routes.append(localRoutes)
+            appendRoutes(routes: localRoutes)
             
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
