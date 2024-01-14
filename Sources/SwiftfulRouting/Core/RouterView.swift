@@ -124,10 +124,12 @@ public struct RouterView<T:View>: View, Router {
         
         print("printing routes:")
         for route in routes {
-            print(route)
+            for route2 in route {
+                print(route2)
+            }
         }
         
-        removeRoutes(route: route)
+//        removeRoutes(route: self.route)
     }
     
     private func setEnvironmentRouterIfNeeded() {
