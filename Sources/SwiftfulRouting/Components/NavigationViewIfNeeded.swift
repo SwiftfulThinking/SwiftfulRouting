@@ -30,7 +30,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
             }
         } else {
             content
-                .onChangeOfPresentationMode(segueOption: segueOption, screens: $screens, onDismiss: onDismiss)
+                .onChangeOfPresentationMode(screens: $screens, onDismiss: onDismiss)
         }
     }
 }
@@ -38,7 +38,6 @@ struct NavigationViewIfNeeded<Content:View>: View {
 struct OnChangeOfPresentationModeViewModifier: ViewModifier {
     
     @Environment(\.presentationMode) var presentationMode
-    let segueOption: SegueOption
     @Binding var screens: [AnyDestination]
     let onDismiss: (() -> Void)?
 
@@ -58,8 +57,8 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
 
 extension View {
     
-    func onChangeOfPresentationMode(segueOption: SegueOption, screens: Binding<[AnyDestination]>, onDismiss: (() -> Void)?) -> some View {
-        modifier(OnChangeOfPresentationModeViewModifier(segueOption: segueOption, screens: screens, onDismiss: onDismiss))
+    func onChangeOfPresentationMode(screens: Binding<[AnyDestination]>, onDismiss: (() -> Void)?) -> some View {
+        modifier(OnChangeOfPresentationModeViewModifier(screens: screens, onDismiss: onDismiss))
     }
 }
 
@@ -98,7 +97,7 @@ struct NavigationStackTransformable<Content:View>: View {
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
                 screens.removeLast()
-                print("DID REMOVE LAST SCREEN")
+                print("DID REMOVE LAST SCREEN: \(screens.count)")
             }
         })
     }
