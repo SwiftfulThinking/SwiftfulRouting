@@ -177,14 +177,14 @@ public struct RouterView<T:View>: View, Router {
     
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
-        //self.onDismiss = route.onDismiss
 
         if route.segue != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
+            self.onDismiss = route.onDismiss
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismiss: route.onDismiss, route: route, routes: routes, environmentRouter: nil, content: destination)))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismiss: nil, route: route, routes: routes, environmentRouter: nil, content: destination)))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -263,8 +263,8 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
-        print("CALLING DISMISS ON")
-        onDismiss?()
+        
+//        onDismiss?()
     }
     
     @available(iOS 16, *)
