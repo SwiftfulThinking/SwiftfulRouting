@@ -233,7 +233,7 @@ public struct RouterView<T:View>: View, Router {
             }
         }
         
-        removeRoutes(route: route)
+//        removeRoutes(route: route)
     }
     
     @available(iOS 16, *)
