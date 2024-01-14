@@ -343,10 +343,14 @@ public struct RouterView<T:View>: View, Router {
     
     @available(iOS 16, *)
     public func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool = false, onDismiss: (() -> Void)?, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
-        self.segueOption = .sheet
+        let newRoute = AnyRoute(.sheet, onDismiss: onDismiss, destination: destination)
+
+        self.segueOption = newRoute.segue
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
-        self.onDismissSheets = onDismiss
+        
+        self.onDismissSheets = newRoute.onDismiss
+        self.appendRoutes(newRoutes: [newRoute])
 
         // If selection == nil, then need to avoid using sheetSelection modifier
         if let selection {
