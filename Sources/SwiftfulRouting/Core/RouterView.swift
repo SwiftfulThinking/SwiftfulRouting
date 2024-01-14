@@ -226,7 +226,7 @@ public struct RouterView<T:View>: View, Router {
 //        }
         
         
-        print("REMOVING ROUTES")
+        print("REMOVING ROUTES withing : \(route.id)")
         let routes = !routes.isEmpty ? routes : rootRoutes
         for route in routes {
             print(route)
