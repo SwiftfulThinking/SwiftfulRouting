@@ -385,7 +385,7 @@ public struct RouterView<T:View>: View, Router {
         self.screenStack = []
 
         if !routes.isEmpty {
-            print("ROUTES CONTAINS")
+            print("ROUTES CONTAINS: \(routes.count)")
             for (index, route) in routes.enumerated() {
                 for route2 in route {
                     print("\(index) :: \(route2.segue)")
