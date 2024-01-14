@@ -78,6 +78,20 @@ extension Array where Element: Identifiable {
         }
     }
     
+    func allAfter(_ element: Element) -> [Element]? {
+        guard let index = self.firstIndex(where: { $0.id == element.id }), index < self.count - 1 else {
+            return nil
+        }
+        return Array(self[(index + 1)...])
+    }
+    
+    func allBefore(_ element: Element) -> [Element]? {
+        guard let index = self.firstIndex(where: { $0.id == element.id }), index > 0 else {
+            return nil
+        }
+        return Array(self[..<index])
+    }
+    
 }
 
 

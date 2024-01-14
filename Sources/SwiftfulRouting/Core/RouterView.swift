@@ -128,21 +128,31 @@ public struct RouterView<T:View>: View, Router {
         onDismissSheets?()
         
         
-        if !routes.isEmpty {
-            print("ROUTES CONTAINS")
-            for (index, route) in routes.enumerated() {
-                for route2 in route {
-                    print("\(index) :: \(route2.segue)")
-                }
-            }
-        } else {
-            print("ROOT ROUTES CONTAINS")
-            for (index, route) in rootRoutes.enumerated() {
-                for route2 in route {
-                    print("\(index) :: \(route2.segue)")
-                }
+        var routes = (!routes.isEmpty ? routes : rootRoutes)
+        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+            for route in allRoutesInFrontOfCurrent.reversed() {
+                route.onDismiss?()
             }
         }
+        
+
+//        if !routes.isEmpty {
+//            print("ROUTES CONTAINS")
+//            for (index, route) in routes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        } else {
+//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
+//
+//            print("ROOT ROUTES CONTAINS")
+//            for (index, route) in rootRoutes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        }
         
 //        removeRoutes(route: self.route)
     }
