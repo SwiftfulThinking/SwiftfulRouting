@@ -221,8 +221,11 @@ public struct RouterView<T:View>: View, Router {
     
     func appendRoutes(routes: [AnyRoute]) {
         if !routes.isEmpty {
+            print("appending: \(routes.count) to ROUTES")
             self.routes.append(routes)
         } else {
+            print("appending: \(routes.count) to ROOT ROUTES")
+
             self.rootRoutes.append(routes)
         }
     }
