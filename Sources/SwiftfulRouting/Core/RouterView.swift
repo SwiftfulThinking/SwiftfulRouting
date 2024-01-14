@@ -117,7 +117,6 @@ public struct RouterView<T:View>: View, Router {
     
     private func onDismissOfSheet() {
         onDismissSheets?()
-        removeRoutes(route: route)
         print("dismissing sheet")
         print("screens: \(screens.count)")
         print("screenstack: \(screenStack.count)")
@@ -127,6 +126,8 @@ public struct RouterView<T:View>: View, Router {
         for route in routes {
             print(route)
         }
+        
+        removeRoutes(route: route)
     }
     
     private func setEnvironmentRouterIfNeeded() {
