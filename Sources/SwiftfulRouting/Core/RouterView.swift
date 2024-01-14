@@ -110,12 +110,23 @@ public struct RouterView<T:View>: View, Router {
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
+    private func onDismissOfPush() {
+        onDismissPush?()
+//        removeRoutes(route: <#T##AnyRoute#>)
+    }
+    
     private func onDismissOfSheet() {
         onDismissSheets?()
+        removeRoutes(route: route)
         print("dismissing sheet")
         print("screens: \(screens.count)")
         print("screenstack: \(screenStack.count)")
         print("routes: \(routes.count)")
+        
+        print("printing routes:")
+        for route in routes {
+            print(route)
+        }
     }
     
     private func setEnvironmentRouterIfNeeded() {
@@ -176,13 +187,13 @@ public struct RouterView<T:View>: View, Router {
         // After segueing, remove that flow from local routes
         // Loop backwards, if have not yet found the current flow...
         // it's a future flow or the current flow and should be removed now
-//        for (index, item) in routes.enumerated().reversed() {
-//            routes.remove(at: index)
-//            
-//            if item.contains(where: { $0.id == route.id }) {
-//                return
-//            }
-//        }
+        for (index, item) in routes.enumerated().reversed() {
+            routes.remove(at: index)
+            
+            if item.contains(where: { $0.id == route.id }) {
+                return
+            }
+        }
     }
     
     // if isEnvironmentRouter & screens no longer includes this screen, then environment did dismiss?
