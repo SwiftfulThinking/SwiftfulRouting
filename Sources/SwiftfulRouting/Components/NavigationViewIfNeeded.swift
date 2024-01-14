@@ -44,18 +44,14 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-        // if the next segueOption is push (the one that just got dismissed)
-        
-        // bind to Segues and execute the last segue? that was in array prior to isPresented = false?
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                if !newValue {
-                    print("DISMISSING: \(screens.count)")
+                // Check screens.isEmpty to ensure there are no screens infront of this screen rendered
+                // This is an edge case where if user pushes too far forward (~10+), the system will stop presenting lowest screens in heirarchy
+                // (ie. this occurs iOS 15 via sheet, push, push, push...
+                if !newValue, screens.isEmpty {
                     onDismiss?()
                 }
             }
-//            .onChange(of: screens) { newValue in
-//                print("SCREENS DID CHANGE: \(newValue.count)")
-//            }
     }
 }
 
