@@ -12,6 +12,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
     
     let addNavigationView: Bool
     let segueOption: SegueOption
+    let onDismiss: (() -> Void)?
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
     
@@ -24,12 +25,12 @@ struct NavigationViewIfNeeded<Content:View>: View {
             } else {
                 NavigationView {
                     content
-                        .onChangeOfPresentationMode()
+                        .onChangeOfPresentationMode(onDismiss: onDismiss)
                 }
             }
         } else {
             content
-                .onChangeOfPresentationMode()
+                .onChangeOfPresentationMode(onDismiss: onDismiss)
         }
     }
 }
@@ -37,19 +38,22 @@ struct NavigationViewIfNeeded<Content:View>: View {
 struct OnChangeOfPresentationModeViewModifier: ViewModifier {
     
     @Environment(\.presentationMode) var presentationMode
+    let onDismiss: (() -> Void)?
 
     func body(content: Content) -> some View {
         content
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                print("CONTENT IS PRESENTED: \(newValue)")
+                if !newValue {
+                    onDismiss?()
+                }
             }
     }
 }
 
 extension View {
     
-    func onChangeOfPresentationMode() -> some View {
-        modifier(OnChangeOfPresentationModeViewModifier())
+    func onChangeOfPresentationMode(onDismiss: (() -> Void)?) -> some View {
+        modifier(OnChangeOfPresentationModeViewModifier(onDismiss: onDismiss))
     }
 }
 

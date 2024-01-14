@@ -88,7 +88,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismiss, screens: $screens) {
             content(AnyRouter(object: self))
                 .showingScreen(
                     option: segueOption,
