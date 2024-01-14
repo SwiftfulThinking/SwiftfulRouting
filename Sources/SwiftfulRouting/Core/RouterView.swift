@@ -345,6 +345,7 @@ public struct RouterView<T:View>: View, Router {
         self.segueOption = .sheet
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
+        self.onDismissSheets = onDismiss
 
         // If selection == nil, then need to avoid using sheetSelection modifier
         if let selection {
