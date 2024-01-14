@@ -263,7 +263,6 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
-        self.onDismiss?()
     }
     
     @available(iOS 16, *)
