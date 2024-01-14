@@ -30,7 +30,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
             }
         } else {
             content
-                .onChangeOfPresentationMode(segueOption: segueOption, onDismiss: onDismiss)
+                .onChangeOfPresentationMode(segueOption: segueOption, screens: $screens, onDismiss: onDismiss)
         }
     }
 }
@@ -39,22 +39,27 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
     
     @Environment(\.presentationMode) var presentationMode
     let segueOption: SegueOption
+    @Binding var screens: [AnyDestination]
     let onDismiss: (() -> Void)?
 
     func body(content: Content) -> some View {
         content
+        // if the next segueOption is push (the one that just got dismissed)
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
                 if segueOption == .push, !newValue {
                     onDismiss?()
                 }
+            }
+            .onChange(of: screens) { newValue in
+                print("SCREENS DID CHANGE: \(newValue.count)")
             }
     }
 }
 
 extension View {
     
-    func onChangeOfPresentationMode(segueOption: SegueOption, onDismiss: (() -> Void)?) -> some View {
-        modifier(OnChangeOfPresentationModeViewModifier(segueOption: segueOption, onDismiss: onDismiss))
+    func onChangeOfPresentationMode(segueOption: SegueOption, screens: Binding<[AnyDestination]>, onDismiss: (() -> Void)?) -> some View {
+        modifier(OnChangeOfPresentationModeViewModifier(segueOption: segueOption, screens: screens, onDismiss: onDismiss))
     }
 }
 
