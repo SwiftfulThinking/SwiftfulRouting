@@ -94,11 +94,13 @@ struct NavigationStackTransformable<Content:View>: View {
         })
         .onChange(of: screens) { newValue in
             if isPushEnabled {
+                print("PUSH INABLED AND RESET TO NEW INIT?")
                 path = .init(newValue)
             }
         }
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
+                print("ON CHANGE PATH COUNT: \(path.count)")
                 screens.last?.onDismiss?()
                 screens.removeLast()
             }
