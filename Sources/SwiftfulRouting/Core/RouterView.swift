@@ -373,6 +373,38 @@ public struct RouterView<T:View>: View, Router {
     public func dismissScreenStack() {
         self.screens = []
         self.screenStack = []
+        
+        print("HI NICK DISMISSING SCREEN STACK")
+        
+        let routes = (!routes.isEmpty ? routes : rootRoutes)
+        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
+            for route in allRoutesInFrontOfCurrent.reversed() {
+                route.onDismiss?()
+            }
+        }
+        
+
+//        if !routes.isEmpty {
+//            print("ROUTES CONTAINS")
+//            for (index, route) in routes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        } else {
+//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
+//
+//            print("ROOT ROUTES CONTAINS")
+//            for (index, route) in rootRoutes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        }
+        print("currently in: \(route.id)")
+        removeRoutes(route: self.route)
+
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
