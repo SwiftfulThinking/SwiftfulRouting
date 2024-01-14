@@ -210,6 +210,8 @@ public struct RouterView<T:View>: View, Router {
             self.onDismissSheets = route.onDismiss
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
+            print("PASSING ROUTES TO SHEET FORM SHEET ROUTER")
+            print(routes)
             self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismissPush: nil, route: route, routes: routes, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
