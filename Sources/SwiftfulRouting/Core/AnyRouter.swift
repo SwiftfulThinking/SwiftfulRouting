@@ -14,10 +14,12 @@ import SwiftUI
 public struct AnyRoute: Identifiable {
     public let id = UUID().uuidString
     let segue: SegueOption
+    let onDismiss: (() -> Void)?
     let destination: (AnyRouter) -> any View
     
-    public init(_ segue: SegueOption, destination: @escaping (AnyRouter) -> any View) {
+    public init(_ segue: SegueOption, onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
+        self.onDismiss = onDismiss
         self.destination = destination
     }
     
@@ -29,6 +31,22 @@ public struct AnyRoute: Identifiable {
     }()
 }
 
+public struct PushRoute: Identifiable {
+    public let id = UUID().uuidString
+    let segue: SegueOption = .push
+    let onDismiss: (() -> Void)?
+    let destination: (AnyRouter) -> any View
+    
+    public init(onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
+        self.onDismiss = onDismiss
+        self.destination = destination
+    }
+    
+    var asAnyRoute: AnyRoute {
+        AnyRoute(segue, onDismiss: onDismiss, destination: destination)
+    }
+}
+
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
@@ -38,8 +56,8 @@ public struct AnyRouter: Router {
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreens([AnyRoute(option, destination: destination)])
+    public func showScreen<T>(_ option: SegueOption, onDismiss: (() -> Void)? = nil, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
+        object.showScreens([AnyRoute(option, onDismiss: onDismiss, destination: destination)])
     }
 
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
@@ -78,14 +96,14 @@ public struct AnyRouter: Router {
 
     /// Push a stack of screens and show the last one immediately.
     @available(iOS 16, *)
-    public func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
+    public func pushScreenStack(destinations: [PushRoute]) {
         object.pushScreenStack(destinations: destinations)
     }
     
     /// Show a resizeable sheet on top of the current context.
     @available(iOS 16, *)
-    public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
-        object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, destination: destination)
+    public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, destination: @escaping (AnyRouter) -> V) where V : View {
+        object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, onDismiss: onDismiss, destination: destination)
     }
         
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
