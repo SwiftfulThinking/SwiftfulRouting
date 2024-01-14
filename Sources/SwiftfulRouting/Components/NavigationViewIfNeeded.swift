@@ -42,6 +42,10 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .onAppear {
+                print("ADDED FOR:")
+                onDismiss?()
+            }
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
                 if !newValue {
                     onDismiss?()
