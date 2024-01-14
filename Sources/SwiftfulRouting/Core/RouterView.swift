@@ -45,7 +45,6 @@ public struct RouterView<T:View>: View, Router {
     // Segues
     @State private var segueOption: SegueOption = .push
     @State public var screens: [AnyDestination] = []
-    @State private var previousScreens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var routes: [[AnyRoute]]
@@ -203,7 +202,7 @@ public struct RouterView<T:View>: View, Router {
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, onDismiss: route.onDismiss, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, onDismiss: route.onDismiss, route: route, routes: routes, environmentRouter: environmentRouter, content: destination)))
             }
         }
         

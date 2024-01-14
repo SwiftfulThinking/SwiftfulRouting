@@ -45,14 +45,16 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
         // if the next segueOption is push (the one that just got dismissed)
+        
+        // bind to Segues and execute the last segue? that was in array prior to isPresented = false?
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                if segueOption == .push, !newValue {
+                if !newValue {
                     onDismiss?()
                 }
             }
-            .onChange(of: screens) { newValue in
-                print("SCREENS DID CHANGE: \(newValue.count)")
-            }
+//            .onChange(of: screens) { newValue in
+//                print("SCREENS DID CHANGE: \(newValue.count)")
+//            }
     }
 }
 
