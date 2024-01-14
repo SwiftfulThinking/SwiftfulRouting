@@ -37,6 +37,8 @@ public struct RouterView<T:View>: View, Router {
 
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
+    
+    let onDismiss: (() -> Void)?
  
     // Routable methods
     @State private var route: AnyRoute
@@ -58,7 +60,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var sheetDetents: Set<PresentationDetentTransformable> = [.large]
     @State private var sheetSelection: Binding<PresentationDetentTransformable> = .constant(.large)
     @State private var sheetSelectionEnabled: Bool = false
-    @State private var showDragIndicator: Bool = true
+    @State private var showDragIndicator: Bool = false
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -68,7 +70,7 @@ public struct RouterView<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: [[AnyRoute]]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, onDismiss: (() -> Void)? = nil, route: AnyRoute? = nil, routes: [[AnyRoute]]? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
@@ -81,6 +83,7 @@ public struct RouterView<T:View>: View, Router {
             self._routes = State(wrappedValue: [[root]])
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
+        self.onDismiss = onDismiss
         self.content = content
 
     }
@@ -95,7 +98,8 @@ public struct RouterView<T:View>: View, Router {
                     sheetDetents: sheetDetents,
                     sheetSelection: sheetSelection,
                     sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator
+                    showDragIndicator: showDragIndicator,
+                    onDismiss: onDismiss
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
         }
@@ -239,7 +243,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     @available(iOS 16, *)
-    public func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool = true, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
+    public func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool = false, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = .sheet
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
@@ -327,8 +331,9 @@ extension View {
         sheetDetents: Set<PresentationDetentTransformable>,
         sheetSelection: Binding<PresentationDetentTransformable>,
         sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool
-    ) -> some View {
+        showDragIndicator: Bool,
+        onDismiss: (() -> Void)?
+        ) -> some View {
             if #available(iOS 14, *) {
                 self
                     .modifier(NavigationLinkViewModifier(
@@ -342,11 +347,13 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
                     ))
                     .modifier(FullScreenCoverViewModifier(
                         option: option,
-                        screens: screens
+                        screens: screens,
+                        onDismiss: onDismiss
                     ))
             } else {
                 self
@@ -361,7 +368,8 @@ extension View {
                         sheetDetents: sheetDetents,
                         sheetSelection: sheetSelection,
                         sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
                     ))
             }
     }
