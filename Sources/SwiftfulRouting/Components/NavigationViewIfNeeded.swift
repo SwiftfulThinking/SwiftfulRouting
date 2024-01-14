@@ -49,6 +49,7 @@ struct OnChangeOfPresentationModeViewModifier: ViewModifier {
         // bind to Segues and execute the last segue? that was in array prior to isPresented = false?
             .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
                 if !newValue {
+                    print("DISMISSING: \(screens.count)")
                     onDismiss?()
                 }
             }
