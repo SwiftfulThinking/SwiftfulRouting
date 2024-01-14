@@ -37,10 +37,10 @@ public struct RouterView<T:View>: View, Router {
 
     let addNavigationView: Bool
     let content: (AnyRouter) -> T
-    let onDismiss: (() -> Void)?
  
     // Routable methods
     @State private var route: AnyRoute
+    @State private var onDismiss: (() -> Void)?
 
     // Segues
     @State private var segueOption: SegueOption = .push
@@ -82,7 +82,7 @@ public struct RouterView<T:View>: View, Router {
             self._routes = State(wrappedValue: [[root]])
         }
         self._environmentRouter = State(wrappedValue: environmentRouter)
-        self.onDismiss = onDismiss
+        self._onDismiss = State(wrappedValue: onDismiss)
         self.content = content
 
     }
@@ -177,6 +177,7 @@ public struct RouterView<T:View>: View, Router {
     
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
+        self.onDismiss = route.onDismiss
 
         if route.segue != .push {
             // Add new Navigation
@@ -213,6 +214,7 @@ public struct RouterView<T:View>: View, Router {
     public func pushScreenStack(destinations: [PushRoute]) {
         // iOS 16 supports NavigationStack, which can push a stack of views and increment an existing view stack
         self.segueOption = .push
+        
         
         // Loop on injected destinations and add them to localStack
         // If screenStack.isEmpty, we are in the root Router and should start building on $screens
