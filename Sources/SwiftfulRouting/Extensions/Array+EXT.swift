@@ -94,6 +94,16 @@ extension Array where Element: Identifiable {
     
 }
 
+extension Array where Element: Collection, Element.Element: Identifiable {
+    mutating func removeArraysAfter(arrayThatIncludesId id: Element.Element.ID) {
+        if let index = self.firstIndex(where: { $0.contains(where: { $0.id == id }) }) {
+            self = Array(self.prefix(upTo: index + 1))
+        }
+        // If an element with the specified id is not found, the original array remains unchanged
+    }
+}
+
+
 
 //extension Array where Element: Equatable {
 //
