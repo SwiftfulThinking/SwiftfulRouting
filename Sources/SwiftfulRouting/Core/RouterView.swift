@@ -85,13 +85,13 @@ public struct RouterView<T:View>: View, Router {
             self._route = State(wrappedValue: route)
             
             self._rootRoutes = State(wrappedValue: [[route]])
-            self._routes = routes ?? .constant([[]])
+            self._routes = routes ?? .constant([])
         } else {
             let root = AnyRoute.root
             self._route = State(wrappedValue: root)
             
             self._rootRoutes = State(wrappedValue: [[root]])
-            self._routes = routes ?? .constant([[]])
+            self._routes = routes ?? .constant([])
         }
         
         self._environmentRouter = State(wrappedValue: environmentRouter)
