@@ -528,10 +528,11 @@ extension RouterView {
         
         for route in screensToDismiss {
             route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
         }
         
         // Remove routes
-        removeRoutingFlowsAfterRoute(newRootScreen)
+        //removeRoutingFlowsAfterRoute(newRootScreen)
 
         // Reset screens to match NavigationStack path
         screens = []
