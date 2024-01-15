@@ -217,23 +217,6 @@ public struct RouterView<T:View>: View, Router {
         
         // Remove flow if needed
         removeRoutingFlowsAfterRoute(route)
-
-
-        
-//        let routes = (!routes.isEmpty ? routes : rootRoutes)
-//        
-//        var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) ?? []
-//        
-//        if isResizableSheet {
-//            allRoutesInFrontOfCurrent.insert(route, at: 0)
-//        }
-//        
-//        for route in allRoutesInFrontOfCurrent.reversed() {
-//            route.onDismiss?()
-//            updateRouteIsPresented(route: route, isPresented: false)
-//        }
-//        
-//        removeRoutingFlowsAfterRoute(route)
     }
     
     private func setEnvironmentRouterIfNeeded() {
@@ -299,15 +282,15 @@ public struct RouterView<T:View>: View, Router {
         }
     }
     
-    var routeBinding: Binding<[[AnyRoute]]> {
-        if !routes.isEmpty {
+    private var routeBinding: Binding<[[AnyRoute]]> {
+        if useRoutesNotRootRoutes {
             return $routes
         }
         return $rootRoutes
     }
     
-    func appendRoutes(newRoutes: [AnyRoute]) {
-        if !routes.isEmpty {
+    private func appendRoutes(newRoutes: [AnyRoute]) {
+        if useRoutesNotRootRoutes {
             self.routes.append(newRoutes)
         } else {
             self.rootRoutes.append(newRoutes)
@@ -328,7 +311,6 @@ public struct RouterView<T:View>: View, Router {
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
-            
             
             // iOS 16 uses NavigationStack and can push additional views onto an existing view stack
             if #available(iOS 16, *) {
@@ -353,11 +335,9 @@ public struct RouterView<T:View>: View, Router {
         // iOS 16 supports NavigationStack, which can push a stack of views and increment an existing view stack
         self.segueOption = .push
         
-        
         // Loop on injected destinations and add them to localStack
         // If screenStack.isEmpty, we are in the root Router and should start building on $screens
         // Else, we are not in the root Router and should continue off of $screenStack
-
         var localStack: [AnyDestination] = []
         let bindingStack = screenStack.isEmpty ? $screens : $screenStack
         var localRoutes: [AnyRoute] = []
