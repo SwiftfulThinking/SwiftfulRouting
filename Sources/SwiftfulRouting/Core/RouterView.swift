@@ -350,7 +350,7 @@ public struct RouterView<T:View>: View, Router {
         if route.segue != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
-            self.onDismissSheets = route.onDismiss
+//            self.onDismissSheets = route.onDismiss
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
 //            print("PASSING ROUTES TO SHEET FORM SHEET ROUTER")
