@@ -44,6 +44,7 @@ public struct RouterView<T:View>: View, Router {
     // Segues
     @State private var segueOption: SegueOption = .push
     @State public var screens: [AnyDestination] = []
+    @State private var previousScreens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
     @State private var rootRoutes: [[AnyRoute]]

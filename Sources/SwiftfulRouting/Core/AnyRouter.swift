@@ -77,6 +77,11 @@ public struct AnyRouter: Router {
     public func showScreen(_ route: AnyRoute) {
         object.showScreens([route])
     }
+
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen(_ route: AnyRoute) {
+        object.showScreens([route])
+    }
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ routes: [AnyRoute]) {
