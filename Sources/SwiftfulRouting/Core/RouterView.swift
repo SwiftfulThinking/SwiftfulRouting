@@ -128,12 +128,12 @@ public struct RouterView<T:View>: View, Router {
         print("ON DISMISS OF PUSH")
 
         let routes = (!routes.isEmpty ? routes : rootRoutes)
-        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
-            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
-            for route in allRoutesInFrontOfCurrent.reversed() {
-                route.onDismiss?()
-            }
+        let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) ?? []
+        let routesToDismiss = [self.route] + allRoutesInFrontOfCurrent
+        for route in routesToDismiss.reversed() {
+            route.onDismiss?()
         }
+        
         removeRoutes(route: self.route)
 
     }
