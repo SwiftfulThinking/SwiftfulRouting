@@ -142,11 +142,11 @@ public struct RouterView<T:View>: View, Router {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
                         print("ROOT ROUTES")
-                        print(routes)
+                        print(rootRoutes)
                         print(setIndex)
                         print(set)
                         print(index)
-                        routes[setIndex][index].updateIsPresented(to: isPresented)
+                        rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
                 }
