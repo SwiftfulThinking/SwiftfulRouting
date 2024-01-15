@@ -109,6 +109,10 @@ public struct RouterView<T:View>: View, Router {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
                         array[setIndex][index].updateIsPresented(to: isPresented)
+                        
+                        if route.id == self.route.id {
+                            self.route.updateIsPresented(to: isPresented)
+                        }
                         return
                     }
                 }
