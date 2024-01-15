@@ -8,7 +8,31 @@
 import SwiftUI
 
 /// RouterView adds modifiers for segues, alerts, and modals. If you are already within a Navigation heirarchy, set addNavigationView = false.
-public struct RouterView<T:View>: View, Router {
+public struct RouterView<T:View>: View {
+    
+    let addNavigationView: Bool
+    let screens: Binding<[AnyDestination]>?
+    let content: (AnyRouter) -> T
+    
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+        self.addNavigationView = addNavigationView
+        self.screens = screens
+        self.content = content
+    }
+
+    public var body: some View {
+        RouterViewInternal(
+            addNavigationView: addNavigationView,
+            screens: screens,
+            route: nil,
+            routes: nil,
+            environmentRouter: nil,
+            content: content
+        )
+    }
+}
+
+struct RouterViewInternal<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.openURL) var openURL
@@ -175,7 +199,7 @@ extension View {
 
 // MARK: Segue
 
-extension RouterView {
+extension RouterViewInternal {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
@@ -222,7 +246,7 @@ extension RouterView {
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -231,16 +255,16 @@ extension RouterView {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 } else {
                     // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screenStack.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
             }
         }
     }
@@ -262,7 +286,7 @@ extension RouterView {
         destinations.forEach { route in
             localRoutes.append(route)
             
-            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
+            let view = AnyDestination(RouterViewInternal<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
             }), onDismiss: route.onDismiss)
             localStack.append(view)
@@ -295,7 +319,7 @@ extension RouterView {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+        self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         
         // Resizable binding is within current Router, so onFirstAppear of newRoute will never execute
         // Manually mark as isPresented
@@ -310,7 +334,7 @@ extension RouterView {
 
 // MARK: Route support
 
-extension RouterView {
+extension RouterViewInternal {
         
     private var useRoutesNotRootRoutes: Bool {
         !routes.isEmpty
@@ -381,7 +405,7 @@ extension RouterView {
 
 // MARK: Dismiss
 
-extension RouterView {
+extension RouterViewInternal {
     
     private func onDismissOfLastPush() {
         // This is for onDismiss via NavigationStack
@@ -539,7 +563,7 @@ extension RouterView {
 
 // MARK: Alerts
 
-extension RouterView {
+extension RouterViewInternal {
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
         guard self.alert == nil else {
@@ -559,7 +583,7 @@ extension RouterView {
 
 // MARK: Modal
 
-extension RouterView {
+extension RouterViewInternal {
     
     public func showModal<T:View>(
         transition: AnyTransition,
