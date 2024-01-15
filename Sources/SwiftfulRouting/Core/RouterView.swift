@@ -162,7 +162,7 @@ public struct RouterView<T:View>: View, Router {
 //        screens.last?.onDismiss?()
         let routes = (!routes.isEmpty ? routes : rootRoutes)
         
-        if let screenToDismiss = routes.last?.last {
+        if let screenToDismiss = routes.last?.last(where: { $0.isPresented }) {
             screenToDismiss.onDismiss?()
             updateRouteIsPresented(route: screenToDismiss, isPresented: false)
             
