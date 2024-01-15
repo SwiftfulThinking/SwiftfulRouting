@@ -101,7 +101,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissOfPush, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissOfPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             content(AnyRouter(object: self))
                 .showingScreen(
                     option: segueOption,
@@ -119,9 +119,26 @@ public struct RouterView<T:View>: View, Router {
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
+    private func onDismissOfLastPush() {
+        // This is called from the NavigationStack root Router, but is dismissing the last screen in $screens
+        
+//        screens.last?.onDismiss?()
+        let routes = (!routes.isEmpty ? routes : rootRoutes)
+        
+        if let screenToDismiss = routes.last?.last {
+            screenToDismiss.onDismiss?()
+            
+            let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(screenToDismiss) ?? screenToDismiss
+            removeRoutes(route: newRootScreen)
+            
+        }
+        
+        screens.removeLast()
+    }
+    
     private func onDismissOfPush() {
         
-        // Dismissing this screen (which is the last screen in $screens)
+        // This is called within the Router of the last screen in $screens, and is dismissing this screen
         
 //        onDismissPush?()
 //        removeRoutes(route: <#T##AnyRoute#>)
@@ -134,12 +151,10 @@ public struct RouterView<T:View>: View, Router {
             route.onDismiss?()
         }
         
-        let allRoutes = !routes.isEmpty ? routes : rootRoutes
-        let newRootScreen: AnyRoute = allRoutes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
+        let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
 
         
         removeRoutes(route: newRootScreen)
-
     }
     
     private func onDismissOfSheet() {
