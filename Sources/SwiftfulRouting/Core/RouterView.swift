@@ -61,10 +61,13 @@ public struct RouterView<T:View>: View, Router {
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
+    // Note: sheet and fullScreenCover bind $dismiss to View in front of them,
+    // while resizableSheet binds to the current View itself (possible fix me)
     @State private var sheetDetents: Set<PresentationDetentTransformable> = [.large]
     @State private var sheetSelection: Binding<PresentationDetentTransformable> = .constant(.large)
     @State private var sheetSelectionEnabled: Bool = false
     @State private var showDragIndicator: Bool = false
+    @State private var isResizableSheet: Bool = false
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -209,20 +212,21 @@ public struct RouterView<T:View>: View, Router {
         // Here and onPush dismiss
         // Need to filter allRoutesInFrontOfCurrent.where({ $0.isPresented })
         
-        print("ROUTES ARE HERE")
-        let rrrrrr = routes.flatMap({ $0 })
-        for rr in rrrrrr {
-            print(rr)
+//        print("ROUTES ARE HERE")
+//        let rrrrrr = routes.flatMap({ $0 })
+//        for rr in rrrrrr {
+//            print(rr)
+//        }
+        
+        var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) ?? []
+        
+        if isResizableSheet {
+            allRoutesInFrontOfCurrent.insert(route, at: 0)
         }
         
-        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) {
-//            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
-            for route in allRoutesInFrontOfCurrent.reversed() {
-                route.onDismiss?()
-                updateRouteIsPresented(route: route, isPresented: false)
-            }
-        } else {
-            print("Nada")
+        for route in allRoutesInFrontOfCurrent.reversed() {
+            route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
         }
         
 
@@ -437,6 +441,7 @@ public struct RouterView<T:View>: View, Router {
         self.segueOption = newRoute.segue
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
+        self.isResizableSheet = true
         
 //        self.onDismissSheets = newRoute.onDismiss
         self.appendRoutes(newRoutes: [newRoute])
