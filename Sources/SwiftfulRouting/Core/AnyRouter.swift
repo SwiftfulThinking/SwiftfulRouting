@@ -8,58 +8,6 @@
 import Foundation
 import SwiftUI
 
-// Note (possible SwiftUI bug?):
-// Do not conform to Equatable here. It causes the @State property wrapper to monitor Equatable value instead of Hashable value
-// so didSegue changing value does not update the View (I think)
-public struct AnyRoute: Identifiable, Hashable {
-    public let id = UUID().uuidString
-    let segue: SegueOption
-    let onDismiss: (() -> Void)?
-    let destination: (AnyRouter) -> any View
-    private(set) var isPresented: Bool = false
-    
-    public init(_ segue: SegueOption, onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
-        self.segue = segue
-        self.onDismiss = onDismiss
-        self.destination = destination
-    }
-    
-    static var root: AnyRoute = {
-        var route = AnyRoute(.push) { router in
-            AnyView(Text("Root"))
-        }
-        return route
-    }()
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id + isPresented.description)
-    }
-    
-    public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
-        lhs.hashValue == rhs.hashValue
-    }
-    
-    mutating func updateIsPresented(to newValue: Bool) {
-        isPresented = newValue
-    }
-}
-
-public struct PushRoute: Identifiable {
-    public let id = UUID().uuidString
-    let segue: SegueOption = .push
-    let onDismiss: (() -> Void)?
-    let destination: (AnyRouter) -> any View
-    
-    public init(onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
-        self.onDismiss = onDismiss
-        self.destination = destination
-    }
-    
-    var asAnyRoute: AnyRoute {
-        AnyRoute(segue, onDismiss: onDismiss, destination: destination)
-    }
-}
-
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
@@ -71,11 +19,6 @@ public struct AnyRouter: Router {
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, onDismiss: (() -> Void)? = nil, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
         object.showScreens([AnyRoute(option, onDismiss: onDismiss, destination: destination)])
-    }
-
-    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen(_ route: AnyRoute) {
-        object.showScreens([route])
     }
 
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
