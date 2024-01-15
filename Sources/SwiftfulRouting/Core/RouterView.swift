@@ -359,13 +359,14 @@ public struct RouterView<T:View>: View, Router {
             
 //            let allRoutes: [[AnyRoute]] = routes + [localRoutes]
 //            self.routes.append(localRoutes)
-            appendRoutes(newRoutes: localRoutes)
             
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
             }), onDismiss: route.onDismiss)
             localStack.append(view)
         }
+
+        appendRoutes(newRoutes: localRoutes)
 
         if screenStack.isEmpty {
             self.screens.append(contentsOf: localStack)
