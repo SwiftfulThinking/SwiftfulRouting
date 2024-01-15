@@ -371,38 +371,67 @@ public struct RouterView<T:View>: View, Router {
     
     @available(iOS 16, *)
     public func dismissScreenStack() {
-        print("HI NICK DISMISSING SCREEN STACK")
         
-        let routes = (!routes.isEmpty ? routes : rootRoutes)
-        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
-            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
-            for route in allRoutesInFrontOfCurrent.reversed() {
+        // This will dismiss current screen and all pushes on curent NavigationStack
+       
+        // Find all screens that will be dismissed
+        
+        var didFindCurrentScreen: Bool = false
+        var newRootScreen: AnyRoute? = nil
+        
+        for route in routes.flatMap({ $0 }).reversed() {
+            if route.id == self.route.id {
+                didFindCurrentScreen = true
+            }
+            
+            // Stop when you find a sheet/fullScreenCover
+            if route.segue != .push {
+                newRootScreen = route
+                break
+            }
+            
+            if didFindCurrentScreen {
                 route.onDismiss?()
             }
         }
         
+        if let newRootScreen {
+            removeRoutes(route: newRootScreen)
+        }
+        
+        
+//        print("HI NICK DISMISSING SCREEN STACK")
+//        
+//        let routes = (!routes.isEmpty ? routes : rootRoutes)
+//        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+//            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
+//            for route in allRoutesInFrontOfCurrent.reversed() {
+//                route.onDismiss?()
+//            }
+//        }
+        
         self.screens = []
         self.screenStack = []
 
-        if !routes.isEmpty {
-            print("ROUTES CONTAINS: \(routes.count)")
-            for (index, route) in routes.enumerated() {
-                for route2 in route {
-                    print("\(index) :: \(route2.id) :: \(route2.segue)")
-                }
-            }
-        } else {
-            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
-
-            print("ROOT ROUTES CONTAINS")
-            for (index, route) in rootRoutes.enumerated() {
-                for route2 in route {
-                    print("\(index) :: \(route2.segue)")
-                }
-            }
-        }
-        print("currently in: \(route.id)")
-        removeRoutes(route: self.route)
+//        if !routes.isEmpty {
+//            print("ROUTES CONTAINS: \(routes.count)")
+//            for (index, route) in routes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.id) :: \(route2.segue)")
+//                }
+//            }
+//        } else {
+//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
+//
+//            print("ROOT ROUTES CONTAINS")
+//            for (index, route) in rootRoutes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        }
+//        print("currently in: \(route.id)")
+//        removeRoutes(route: self.route)
 
     }
     
