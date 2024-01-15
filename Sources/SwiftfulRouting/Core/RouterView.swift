@@ -146,34 +146,15 @@ public struct RouterView<T:View>: View, Router {
             return
         }
         
-        // Trigger screen's onDismiss
-        screenToDismiss.onDismiss?()
-        
-        // Set screen to not presented
-        updateRouteIsPresented(route: screenToDismiss, isPresented: false)
-        
-        // New root is the screen before the screen to dismiss        
-        guard let newRootScreen: AnyRoute = currentRouteArray.firstBefore(screenToDismiss) else {
-            #if DEBUG
-            assertionFailure("Did dismiss screen from NavigationStack but could not find new root screen.")
-            #endif
-            return
-        }
-        
-        // Remove flow if needed
-        removeRoutingFlowsAfterRoute(newRootScreen)
+        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
     }
-    
+        
     private func onDismissOfCurrentPush() {
         // This is for onDismiss via NavigationView
         // This is called within the Router of the last screen in in the stack, and is dismissing this screen
         print("ON DISMISS OF PUSH")
-
-        let routes = (!routes.isEmpty ? routes : rootRoutes)
         
-        // Dismiss the current screen
         
-        // As a safety precaution, check that visible screen == self.route
         guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
             assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
@@ -181,26 +162,33 @@ public struct RouterView<T:View>: View, Router {
             return
         }
         
+        // As a safety precaution, check that visible screen == self.route
         if screenToDismiss != route {
             #if DEBUG
-            print(screenToDismiss)
-            print(route)
             assertionFailure("Attempt to dismiss push that is not the view's current push.")
             #endif
             return
         }
 
+        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
+    }
+    
+    private func dismissScreenAndUpdateRoutes(screen screenToDismiss: AnyRoute) {
+        // Trigger screen's onDismiss
+        screenToDismiss.onDismiss?()
         
-        // allRoutesInFrontOfCurrent should always be 0?
-        let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) ?? []
-        let routesToDismiss = [self.route] + allRoutesInFrontOfCurrent
-        for route in routesToDismiss.reversed() {
-            route.onDismiss?()
-            updateRouteIsPresented(route: route, isPresented: false)
+        // Set screen to not presented
+        updateRouteIsPresented(route: screenToDismiss, isPresented: false)
+        
+        // New root is the screen before the screen to dismiss
+        guard let newRootScreen = currentRouteArray.firstBefore(screenToDismiss) else {
+            #if DEBUG
+            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            #endif
+            return
         }
         
-        let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
-
+        // Remove flow if needed
         removeRoutingFlowsAfterRoute(newRootScreen)
     }
     
