@@ -490,7 +490,7 @@ extension RouterView {
         
         var screensToDismiss: [AnyRoute] = []
         var didFindCurrentScreen: Bool = false
-        var newRootScreen: AnyRoute? = nil
+        var newRootScreen: AnyRoute? = currentRouteArray.first
         
         
         // .push, .sheet, .push, .push, .push, .sheet, .push
