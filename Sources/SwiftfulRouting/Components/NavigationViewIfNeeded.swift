@@ -12,13 +12,15 @@ struct NavigationViewIfNeeded<Content:View>: View {
     
     let addNavigationView: Bool
     let segueOption: SegueOption
+    let onDismiss: (() -> Void)?
+    let onDismissLastPush: () -> Void
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
     
     @ViewBuilder var body: some View {
         if addNavigationView {
             if #available(iOS 16.0, *) {
-                NavigationStackTransformable(segueOption: segueOption, screens: $screens) {
+                NavigationStackTransformable(segueOption: segueOption, onDismissLastPush: onDismissLastPush, screens: $screens) {
                     content
                 }
             } else {
@@ -27,10 +29,43 @@ struct NavigationViewIfNeeded<Content:View>: View {
                 }
             }
         } else {
-            content
+            if #available(iOS 16.0, *) {
+                // onChangeOfPresentationMode is NOT required for iOS 16 bc onDismiss will trigger within NavigationStackTransformable
+                content
+            } else {
+                content
+                    .onChangeOfPresentationMode(screens: $screens, onDismiss: onDismiss)
+            }
         }
     }
 }
+
+struct OnChangeOfPresentationModeViewModifier: ViewModifier {
+    
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var screens: [AnyDestination]
+    let onDismiss: (() -> Void)?
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
+                // Check screens.isEmpty to ensure there are no screens infront of this screen rendered
+                // This is an edge case where if user pushes too far forward (~10+), the system will stop presenting lowest screens in heirarchy
+                // (ie. this occurs iOS 15 via sheet, push, push, push...
+                if !newValue, screens.isEmpty {
+                    onDismiss?()
+                }
+            }
+    }
+}
+
+extension View {
+    
+    func onChangeOfPresentationMode(screens: Binding<[AnyDestination]>, onDismiss: (() -> Void)?) -> some View {
+        modifier(OnChangeOfPresentationModeViewModifier(screens: screens, onDismiss: onDismiss))
+    }
+}
+
 
 @available(iOS 16, *)
 struct NavigationStackTransformable<Content:View>: View {
@@ -42,6 +77,7 @@ struct NavigationStackTransformable<Content:View>: View {
     // We have to observe the path to monitor native screen dismissal that aren't via router.dismiss
     
     let segueOption: SegueOption
+    let onDismissLastPush: () -> Void
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
 
@@ -65,7 +101,9 @@ struct NavigationStackTransformable<Content:View>: View {
         }
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
-                screens.removeLast()
+                onDismissLastPush()
+//                screens.last?.onDismiss?()
+//                screens.removeLast()
             }
         })
     }

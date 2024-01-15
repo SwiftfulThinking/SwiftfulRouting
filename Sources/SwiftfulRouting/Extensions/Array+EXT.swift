@@ -78,7 +78,31 @@ extension Array where Element: Identifiable {
         }
     }
     
+    func allAfter(_ element: Element) -> [Element]? {
+        guard let index = self.firstIndex(where: { $0.id == element.id }), index < self.count - 1 else {
+            return nil
+        }
+        return Array(self[(index + 1)...])
+    }
+    
+    func allBefore(_ element: Element) -> [Element]? {
+        guard let index = self.firstIndex(where: { $0.id == element.id }), index > 0 else {
+            return nil
+        }
+        return Array(self[..<index])
+    }
+    
 }
+
+extension Array where Element: Collection, Element.Element: Identifiable {
+    mutating func removeArraysAfter(arrayThatIncludesId id: Element.Element.ID) {
+        if let index = self.firstIndex(where: { $0.contains(where: { $0.id == id }) }) {
+            self = Array(self.prefix(upTo: index + 1))
+        }
+        // If an element with the specified id is not found, the original array remains unchanged
+    }
+}
+
 
 
 //extension Array where Element: Equatable {
