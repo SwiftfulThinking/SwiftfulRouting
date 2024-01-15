@@ -495,7 +495,7 @@ extension RouterView {
         
         // .push, .sheet, .push, .push, .push, .sheet, .push
         
-        for route in currentRouteArray.reversed() {
+        for route in currentRouteArray.filter({ $0.isPresented }).reversed() {
             if route.segue == .push {
                 screensToDismiss.append(route)
             }
