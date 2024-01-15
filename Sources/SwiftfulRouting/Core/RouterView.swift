@@ -121,7 +121,7 @@ public struct RouterView<T:View>: View, Router {
     
     private func onDismissOfLastPush() {
         // This is called from the NavigationStack root Router, but is dismissing the last screen in $screens
-        
+        print("onDismissOfLastPush")
 //        screens.last?.onDismiss?()
         let routes = (!routes.isEmpty ? routes : rootRoutes)
         
