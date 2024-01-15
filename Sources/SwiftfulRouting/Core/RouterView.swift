@@ -191,31 +191,19 @@ public struct RouterView<T:View>: View, Router {
     private func onDismissOfSheet() {
         // This is for onDismiss via Sheet or FullScreenCover
         // This is called within the Router prior to the Router of the sheet being dismissed
-        print("ON DISMISS OF SHEET")
-        print(useRoutesNotRootRoutes)
-        print(currentRouteArray)
+
         // A Sheet/FullScreenCover represents an 'environment' in SwiftUI (ie. each Sheet has it's own NavigationStack)
         // When an 'environment' is dismissed, we are also dismissing all screens pushed onto that NavigationStack
         // The Sheet being dismissed is actually the firstAfter current route
-        var allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) ?? []
-//        guard var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) else {
-//            #if DEBUG
-//            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
-//            #endif
-//            return
-//        }
-        
-        // Edge case: due to resizableSheet's implementation (see above - to fix)
-        // this scenario is actually dismissing the current route and not the next one
-//        if isResizableSheet {
-//            print("IS RESIZABLE SHEET")
-//            allRoutesInFrontOfCurrent.insert(route, at: 0)
-//        }
-        print("DISMISS COUNT: \(allRoutesInFrontOfCurrent)")
+        guard var allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
+            #if DEBUG
+            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            #endif
+            return
+        }
 
         // Dismiss all routes in reverse order
         for route in allRoutesInFrontOfCurrent.reversed() {
-            
             route.onDismiss?()
             updateRouteIsPresented(route: route, isPresented: false)
         }
@@ -296,12 +284,8 @@ public struct RouterView<T:View>: View, Router {
     
     private func appendRoutes(newRoutes: [AnyRoute]) {
         if useRoutesNotRootRoutes {
-            print("APPENDING ROUTES TO ROUTES")
-            print(newRoutes)
             self.routes.append(newRoutes)
         } else {
-            print("APPENDING ROUTES TO ROOTS")
-            print(newRoutes)
             self.rootRoutes.append(newRoutes)
         }
     }
