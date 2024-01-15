@@ -196,7 +196,7 @@ public struct RouterView<T:View>: View, Router {
         // A Sheet/FullScreenCover represents an 'environment' in SwiftUI (ie. each Sheet has it's own NavigationStack)
         // When an 'environment' is dismissed, we are also dismissing all screens pushed onto that NavigationStack
         // The Sheet being dismissed is actually the firstAfter current route
-        guard var allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
+        guard var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) else {
             #if DEBUG
             assertionFailure("Did dismiss pushed screen but could not find new root screen.")
             #endif
