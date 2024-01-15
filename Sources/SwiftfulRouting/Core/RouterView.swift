@@ -127,6 +127,11 @@ public struct RouterView<T:View>: View, Router {
         print("onDismissOfLastPush")
 
         
+        // Remove screen from current Router's screen stack
+        // Note: even if below 'route' logic fails, the screen has already been removed from View heirarchy
+        // So removing final screen from screens should always occur?
+        screens.removeLast()
+
         // Find the last screen in the heirarchy that is presented and is .push
         // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
         guard let screenToDismiss = currentRouteArray.last?.last(where: { $0.isPresented && $0.segue == .push }) else {
@@ -150,9 +155,8 @@ public struct RouterView<T:View>: View, Router {
             return
         }
         
+        // Remove flow if needed
         removeRoutingFlowsAfterRoute(newRootScreen)
-
-        screens.removeLast()
     }
     
     private func onDismissOfCurrentPush() {
