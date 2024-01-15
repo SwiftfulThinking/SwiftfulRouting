@@ -127,6 +127,11 @@ public struct RouterView<T:View>: View, Router {
             for (setIndex, set) in routes.enumerated() {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
+                        print("ROUTES")
+                        print(routes)
+                        print(setIndex)
+                        print(set)
+                        print(index)
                         routes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
@@ -136,6 +141,11 @@ public struct RouterView<T:View>: View, Router {
             for (setIndex, set) in rootRoutes.enumerated() {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
+                        print("ROOT ROUTES")
+                        print(routes)
+                        print(setIndex)
+                        print(set)
+                        print(index)
                         routes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
