@@ -206,11 +206,14 @@ public struct RouterView<T:View>: View, Router {
         // Edge case: due to resizableSheet's implementation (see above - to fix)
         // this scenario is actually dismissing the current route and not the next one
         if isResizableSheet {
+            print("IS RESIZABLE SHEET")
             allRoutesInFrontOfCurrent.insert(route, at: 0)
         }
+        print("DISMISS COUNT: \(allRoutesInFrontOfCurrent)")
 
         // Dismiss all routes in reverse order
         for route in allRoutesInFrontOfCurrent.reversed() {
+            
             route.onDismiss?()
             updateRouteIsPresented(route: route, isPresented: false)
         }
