@@ -7,29 +7,7 @@
 
 import SwiftUI
 
-extension View {
-    func onFirstAppear(perform action: @escaping () -> Void) -> some View {
-        self.modifier(OnFirstAppearModifier(action: action))
-    }
-}
-
-struct OnFirstAppearModifier: ViewModifier {
-    let action: @MainActor () -> Void
-    @State private var isFirstAppear = true
-    
-    func body(content: Content) -> some View {
-        content
-            .onAppear {
-                if isFirstAppear {
-                    action()
-                    isFirstAppear = false
-                }
-            }
-    }
-}
-
-/// RouterView adds modifiers for segues, alerts, and modals. Use the escaping Router to perform actions. If you are already within a Navigation heirarchy, set addNavigationView = false.
-
+/// RouterView adds modifiers for segues, alerts, and modals. If you are already within a Navigation heirarchy, set addNavigationView = false.
 public struct RouterView<T:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
@@ -124,12 +102,6 @@ public struct RouterView<T:View>: View, Router {
             for (setIndex, set) in routes.enumerated() {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
-//                        print("ROUTES")
-//                        print(routes)
-//                        print(setIndex)
-//                        print(set)
-//                        print(index)
-                        print("route \(route.id) is presented: \(isPresented)")
                         routes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
@@ -139,12 +111,6 @@ public struct RouterView<T:View>: View, Router {
             for (setIndex, set) in rootRoutes.enumerated() {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
-//                        print("ROOT ROUTES")
-//                        print(rootRoutes)
-//                        print(setIndex)
-//                        print(set)
-//                        print(index)
-                        print("route \(route.id) is presented: \(isPresented)")
                         rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
@@ -156,7 +122,7 @@ public struct RouterView<T:View>: View, Router {
     private func onDismissOfLastPush() {
         // This is called from the NavigationStack root Router, but is dismissing the last screen in $screens
         print("onDismissOfLastPush")
-//        screens.last?.onDismiss?()
+
         let routes = (!routes.isEmpty ? routes : rootRoutes)
         
         if let screenToDismiss = routes.last?.last(where: { $0.isPresented }) {
@@ -172,11 +138,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfPush() {
-        
         // This is called within the Router of the last screen in $screens, and is dismissing this screen
-        
-//        onDismissPush?()
-//        removeRoutes(route: <#T##AnyRoute#>)
         print("ON DISMISS OF PUSH")
 
         let routes = (!routes.isEmpty ? routes : rootRoutes)
@@ -196,21 +158,9 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfSheet() {
-        // HOLD?
-//        onDismissSheets?()
         print("ON DISMISS OF SHEET")
         
         let routes = (!routes.isEmpty ? routes : rootRoutes)
-        
-        
-        // Here and onPush dismiss
-        // Need to filter allRoutesInFrontOfCurrent.where({ $0.isPresented })
-        
-//        print("ROUTES ARE HERE")
-//        let rrrrrr = routes.flatMap({ $0 })
-//        for rr in rrrrrr {
-//            print(rr)
-//        }
         
         var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) ?? []
         
@@ -222,25 +172,6 @@ public struct RouterView<T:View>: View, Router {
             route.onDismiss?()
             updateRouteIsPresented(route: route, isPresented: false)
         }
-        
-
-//        if !routes.isEmpty {
-//            print("ROUTES CONTAINS")
-//            for (index, route) in routes.enumerated() {
-//                for route2 in route {
-//                    print("\(index) :: \(route2.segue)")
-//                }
-//            }
-//        } else {
-//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
-//
-//            print("ROOT ROUTES CONTAINS")
-//            for (index, route) in rootRoutes.enumerated() {
-//                for route2 in route {
-//                    print("\(index) :: \(route2.segue)")
-//                }
-//            }
-//        }
         
         removeRoutes(route: self.route)
     }
@@ -261,7 +192,6 @@ public struct RouterView<T:View>: View, Router {
             return
         }
         
-//        routes.append(newRoutes)
         appendRoutes(newRoutes: newRoutes)
         
         let destination = { router in
@@ -301,36 +231,12 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func removeRoutes(route: AnyRoute) {
-        // After segueing, remove that flow from local routes
-        // Loop backwards, if have not yet found the current flow...
-        // it's a future flow or the current flow and should be removed now
-//        for (index, item) in routes.enumerated().reversed() {
-//            routes.remove(at: index)
-//            
-//            if item.contains(where: { $0.id == route.id }) {
-//                return
-//            }
-//        }
-        
-//        print("REMOVING ROUTES withing : \(route.id)")
-//        let printRoutes = !routes.isEmpty ? routes : rootRoutes
-//        for route in printRoutes {
-//            print(route)
-//        }
-
         // Remove all flows after current
         if !routes.isEmpty {
             routes.removeArraysAfter(arrayThatIncludesId: route.id)
         } else {
             rootRoutes.removeArraysAfter(arrayThatIncludesId: route.id)
         }
-        
-//        print("RESULT FOR : \(route.id)")
-//        let printRoutes2 = !routes.isEmpty ? routes : rootRoutes
-//        for route in printRoutes2 {
-//            print(route)
-//        }
-
     }
     
     var routeBinding: Binding<[[AnyRoute]]> {
@@ -356,15 +262,8 @@ public struct RouterView<T:View>: View, Router {
         if route.segue != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
-//            self.onDismissSheets = route.onDismiss
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-//            print("PASSING ROUTES TO SHEET FORM SHEET ROUTER")
-//            for route in routes {
-//                for route2 in route {
-//                    print(route2)
-//                }
-//            }
             self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
@@ -387,8 +286,6 @@ public struct RouterView<T:View>: View, Router {
                 self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
             }
         }
-        
-//        removeRoutes(route: route)
     }
     
     @available(iOS 16, *)
@@ -409,9 +306,6 @@ public struct RouterView<T:View>: View, Router {
         
         destinations.forEach { route in
             localRoutes.append(route)
-            
-//            let allRoutes: [[AnyRoute]] = routes + [localRoutes]
-//            self.routes.append(localRoutes)
             
             let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
@@ -436,11 +330,7 @@ public struct RouterView<T:View>: View, Router {
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
         self.isResizableSheet = true
-        
-//        self.onDismissSheets = newRoute.onDismiss
         self.appendRoutes(newRoutes: [newRoute])
-        print("Appended route for resiable sheet")
-        onDismiss?()
 
         // If selection == nil, then need to avoid using sheetSelection modifier
         if let selection {
@@ -455,8 +345,6 @@ public struct RouterView<T:View>: View, Router {
     
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
-        
-//        onDismiss?()
     }
     
     @available(iOS 16, *)
@@ -487,43 +375,11 @@ public struct RouterView<T:View>: View, Router {
         }
         
         if let newRootScreen {
-//            print("NEW ROOT: \(newRootScreen.id)")
             removeRoutes(route: newRootScreen)
         }
         
-        
-//        print("HI NICK DISMISSING SCREEN STACK")
-//        
-//        let routes = (!routes.isEmpty ? routes : rootRoutes)
-//        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
-//            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
-//            for route in allRoutesInFrontOfCurrent.reversed() {
-//                route.onDismiss?()
-//            }
-//        }
-        
         self.screens = []
         self.screenStack = []
-
-//        if !routes.isEmpty {
-//            print("ROUTES CONTAINS: \(routes.count)")
-//            for (index, route) in routes.enumerated() {
-//                for route2 in route {
-//                    print("\(index) :: \(route2.id) :: \(route2.segue)")
-//                }
-//            }
-//        } else {
-//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
-//
-//            print("ROOT ROUTES CONTAINS")
-//            for (index, route) in rootRoutes.enumerated() {
-//                for route2 in route {
-//                    print("\(index) :: \(route2.segue)")
-//                }
-//            }
-//        }
-//        print("currently in: \(route.id)")
-//        removeRoutes(route: self.route)
 
     }
     

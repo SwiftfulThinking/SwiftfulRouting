@@ -40,33 +40,6 @@ struct NavigationViewIfNeeded<Content:View>: View {
     }
 }
 
-struct OnChangeOfPresentationModeViewModifier: ViewModifier {
-    
-    @Environment(\.presentationMode) var presentationMode
-    @Binding var screens: [AnyDestination]
-    let onDismiss: (() -> Void)?
-
-    func body(content: Content) -> some View {
-        content
-            .onChange(of: presentationMode.wrappedValue.isPresented) { newValue in
-                // Check screens.isEmpty to ensure there are no screens infront of this screen rendered
-                // This is an edge case where if user pushes too far forward (~10+), the system will stop presenting lowest screens in heirarchy
-                // (ie. this occurs iOS 15 via sheet, push, push, push...
-                if !newValue, screens.isEmpty {
-                    onDismiss?()
-                }
-            }
-    }
-}
-
-extension View {
-    
-    func onChangeOfPresentationMode(screens: Binding<[AnyDestination]>, onDismiss: (() -> Void)?) -> some View {
-        modifier(OnChangeOfPresentationModeViewModifier(screens: screens, onDismiss: onDismiss))
-    }
-}
-
-
 @available(iOS 16, *)
 struct NavigationStackTransformable<Content:View>: View {
     
@@ -102,8 +75,6 @@ struct NavigationStackTransformable<Content:View>: View {
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
                 onDismissLastPush()
-//                screens.last?.onDismiss?()
-//                screens.removeLast()
             }
         })
     }
