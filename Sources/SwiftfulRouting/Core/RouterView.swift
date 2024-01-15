@@ -430,8 +430,10 @@ public struct RouterView<T:View>: View, Router {
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
         
-        self.onDismissSheets = newRoute.onDismiss
+//        self.onDismissSheets = newRoute.onDismiss
         self.appendRoutes(newRoutes: [newRoute])
+        print("Appended route for resiable sheet")
+        onDismiss?()
 
         // If selection == nil, then need to avoid using sheetSelection modifier
         if let selection {
