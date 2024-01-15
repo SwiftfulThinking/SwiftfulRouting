@@ -114,9 +114,34 @@ public struct RouterView<T:View>: View, Router {
                     onDismiss: onDismissOfSheet
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                .onFirstAppear(perform: {
+                    updateRouteIsPresented(route: route, isPresented: true)
+                })
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
+    }
+    
+    private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
+        if !routes.isEmpty {
+            for (setIndex, set) in routes.enumerated() {
+                for (index, someRoute) in set.enumerated() {
+                    if someRoute.id == route.id {
+                        routes[setIndex][index].updateIsPresented(to: isPresented)
+                        return
+                    }
+                }
+            }
+        } else {
+            for (setIndex, set) in rootRoutes.enumerated() {
+                for (index, route) in set.enumerated() {
+                    if route.id == self.route.id {
+                        routes[setIndex][index].updateIsPresented(to: isPresented)
+                        return
+                    }
+                }
+            }
+        }
     }
     
     private func onDismissOfLastPush() {
@@ -127,6 +152,7 @@ public struct RouterView<T:View>: View, Router {
         
         if let screenToDismiss = routes.last?.last {
             screenToDismiss.onDismiss?()
+            updateRouteIsPresented(route: screenToDismiss, isPresented: false)
             
             let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(screenToDismiss) ?? screenToDismiss
             removeRoutes(route: newRootScreen)
@@ -145,10 +171,13 @@ public struct RouterView<T:View>: View, Router {
         print("ON DISMISS OF PUSH")
 
         let routes = (!routes.isEmpty ? routes : rootRoutes)
+        
+        // allRoutesInFrontOfCurrent should always be 0?
         let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) ?? []
         let routesToDismiss = [self.route] + allRoutesInFrontOfCurrent
         for route in routesToDismiss.reversed() {
             route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
         }
         
         let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
@@ -163,10 +192,16 @@ public struct RouterView<T:View>: View, Router {
         print("ON DISMISS OF SHEET")
         
         let routes = (!routes.isEmpty ? routes : rootRoutes)
-        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+        
+        
+        // Here and onPush dismiss
+        // Need to filter allRoutesInFrontOfCurrent.where({ $0.isPresented })
+        
+        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) {
             print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
             for route in allRoutesInFrontOfCurrent.reversed() {
                 route.onDismiss?()
+                updateRouteIsPresented(route: route, isPresented: false)
             }
         }
         

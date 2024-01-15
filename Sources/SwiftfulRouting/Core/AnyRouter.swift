@@ -16,6 +16,7 @@ public struct AnyRoute: Identifiable, Equatable {
     let segue: SegueOption
     let onDismiss: (() -> Void)?
     let destination: (AnyRouter) -> any View
+    private(set) var isPresented: Bool = false
     
     public init(_ segue: SegueOption, onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
@@ -32,6 +33,10 @@ public struct AnyRoute: Identifiable, Equatable {
     
     public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    mutating func updateIsPresented(to newValue: Bool) {
+        isPresented = newValue
     }
 }
 
