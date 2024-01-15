@@ -484,17 +484,13 @@ extension RouterView {
     @available(iOS 16, *)
     public func dismissScreenStack() {
         // This will dismiss current screen and all screens pushed onto the current NavigationStack
-       
-        // Find all screens ahead of current screen that are .push
-        
+        // .push, .sheet, .push, .push, .push, .sheet, .push
         
         var screensToDismiss: [AnyRoute] = []
         var didFindCurrentScreen: Bool = false
         var newRootScreen: AnyRoute? = currentRouteArray.first
         
-        
-        // .push, .sheet, .push, .push, .push, .sheet, .push
-        
+        // Find all screens on current stack that are ahead of current screen that are .push & isPresented
         for route in currentRouteArray.filter({ $0.isPresented }).reversed() {
             if route.segue == .push {
                 screensToDismiss.append(route)
@@ -519,7 +515,7 @@ extension RouterView {
             }
         }
         
-        guard didFindCurrentScreen, let newRootScreen else {
+        guard didFindCurrentScreen, newRootScreen != nil else {
             #if DEBUG
             assertionFailure("Failed to find screens when dismissing screenStack.")
             #endif
@@ -531,7 +527,7 @@ extension RouterView {
             updateRouteIsPresented(route: route, isPresented: false)
         }
         
-        // Remove routes
+        // Remove routes (not needed?)
         //removeRoutingFlowsAfterRoute(newRootScreen)
 
         // Reset screens to match NavigationStack path
