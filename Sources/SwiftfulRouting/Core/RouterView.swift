@@ -531,10 +531,11 @@ extension RouterView {
         }
         
         // Remove routes
-        // removeRoutingFlowsAfterRoute(newRootScreen)
+        removeRoutingFlowsAfterRoute(newRootScreen)
 
-        self.screens = []
-        self.screenStack = []
+        // Reset screens to match NavigationStack path
+        screens = []
+        screenStack = []
     }
 
 }
