@@ -11,7 +11,7 @@ import SwiftUI
 // Note (possible SwiftUI bug?):
 // Do not conform to Equatable here. It causes the @State property wrapper to monitor Equatable value instead of Hashable value
 // so didSegue changing value does not update the View (I think)
-public struct AnyRoute: Identifiable, Equatable {
+public struct AnyRoute: Identifiable, Hashable {
     public let id = UUID().uuidString
     let segue: SegueOption
     let onDismiss: (() -> Void)?
@@ -31,8 +31,12 @@ public struct AnyRoute: Identifiable, Equatable {
         return route
     }()
     
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id + isPresented.description)
+    }
+    
     public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
-        lhs.id == rhs.id
+        lhs.hashValue == rhs.hashValue
     }
     
     mutating func updateIsPresented(to newValue: Bool) {
