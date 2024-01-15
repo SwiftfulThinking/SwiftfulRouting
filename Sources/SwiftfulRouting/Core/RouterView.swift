@@ -93,133 +93,89 @@ public struct RouterView<T:View>: View, Router {
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
-    
-    private var useRoutesNotRootRoutes: Bool {
-        !routes.isEmpty
-    }
-    
-    private var currentRouteArray: [AnyRoute] {
-        (useRoutesNotRootRoutes ? routes : rootRoutes).flatMap({ $0 })
-    }
-    
-    private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
-        
-        func setRouteIsPresented(array: inout [[AnyRoute]]) {
-            for (setIndex, set) in array.enumerated() {
-                for (index, someRoute) in set.enumerated() {
-                    if someRoute.id == route.id {
-                        array[setIndex][index].updateIsPresented(to: isPresented)
-                        
-                        if route.id == self.route.id {
-                            self.route.updateIsPresented(to: isPresented)
-                        }
-                        return
+            
+}
+
+struct RouterView_Previews: PreviewProvider {
+    static var previews: some View {
+        RouterView { router in
+            Text("Hi")
+                .onTapGesture {
+                    router.showScreen(.push) { router in
+                        Text("Hello, world")
                     }
                 }
+        }
+    }
+}
+
+extension View {
+    
+    @ViewBuilder func showingScreen(
+        option: SegueOption,
+        screens: Binding<[AnyDestination]>,
+        screenStack: [AnyDestination],
+        sheetDetents: Set<PresentationDetentTransformable>,
+        sheetSelection: Binding<PresentationDetentTransformable>,
+        sheetSelectionEnabled: Bool,
+        showDragIndicator: Bool,
+        onDismiss: (() -> Void)?
+        ) -> some View {
+            if #available(iOS 14, *) {
+                self
+                    .modifier(NavigationLinkViewModifier(
+                        option: option,
+                        screens: screens,
+                        shouldAddNavigationDestination: screenStack.isEmpty
+                    ))
+                    .modifier(SheetViewModifier(
+                        option: option,
+                        screens: screens,
+                        sheetDetents: sheetDetents,
+                        sheetSelection: sheetSelection,
+                        sheetSelectionEnabled: sheetSelectionEnabled,
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
+                    ))
+                    .modifier(FullScreenCoverViewModifier(
+                        option: option,
+                        screens: screens,
+                        onDismiss: onDismiss
+                    ))
+            } else {
+                self
+                    .modifier(NavigationLinkViewModifier(
+                        option: option,
+                        screens: screens,
+                        shouldAddNavigationDestination: screenStack.isEmpty
+                    ))
+                    .modifier(SheetViewModifier(
+                        option: option,
+                        screens: screens,
+                        sheetDetents: sheetDetents,
+                        sheetSelection: sheetSelection,
+                        sheetSelectionEnabled: sheetSelectionEnabled,
+                        showDragIndicator: showDragIndicator,
+                        onDismiss: onDismiss
+                    ))
             }
-        }
-        
-        if useRoutesNotRootRoutes {
-            setRouteIsPresented(array: &routes)
-        } else {
-            setRouteIsPresented(array: &rootRoutes)
-        }
+    }
+
+    @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
+        self
+            .modifier(ConfirmationDialogViewModifier(option: option, item: item))
+            .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    private func onDismissOfLastPush() {
-        // This is for onDismiss via NavigationStack
-        // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
-        
-        // Remove screen from current Router's screen stack
-        // Note: even if below 'route' logic fails, the screen has already been removed from View heirarchy
-        // So removing final screen from screens should always occur?
-        screens.removeLast()
-
-        // Find the last screen in the heirarchy that is presented and is .push
-        // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
-        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
-            #if DEBUG
-            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
-            #endif
-            return
-        }
-        
-        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
-    }
-        
-    private func onDismissOfCurrentPush() {
-        // This is for onDismiss via NavigationView
-        // This is called within the Router of the last screen in in the stack, and is dismissing this screen
-        
-        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
-            #if DEBUG
-            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
-            #endif
-            return
-        }
-        
-        // As a safety precaution, check that visible screen == self.route
-        if screenToDismiss != route {
-            #if DEBUG
-            assertionFailure("Attempt to dismiss push that is not the view's current push.")
-            #endif
-            return
-        }
-
-        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
+    func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
+        modifier(ModalViewModifier(configuration: configuration, item: item))
     }
     
-    private func dismissScreenAndUpdateRoutes(screen screenToDismiss: AnyRoute) {
-        // Trigger screen's onDismiss
-        screenToDismiss.onDismiss?()
-        
-        // Set screen to not presented
-        updateRouteIsPresented(route: screenToDismiss, isPresented: false)
-        
-        // New root is the screen before the screen to dismiss
-        guard let newRootScreen = currentRouteArray.firstBefore(screenToDismiss) else {
-            #if DEBUG
-            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
-            #endif
-            return
-        }
-        
-        // Remove flow if needed
-        removeRoutingFlowsAfterRoute(newRootScreen)
-    }
-    
-    private func onDismissOfSheet() {
-        // This is for onDismiss via Sheet or FullScreenCover
-        // This is called within the Router prior to the Router of the sheet being dismissed
+}
 
-        // A Sheet/FullScreenCover represents an 'environment' in SwiftUI (ie. each Sheet has it's own NavigationStack)
-        // When an 'environment' is dismissed, we are also dismissing all screens pushed onto that NavigationStack
-        // The Sheet being dismissed is actually the firstAfter current route
-        guard var allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
-            #if DEBUG
-            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
-            #endif
-            return
-        }
+// MARK: Segue
 
-        // Dismiss all routes in reverse order
-        for route in allRoutesInFrontOfCurrent.reversed() {
-            route.onDismiss?()
-            updateRouteIsPresented(route: route, isPresented: false)
-        }
-        
-        // Remove flow if needed
-        removeRoutingFlowsAfterRoute(route)
-    }
-    
-    private func setEnvironmentRouterIfNeeded() {
-        // If this is a new environnent (ie. .sheet or .fullScreenCover) then no previous environmentRouter will be passed in
-        // Therefore, this is the start of a new environment and this router will be the environmentRouter
-        // The first screen should not have one
-        if environmentRouter == nil {
-            environmentRouter = self
-        }
-    }
+extension RouterView {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func showScreens(_ newRoutes: [AnyRoute]) {
@@ -236,19 +192,7 @@ public struct RouterView<T:View>: View, Router {
         
         showScreen(route, destination: destination)
     }
-    
-    public func dismissEnvironment() {
-        if let environmentRouter {
-            environmentRouter.dismissScreen()
-        } else {
-            dismissScreen()
-        }
-    }
-    
-    private enum RoutableError: LocalizedError {
-        case noNextScreenSet
-    }
-    
+            
     public func showNextScreen() throws {
         guard
             let currentFlow = routes.last(where: { flow in
@@ -266,32 +210,10 @@ public struct RouterView<T:View>: View, Router {
         showScreen(nextRoute, destination: destination)
     }
     
-    private func removeRoutingFlowsAfterRoute(_ route: AnyRoute) {
-        // Remove all flows (arrays) after current flow
-        if useRoutesNotRootRoutes {
-            routes.removeArraysAfter(arrayThatIncludesId: route.id)
-        } else {
-            rootRoutes.removeArraysAfter(arrayThatIncludesId: route.id)
-        }
+    private enum RoutableError: LocalizedError {
+        case noNextScreenSet
     }
-    
-    private var routeBinding: Binding<[[AnyRoute]]> {
-        if useRoutesNotRootRoutes {
-            return $routes
-        }
-        return $rootRoutes
-    }
-    
-    private func appendRoutes(newRoutes: [AnyRoute]) {
-        if useRoutesNotRootRoutes {
-            self.routes.append(newRoutes)
-        } else {
-            self.rootRoutes.append(newRoutes)
-        }
-    }
-    
-    // if isEnvironmentRouter & screens no longer includes this screen, then environment did dismiss?
-    
+
     private func showScreen<V:View>(_ route: AnyRoute, @ViewBuilder destination: @escaping (AnyRouter) -> V) {
         self.segueOption = route.segue
 
@@ -379,46 +301,247 @@ public struct RouterView<T:View>: View, Router {
         // Manually mark as isPresented
         updateRouteIsPresented(route: newRoute, isPresented: true)
     }
+                
+    public func showSafari(_ url: @escaping () -> URL) {
+        openURL(url())
+    }
+
+}
+
+// MARK: Route support
+
+extension RouterView {
+        
+    private var useRoutesNotRootRoutes: Bool {
+        !routes.isEmpty
+    }
     
+    private var currentRouteArray: [AnyRoute] {
+        (useRoutesNotRootRoutes ? routes : rootRoutes).flatMap({ $0 })
+    }
+    
+    private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
+        
+        func setRouteIsPresented(array: inout [[AnyRoute]]) {
+            for (setIndex, set) in array.enumerated() {
+                for (index, someRoute) in set.enumerated() {
+                    if someRoute.id == route.id {
+                        array[setIndex][index].updateIsPresented(to: isPresented)
+                        
+                        if route.id == self.route.id {
+                            self.route.updateIsPresented(to: isPresented)
+                        }
+                        return
+                    }
+                }
+            }
+        }
+        
+        if useRoutesNotRootRoutes {
+            setRouteIsPresented(array: &routes)
+        } else {
+            setRouteIsPresented(array: &rootRoutes)
+        }
+    }
+        
+    private func setEnvironmentRouterIfNeeded() {
+        // If this is a new environnent (ie. .sheet or .fullScreenCover) then no previous environmentRouter will be passed in
+        // Therefore, this is the start of a new environment and this router will be the environmentRouter
+        // The first screen should not have one
+        if environmentRouter == nil {
+            environmentRouter = self
+        }
+    }
+        
+    private func removeRoutingFlowsAfterRoute(_ route: AnyRoute) {
+        // Remove all flows (arrays) after current flow
+        if useRoutesNotRootRoutes {
+            routes.removeArraysAfter(arrayThatIncludesId: route.id)
+        } else {
+            rootRoutes.removeArraysAfter(arrayThatIncludesId: route.id)
+        }
+    }
+    
+    private var routeBinding: Binding<[[AnyRoute]]> {
+        if useRoutesNotRootRoutes {
+            return $routes
+        }
+        return $rootRoutes
+    }
+    
+    private func appendRoutes(newRoutes: [AnyRoute]) {
+        if useRoutesNotRootRoutes {
+            self.routes.append(newRoutes)
+        } else {
+            self.rootRoutes.append(newRoutes)
+        }
+    }
+
+}
+
+// MARK: Dismiss
+
+extension RouterView {
+    
+    private func onDismissOfLastPush() {
+        // This is for onDismiss via NavigationStack
+        // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
+        
+        // Remove screen from current Router's screen stack
+        // Note: even if below 'route' logic fails, the screen has already been removed from View heirarchy
+        // So removing final screen from screens should always occur?
+        screens.removeLast()
+
+        // Find the last screen in the heirarchy that is presented and is .push
+        // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
+        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
+            #if DEBUG
+            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            #endif
+            return
+        }
+        
+        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
+    }
+        
+    private func onDismissOfCurrentPush() {
+        // This is for onDismiss via NavigationView
+        // This is called within the Router of the last screen in in the stack, and is dismissing this screen
+        
+        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
+            #if DEBUG
+            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            #endif
+            return
+        }
+        
+        // As a safety precaution, check that visible screen == self.route
+        if screenToDismiss != route {
+            #if DEBUG
+            assertionFailure("Attempt to dismiss push that is not the view's current push.")
+            #endif
+            return
+        }
+
+        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
+    }
+    
+    private func dismissScreenAndUpdateRoutes(screen screenToDismiss: AnyRoute) {
+        // Trigger screen's onDismiss
+        screenToDismiss.onDismiss?()
+        
+        // Set screen to not presented
+        updateRouteIsPresented(route: screenToDismiss, isPresented: false)
+        
+        // New root is the screen before the screen to dismiss
+        guard let newRootScreen = currentRouteArray.firstBefore(screenToDismiss) else {
+            #if DEBUG
+            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            #endif
+            return
+        }
+        
+        // Remove flow if needed
+        removeRoutingFlowsAfterRoute(newRootScreen)
+    }
+    
+    private func onDismissOfSheet() {
+        // This is for onDismiss via Sheet or FullScreenCover
+        // This is called within the Router prior to the Router of the sheet being dismissed
+
+        // A Sheet/FullScreenCover represents an 'environment' in SwiftUI (ie. each Sheet has it's own NavigationStack)
+        // When an 'environment' is dismissed, we are also dismissing all screens pushed onto that NavigationStack
+        // The Sheet being dismissed is actually the firstAfter current route
+        guard let allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
+            #if DEBUG
+            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            #endif
+            return
+        }
+
+        // Dismiss all routes in reverse order
+        for route in allRoutesInFrontOfCurrent.reversed() {
+            route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
+        }
+        
+        // Remove flow if needed
+        removeRoutingFlowsAfterRoute(route)
+    }
+
     public func dismissScreen() {
         self.presentationMode.wrappedValue.dismiss()
     }
     
+    public func dismissEnvironment() {
+        if let environmentRouter {
+            environmentRouter.dismissScreen()
+        } else {
+            dismissScreen()
+        }
+    }
+    
     @available(iOS 16, *)
     public func dismissScreenStack() {
-        
-        // This will dismiss current screen and all pushes on curent NavigationStack
+        // This will dismiss current screen and all screens pushed onto the current NavigationStack
        
-        // Find all screens that will be dismissed
+        // Find all screens ahead of current screen that are .push
         
-        let allRoutes = !routes.isEmpty ? routes : rootRoutes
+        
+        var screensToDismiss: [AnyRoute] = []
         var didFindCurrentScreen: Bool = false
-        var newRootScreen: AnyRoute? = allRoutes.first?.first
+        var newRootScreen: AnyRoute? = nil
         
-        for route in allRoutes.flatMap({ $0 }).reversed() {
+        
+        // .push, .sheet, .push, .push, .push, .sheet, .push
+        
+        for route in currentRouteArray.reversed() {
+            if route.segue == .push {
+                screensToDismiss.append(route)
+            }
+            
             if route.id == self.route.id {
                 didFindCurrentScreen = true
             }
             
             // Stop when you find a sheet/fullScreenCover
             if route.segue != .push {
-                newRootScreen = route
-                break
-            }
-            
-            if didFindCurrentScreen {
-                route.onDismiss?()
+                
+                // newRootScreen is the first screen before currentScreen that is not .push
+                if didFindCurrentScreen {
+                    newRootScreen = route
+                    break
+                    
+                // push must be on a lower stack, reset screensToDismiss
+                } else {
+                    screensToDismiss = []
+                }
             }
         }
         
-        if let newRootScreen {
-            removeRoutingFlowsAfterRoute(newRootScreen)
+        guard didFindCurrentScreen, let newRootScreen else {
+            #if DEBUG
+            assertionFailure("Failed to find screens when dismissing screenStack.")
+            #endif
+            return
         }
         
+        for route in screensToDismiss {
+            route.onDismiss?()
+        }
+        
+        // Remove routes
+        // removeRoutingFlowsAfterRoute(newRootScreen)
+
         self.screens = []
         self.screenStack = []
-
     }
+
+}
+
+// MARK: Alerts
+
+extension RouterView {
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
         guard self.alert == nil else {
@@ -433,6 +556,12 @@ public struct RouterView<T:View>: View, Router {
     public func dismissAlert() {
         self.alert = nil
     }
+
+}
+
+// MARK: Modal
+
+extension RouterView {
     
     public func showModal<T:View>(
         transition: AnyTransition,
@@ -454,85 +583,5 @@ public struct RouterView<T:View>: View, Router {
     public func dismissModal() {
         self.modal = nil
     }
-    
-    public func showSafari(_ url: @escaping () -> URL) {
-        openURL(url())
-    }
-}
 
-struct RouterView_Previews: PreviewProvider {
-    static var previews: some View {
-        RouterView { router in
-            Text("Hi")
-                .onTapGesture {
-                    router.showScreen(.push) { router in
-                        Text("Hello, world")
-                    }
-                }
-        }
-    }
-}
-
-extension View {
-    
-    @ViewBuilder func showingScreen(
-        option: SegueOption,
-        screens: Binding<[AnyDestination]>,
-        screenStack: [AnyDestination],
-        sheetDetents: Set<PresentationDetentTransformable>,
-        sheetSelection: Binding<PresentationDetentTransformable>,
-        sheetSelectionEnabled: Bool,
-        showDragIndicator: Bool,
-        onDismiss: (() -> Void)?
-        ) -> some View {
-            if #available(iOS 14, *) {
-                self
-                    .modifier(NavigationLinkViewModifier(
-                        option: option,
-                        screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty
-                    ))
-                    .modifier(SheetViewModifier(
-                        option: option,
-                        screens: screens,
-                        sheetDetents: sheetDetents,
-                        sheetSelection: sheetSelection,
-                        sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator,
-                        onDismiss: onDismiss
-                    ))
-                    .modifier(FullScreenCoverViewModifier(
-                        option: option,
-                        screens: screens,
-                        onDismiss: onDismiss
-                    ))
-            } else {
-                self
-                    .modifier(NavigationLinkViewModifier(
-                        option: option,
-                        screens: screens,
-                        shouldAddNavigationDestination: screenStack.isEmpty
-                    ))
-                    .modifier(SheetViewModifier(
-                        option: option,
-                        screens: screens,
-                        sheetDetents: sheetDetents,
-                        sheetSelection: sheetSelection,
-                        sheetSelectionEnabled: sheetSelectionEnabled,
-                        showDragIndicator: showDragIndicator,
-                        onDismiss: onDismiss
-                    ))
-            }
-    }
-
-    @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
-        self
-            .modifier(ConfirmationDialogViewModifier(option: option, item: item))
-            .modifier(AlertViewModifier(option: option, item: item))
-    }
-    
-    func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
-        modifier(ModalViewModifier(configuration: configuration, item: item))
-    }
-    
 }
