@@ -192,7 +192,8 @@ public struct RouterView<T:View>: View, Router {
         // This is for onDismiss via Sheet or FullScreenCover
         // This is called within the Router prior to the Router of the sheet being dismissed
         print("ON DISMISS OF SHEET")
-
+        print(useRoutesNotRootRoutes)
+        print(currentRouteArray)
         // A Sheet/FullScreenCover represents an 'environment' in SwiftUI (ie. each Sheet has it's own NavigationStack)
         // When an 'environment' is dismissed, we are also dismissing all screens pushed onto that NavigationStack
         // The Sheet being dismissed is actually the firstAfter current route
