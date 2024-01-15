@@ -142,8 +142,8 @@ public struct RouterView<T:View>: View, Router {
         // Set screen to not presented
         updateRouteIsPresented(route: screenToDismiss, isPresented: false)
         
-        // New root is the screen before the screen to dismiss
-        guard let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(screenToDismiss) else {
+        // New root is the screen before the screen to dismiss        
+        guard let newRootScreen: AnyRoute = currentRouteArray.flatMap({ $0 }).firstBefore(screenToDismiss) else {
             #if DEBUG
             assertionFailure("Did dismiss screen from NavigationStack but could not find new root screen.")
             #endif
