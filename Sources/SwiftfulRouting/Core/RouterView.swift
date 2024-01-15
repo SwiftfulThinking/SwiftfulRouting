@@ -21,7 +21,7 @@ public struct RouterView<T:View>: View, Router {
 
     // Segues
     @State private var segueOption: SegueOption = .push
-    @State public var screens: [AnyDestination] = []
+    @State private var screens: [AnyDestination] = []
     @State private var previousScreens: [AnyDestination] = []
     
     /// routes are all routes set on heirarchy, included ones that are in front of current screen
@@ -97,30 +97,52 @@ public struct RouterView<T:View>: View, Router {
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
+    private var useRoutesNotRootRoutes: Bool {
+        !routes.isEmpty
+    }
+    
     private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
-        if !routes.isEmpty {
-            for (setIndex, set) in routes.enumerated() {
+        
+        func setRouteIsPresented(array: inout [[AnyRoute]]) {
+            for (setIndex, set) in array.enumerated() {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
-                        routes[setIndex][index].updateIsPresented(to: isPresented)
-                        return
-                    }
-                }
-            }
-        } else {
-            for (setIndex, set) in rootRoutes.enumerated() {
-                for (index, someRoute) in set.enumerated() {
-                    if someRoute.id == route.id {
-                        rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
+                        array[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
                 }
             }
         }
+        
+        if useRoutesNotRootRoutes {
+            setRouteIsPresented(array: &routes)
+        } else {
+            setRouteIsPresented(array: &rootRoutes)
+        }
+        
+//        if !routes.isEmpty {
+//            for (setIndex, set) in routes.enumerated() {
+//                for (index, someRoute) in set.enumerated() {
+//                    if someRoute.id == route.id {
+//                        routes[setIndex][index].updateIsPresented(to: isPresented)
+//                        return
+//                    }
+//                }
+//            }
+//        } else {
+//            for (setIndex, set) in rootRoutes.enumerated() {
+//                for (index, someRoute) in set.enumerated() {
+//                    if someRoute.id == route.id {
+//                        rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
+//                        return
+//                    }
+//                }
+//            }
+//        }
     }
     
     private func onDismissOfLastPush() {
-        // This is called from the NavigationStack root Router, but is dismissing the last screen in $screens
+        // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
         print("onDismissOfLastPush")
 
         let routes = (!routes.isEmpty ? routes : rootRoutes)
