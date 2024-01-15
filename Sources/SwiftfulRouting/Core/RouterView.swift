@@ -207,10 +207,10 @@ public struct RouterView<T:View>: View, Router {
         
         // Edge case: due to resizableSheet's implementation (see above - to fix)
         // this scenario is actually dismissing the current route and not the next one
-        if isResizableSheet {
-            print("IS RESIZABLE SHEET")
-            allRoutesInFrontOfCurrent.insert(route, at: 0)
-        }
+//        if isResizableSheet {
+//            print("IS RESIZABLE SHEET")
+//            allRoutesInFrontOfCurrent.insert(route, at: 0)
+//        }
         print("DISMISS COUNT: \(allRoutesInFrontOfCurrent)")
 
         // Dismiss all routes in reverse order
@@ -390,6 +390,10 @@ public struct RouterView<T:View>: View, Router {
         }
         
         self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+        
+        // Resizable binding is within current Router, so onFirstAppear of newRoute will never execute
+        // Manually mark as isPresented
+        updateRouteIsPresented(route: newRoute, isPresented: true)
     }
     
     public func dismissScreen() {
