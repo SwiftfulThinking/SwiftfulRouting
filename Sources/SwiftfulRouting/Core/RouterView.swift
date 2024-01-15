@@ -478,7 +478,7 @@ public struct RouterView<T:View>: View, Router {
         }
         
         if let newRootScreen {
-            print("NEW ROOT: \(newRootScreen.id)")
+//            print("NEW ROOT: \(newRootScreen.id)")
             removeRoutes(route: newRootScreen)
         }
         
@@ -496,23 +496,23 @@ public struct RouterView<T:View>: View, Router {
         self.screens = []
         self.screenStack = []
 
-        if !routes.isEmpty {
-            print("ROUTES CONTAINS: \(routes.count)")
-            for (index, route) in routes.enumerated() {
-                for route2 in route {
-                    print("\(index) :: \(route2.id) :: \(route2.segue)")
-                }
-            }
-        } else {
-            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
-
-            print("ROOT ROUTES CONTAINS")
-            for (index, route) in rootRoutes.enumerated() {
-                for route2 in route {
-                    print("\(index) :: \(route2.segue)")
-                }
-            }
-        }
+//        if !routes.isEmpty {
+//            print("ROUTES CONTAINS: \(routes.count)")
+//            for (index, route) in routes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.id) :: \(route2.segue)")
+//                }
+//            }
+//        } else {
+//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
+//
+//            print("ROOT ROUTES CONTAINS")
+//            for (index, route) in rootRoutes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        }
 //        print("currently in: \(route.id)")
 //        removeRoutes(route: self.route)
 
