@@ -12,7 +12,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
     
     let addNavigationView: Bool
     let segueOption: SegueOption
-    let onDismiss: (() -> Void)?
+    let onDismissCurrentPush: (() -> Void)?
     let onDismissLastPush: () -> Void
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
@@ -34,7 +34,7 @@ struct NavigationViewIfNeeded<Content:View>: View {
                 content
             } else {
                 content
-                    .onChangeOfPresentationMode(screens: $screens, onDismiss: onDismiss)
+                    .onChangeOfPresentationMode(screens: $screens, onDismiss: onDismissCurrentPush)
             }
         }
     }

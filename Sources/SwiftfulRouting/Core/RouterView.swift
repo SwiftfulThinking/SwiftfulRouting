@@ -49,10 +49,7 @@ public struct RouterView<T:View>: View, Router {
     // Modals
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
-    
-    // Need a Binding to Routes across RouterViews
-    // Need to initialize the array
-    
+        
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
@@ -76,7 +73,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissOfPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             content(AnyRouter(object: self))
                 .showingScreen(
                     option: segueOption,
@@ -101,6 +98,10 @@ public struct RouterView<T:View>: View, Router {
         !routes.isEmpty
     }
     
+    private var currentRouteArray: [[AnyRoute]] {
+        useRoutesNotRootRoutes ? routes : rootRoutes
+    }
+    
     private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
         
         func setRouteIsPresented(array: inout [[AnyRoute]]) {
@@ -119,47 +120,42 @@ public struct RouterView<T:View>: View, Router {
         } else {
             setRouteIsPresented(array: &rootRoutes)
         }
-        
-//        if !routes.isEmpty {
-//            for (setIndex, set) in routes.enumerated() {
-//                for (index, someRoute) in set.enumerated() {
-//                    if someRoute.id == route.id {
-//                        routes[setIndex][index].updateIsPresented(to: isPresented)
-//                        return
-//                    }
-//                }
-//            }
-//        } else {
-//            for (setIndex, set) in rootRoutes.enumerated() {
-//                for (index, someRoute) in set.enumerated() {
-//                    if someRoute.id == route.id {
-//                        rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
-//                        return
-//                    }
-//                }
-//            }
-//        }
     }
     
     private func onDismissOfLastPush() {
         // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
         print("onDismissOfLastPush")
 
-        let routes = (!routes.isEmpty ? routes : rootRoutes)
         
-        if let screenToDismiss = routes.last?.last(where: { $0.isPresented }) {
-            screenToDismiss.onDismiss?()
-            updateRouteIsPresented(route: screenToDismiss, isPresented: false)
-            
-            let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(screenToDismiss) ?? screenToDismiss
-            removeRoutes(route: newRootScreen)
-            
+        // Find the last screen in the heirarchy that is presented and is .push
+        // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
+        guard let screenToDismiss = currentRouteArray.last?.last(where: { $0.isPresented && $0.segue == .push }) else {
+            #if DEBUG
+            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            #endif
+            return
         }
         
+        // Trigger screen's onDismiss
+        screenToDismiss.onDismiss?()
+        
+        // Set screen to not presented
+        updateRouteIsPresented(route: screenToDismiss, isPresented: false)
+        
+        // New root is the screen before the screen to dismiss
+        guard let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(screenToDismiss) else {
+            #if DEBUG
+            assertionFailure("Did dismiss screen from NavigationStack but could not find new root screen.")
+            #endif
+            return
+        }
+        
+        removeRoutingFlowsAfterRoute(newRootScreen)
+
         screens.removeLast()
     }
     
-    private func onDismissOfPush() {
+    private func onDismissOfCurrentPush() {
         // This is called within the Router of the last screen in $screens, and is dismissing this screen
         print("ON DISMISS OF PUSH")
 
@@ -175,8 +171,7 @@ public struct RouterView<T:View>: View, Router {
         
         let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
 
-        
-        removeRoutes(route: newRootScreen)
+        removeRoutingFlowsAfterRoute(newRootScreen)
     }
     
     private func onDismissOfSheet() {
@@ -195,7 +190,7 @@ public struct RouterView<T:View>: View, Router {
             updateRouteIsPresented(route: route, isPresented: false)
         }
         
-        removeRoutes(route: self.route)
+        removeRoutingFlowsAfterRoute(route)
     }
     
     private func setEnvironmentRouterIfNeeded() {
@@ -252,9 +247,9 @@ public struct RouterView<T:View>: View, Router {
         showScreen(nextRoute, destination: destination)
     }
     
-    private func removeRoutes(route: AnyRoute) {
-        // Remove all flows after current
-        if !routes.isEmpty {
+    private func removeRoutingFlowsAfterRoute(_ route: AnyRoute) {
+        // Remove all flows (arrays) after current flow
+        if useRoutesNotRootRoutes {
             routes.removeArraysAfter(arrayThatIncludesId: route.id)
         } else {
             rootRoutes.removeArraysAfter(arrayThatIncludesId: route.id)
