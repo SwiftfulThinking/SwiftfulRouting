@@ -129,8 +129,6 @@ public struct RouterView<T:View>: View, Router {
     private func onDismissOfLastPush() {
         // This is for onDismiss via NavigationStack
         // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
-        print("onDismissOfLastPush")
-
         
         // Remove screen from current Router's screen stack
         // Note: even if below 'route' logic fails, the screen has already been removed from View heirarchy
@@ -152,8 +150,6 @@ public struct RouterView<T:View>: View, Router {
     private func onDismissOfCurrentPush() {
         // This is for onDismiss via NavigationView
         // This is called within the Router of the last screen in in the stack, and is dismissing this screen
-        print("ON DISMISS OF PUSH")
-        
         
         guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
@@ -193,22 +189,51 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfSheet() {
+        // This is for onDismiss via Sheet or FullScreenCover
+        // This is called within the Router prior to the Router of the sheet being dismissed
         print("ON DISMISS OF SHEET")
+
+        // A Sheet/FullScreenCover represents an 'environment' in SwiftUI (ie. each Sheet has it's own NavigationStack)
+        // When an 'environment' is dismissed, we are also dismissing all screens pushed onto that NavigationStack
+        // The Sheet being dismissed is actually the firstAfter current route
+        guard var allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
+            #if DEBUG
+            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            #endif
+            return
+        }
         
-        let routes = (!routes.isEmpty ? routes : rootRoutes)
-        
-        var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) ?? []
-        
+        // Edge case: due to resizableSheet's implementation (see above - to fix)
+        // this scenario is actually dismissing the current route and not the next one
         if isResizableSheet {
             allRoutesInFrontOfCurrent.insert(route, at: 0)
         }
-        
+
+        // Dismiss all routes in reverse order
         for route in allRoutesInFrontOfCurrent.reversed() {
             route.onDismiss?()
             updateRouteIsPresented(route: route, isPresented: false)
         }
         
+        // Remove flow if needed
         removeRoutingFlowsAfterRoute(route)
+
+
+        
+//        let routes = (!routes.isEmpty ? routes : rootRoutes)
+//        
+//        var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) ?? []
+//        
+//        if isResizableSheet {
+//            allRoutesInFrontOfCurrent.insert(route, at: 0)
+//        }
+//        
+//        for route in allRoutesInFrontOfCurrent.reversed() {
+//            route.onDismiss?()
+//            updateRouteIsPresented(route: route, isPresented: false)
+//        }
+//        
+//        removeRoutingFlowsAfterRoute(route)
     }
     
     private func setEnvironmentRouterIfNeeded() {
