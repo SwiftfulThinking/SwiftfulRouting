@@ -13,13 +13,14 @@ struct NavigationViewIfNeeded<Content:View>: View {
     let addNavigationView: Bool
     let segueOption: SegueOption
     let onDismiss: (() -> Void)?
+    let onDismissLastPush: () -> Void
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
     
     @ViewBuilder var body: some View {
         if addNavigationView {
             if #available(iOS 16.0, *) {
-                NavigationStackTransformable(segueOption: segueOption, screens: $screens) {
+                NavigationStackTransformable(segueOption: segueOption, onDismissLastPush: onDismissLastPush, screens: $screens) {
                     content
                 }
             } else {
@@ -76,6 +77,7 @@ struct NavigationStackTransformable<Content:View>: View {
     // We have to observe the path to monitor native screen dismissal that aren't via router.dismiss
     
     let segueOption: SegueOption
+    let onDismissLastPush: () -> Void
     @Binding var screens: [AnyDestination]
     @ViewBuilder var content: Content
 
@@ -99,8 +101,9 @@ struct NavigationStackTransformable<Content:View>: View {
         }
         .onChange(of: path, perform: { path in
             if path.count < screens.count {
-                screens.last?.onDismiss?()
-                screens.removeLast()
+                onDismissLastPush()
+//                screens.last?.onDismiss?()
+//                screens.removeLast()
             }
         })
     }

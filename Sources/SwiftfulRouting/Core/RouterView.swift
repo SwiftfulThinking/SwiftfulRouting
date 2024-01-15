@@ -40,12 +40,6 @@ public struct RouterView<T:View>: View, Router {
  
     // Routable methods
     @State private var route: AnyRoute
-    
-    // The lifecycle of onDismiss is different for (sheet & fullScreenCover) vs push, push needs to observe presentationMode
-    // sheet onDismiss is called from the view's Router
-    // push onDismiss is called from the preview view's Router
-    @State private var onDismissSheets: (() -> Void)? = nil
-    @State private var onDismissPush: (() -> Void)?
 
     // Segues
     @State private var segueOption: SegueOption = .push
@@ -62,10 +56,13 @@ public struct RouterView<T:View>: View, Router {
 
     // Configuration for resizable sheet on iOS 16+
     // TODO: Move resizable sheet modifiers into a struct "SheetConfiguration"
+    // Note: sheet and fullScreenCover bind $dismiss to View in front of them,
+    // while resizableSheet binds to the current View itself (possible fix me)
     @State private var sheetDetents: Set<PresentationDetentTransformable> = [.large]
     @State private var sheetSelection: Binding<PresentationDetentTransformable> = .constant(.large)
     @State private var sheetSelectionEnabled: Bool = false
     @State private var showDragIndicator: Bool = false
+    @State private var isResizableSheet: Bool = false
 
     // Alerts
     @State private var alertOption: AlertOption = .alert
@@ -78,7 +75,7 @@ public struct RouterView<T:View>: View, Router {
     // Need a Binding to Routes across RouterViews
     // Need to initialize the array
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, onDismissPush: (() -> Void)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
@@ -96,13 +93,12 @@ public struct RouterView<T:View>: View, Router {
         }
         
         self._environmentRouter = State(wrappedValue: environmentRouter)
-        self._onDismissPush = State(wrappedValue: onDismissPush)
         self.content = content
 
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissPush, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissOfPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             content(AnyRouter(object: self))
                 .showingScreen(
                     option: segueOption,
@@ -115,14 +111,88 @@ public struct RouterView<T:View>: View, Router {
                     onDismiss: onDismissOfSheet
                 )
                 .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                .onFirstAppear(perform: {
+                    updateRouteIsPresented(route: route, isPresented: true)
+                })
         }
         .showingAlert(option: alertOption, item: $alert)
         .showingModal(configuration: modalConfiguration, item: $modal)
     }
     
+    private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
+        if !routes.isEmpty {
+            for (setIndex, set) in routes.enumerated() {
+                for (index, someRoute) in set.enumerated() {
+                    if someRoute.id == route.id {
+//                        print("ROUTES")
+//                        print(routes)
+//                        print(setIndex)
+//                        print(set)
+//                        print(index)
+                        print("route \(route.id) is presented: \(isPresented)")
+                        routes[setIndex][index].updateIsPresented(to: isPresented)
+                        return
+                    }
+                }
+            }
+        } else {
+            for (setIndex, set) in rootRoutes.enumerated() {
+                for (index, someRoute) in set.enumerated() {
+                    if someRoute.id == route.id {
+//                        print("ROOT ROUTES")
+//                        print(rootRoutes)
+//                        print(setIndex)
+//                        print(set)
+//                        print(index)
+                        print("route \(route.id) is presented: \(isPresented)")
+                        rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
+    private func onDismissOfLastPush() {
+        // This is called from the NavigationStack root Router, but is dismissing the last screen in $screens
+        print("onDismissOfLastPush")
+//        screens.last?.onDismiss?()
+        let routes = (!routes.isEmpty ? routes : rootRoutes)
+        
+        if let screenToDismiss = routes.last?.last(where: { $0.isPresented }) {
+            screenToDismiss.onDismiss?()
+            updateRouteIsPresented(route: screenToDismiss, isPresented: false)
+            
+            let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(screenToDismiss) ?? screenToDismiss
+            removeRoutes(route: newRootScreen)
+            
+        }
+        
+        screens.removeLast()
+    }
+    
     private func onDismissOfPush() {
-        onDismissPush?()
+        
+        // This is called within the Router of the last screen in $screens, and is dismissing this screen
+        
+//        onDismissPush?()
 //        removeRoutes(route: <#T##AnyRoute#>)
+        print("ON DISMISS OF PUSH")
+
+        let routes = (!routes.isEmpty ? routes : rootRoutes)
+        
+        // allRoutesInFrontOfCurrent should always be 0?
+        let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) ?? []
+        let routesToDismiss = [self.route] + allRoutesInFrontOfCurrent
+        for route in routesToDismiss.reversed() {
+            route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
+        }
+        
+        let newRootScreen: AnyRoute = routes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
+
+        
+        removeRoutes(route: newRootScreen)
     }
     
     private func onDismissOfSheet() {
@@ -131,11 +201,26 @@ public struct RouterView<T:View>: View, Router {
         print("ON DISMISS OF SHEET")
         
         let routes = (!routes.isEmpty ? routes : rootRoutes)
-        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
-            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
-            for route in allRoutesInFrontOfCurrent.reversed() {
-                route.onDismiss?()
-            }
+        
+        
+        // Here and onPush dismiss
+        // Need to filter allRoutesInFrontOfCurrent.where({ $0.isPresented })
+        
+//        print("ROUTES ARE HERE")
+//        let rrrrrr = routes.flatMap({ $0 })
+//        for rr in rrrrrr {
+//            print(rr)
+//        }
+        
+        var allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) ?? []
+        
+        if isResizableSheet {
+            allRoutesInFrontOfCurrent.insert(route, at: 0)
+        }
+        
+        for route in allRoutesInFrontOfCurrent.reversed() {
+            route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
         }
         
 
@@ -271,7 +356,7 @@ public struct RouterView<T:View>: View, Router {
         if route.segue != .push {
             // Add new Navigation
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
-            self.onDismissSheets = route.onDismiss
+//            self.onDismissSheets = route.onDismiss
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
 //            print("PASSING ROUTES TO SHEET FORM SHEET ROUTER")
@@ -280,7 +365,7 @@ public struct RouterView<T:View>: View, Router {
 //                    print(route2)
 //                }
 //            }
-            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismissPush: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+            self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -290,16 +375,16 @@ public struct RouterView<T:View>: View, Router {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 } else {
                     // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screenStack.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                self.screens.append(AnyDestination(RouterView<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
             }
         }
         
@@ -327,13 +412,14 @@ public struct RouterView<T:View>: View, Router {
             
 //            let allRoutes: [[AnyRoute]] = routes + [localRoutes]
 //            self.routes.append(localRoutes)
-            appendRoutes(newRoutes: localRoutes)
             
-            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, onDismissPush: route.onDismiss, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
+            let view = AnyDestination(RouterView<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
             }), onDismiss: route.onDismiss)
             localStack.append(view)
         }
+
+        appendRoutes(newRoutes: localRoutes)
 
         if screenStack.isEmpty {
             self.screens.append(contentsOf: localStack)
@@ -349,9 +435,12 @@ public struct RouterView<T:View>: View, Router {
         self.segueOption = newRoute.segue
         self.sheetDetents = sheetDetents
         self.showDragIndicator = showDragIndicator
+        self.isResizableSheet = true
         
-        self.onDismissSheets = newRoute.onDismiss
+//        self.onDismissSheets = newRoute.onDismiss
         self.appendRoutes(newRoutes: [newRoute])
+        print("Appended route for resiable sheet")
+        onDismiss?()
 
         // If selection == nil, then need to avoid using sheetSelection modifier
         if let selection {
@@ -361,7 +450,7 @@ public struct RouterView<T:View>: View, Router {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, onDismissPush: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+        self.screens.append(AnyDestination(RouterView<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
     }
     
     public func dismissScreen() {
@@ -372,8 +461,70 @@ public struct RouterView<T:View>: View, Router {
     
     @available(iOS 16, *)
     public func dismissScreenStack() {
+        
+        // This will dismiss current screen and all pushes on curent NavigationStack
+       
+        // Find all screens that will be dismissed
+        
+        let allRoutes = !routes.isEmpty ? routes : rootRoutes
+        var didFindCurrentScreen: Bool = false
+        var newRootScreen: AnyRoute? = allRoutes.first?.first
+        
+        for route in allRoutes.flatMap({ $0 }).reversed() {
+            if route.id == self.route.id {
+                didFindCurrentScreen = true
+            }
+            
+            // Stop when you find a sheet/fullScreenCover
+            if route.segue != .push {
+                newRootScreen = route
+                break
+            }
+            
+            if didFindCurrentScreen {
+                route.onDismiss?()
+            }
+        }
+        
+        if let newRootScreen {
+//            print("NEW ROOT: \(newRootScreen.id)")
+            removeRoutes(route: newRootScreen)
+        }
+        
+        
+//        print("HI NICK DISMISSING SCREEN STACK")
+//        
+//        let routes = (!routes.isEmpty ? routes : rootRoutes)
+//        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+//            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
+//            for route in allRoutesInFrontOfCurrent.reversed() {
+//                route.onDismiss?()
+//            }
+//        }
+        
         self.screens = []
         self.screenStack = []
+
+//        if !routes.isEmpty {
+//            print("ROUTES CONTAINS: \(routes.count)")
+//            for (index, route) in routes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.id) :: \(route2.segue)")
+//                }
+//            }
+//        } else {
+//            let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)
+//
+//            print("ROOT ROUTES CONTAINS")
+//            for (index, route) in rootRoutes.enumerated() {
+//                for route2 in route {
+//                    print("\(index) :: \(route2.segue)")
+//                }
+//            }
+//        }
+//        print("currently in: \(route.id)")
+//        removeRoutes(route: self.route)
+
     }
     
     public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
