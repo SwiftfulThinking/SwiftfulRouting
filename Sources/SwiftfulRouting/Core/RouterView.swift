@@ -132,7 +132,7 @@ public struct RouterView<T:View>: View, Router {
 //                        print(setIndex)
 //                        print(set)
 //                        print(index)
-                        print("route \(route.id) is presented: \(isPresented)")
+//                        print("route \(route.id) is presented: \(isPresented)")
                         routes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
@@ -147,7 +147,7 @@ public struct RouterView<T:View>: View, Router {
 //                        print(setIndex)
 //                        print(set)
 //                        print(index)
-                        print("route \(route.id) is presented: \(isPresented)")
+//                        print("route \(route.id) is presented: \(isPresented)")
                         rootRoutes[setIndex][index].updateIsPresented(to: isPresented)
                         return
                     }
@@ -201,7 +201,7 @@ public struct RouterView<T:View>: View, Router {
     private func onDismissOfSheet() {
         // HOLD?
 //        onDismissSheets?()
-        print("ON DISMISS OF SHEET")
+//        print("ON DISMISS OF SHEET")
         
         let routes = (!routes.isEmpty ? routes : rootRoutes)
         
@@ -210,7 +210,7 @@ public struct RouterView<T:View>: View, Router {
         // Need to filter allRoutesInFrontOfCurrent.where({ $0.isPresented })
         
         if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) {
-            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
+//            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
             for route in allRoutesInFrontOfCurrent.reversed() {
                 route.onDismiss?()
                 updateRouteIsPresented(route: route, isPresented: false)
