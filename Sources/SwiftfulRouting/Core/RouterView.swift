@@ -209,12 +209,20 @@ public struct RouterView<T:View>: View, Router {
         // Here and onPush dismiss
         // Need to filter allRoutesInFrontOfCurrent.where({ $0.isPresented })
         
+        print("ROUTES ARE HERE")
+        let rrrrrr = routes.flatMap({ $0 })
+        for rr in rrrrrr {
+            print(rr)
+        }
+        
         if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route)?.filter({ $0.isPresented }) {
 //            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
             for route in allRoutesInFrontOfCurrent.reversed() {
                 route.onDismiss?()
                 updateRouteIsPresented(route: route, isPresented: false)
             }
+        } else {
+            print("Nada")
         }
         
 
