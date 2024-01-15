@@ -392,7 +392,7 @@ public struct RouterView<T:View>: View, Router {
         }
         
         if let newRootScreen {
-            removeRoutes(route: newRootScreen)
+            removeRoutingFlowsAfterRoute(newRootScreen)
         }
         
         self.screens = []
