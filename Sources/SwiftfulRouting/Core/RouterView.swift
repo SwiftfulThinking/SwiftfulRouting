@@ -101,7 +101,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissPush, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismiss: onDismissOfPush, screens: $screens) {
             content(AnyRouter(object: self))
                 .showingScreen(
                     option: segueOption,
@@ -120,8 +120,22 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfPush() {
-        onDismissPush?()
+        
+        // Dismissing this screen (which is the last screen in $screens)
+        
+//        onDismissPush?()
 //        removeRoutes(route: <#T##AnyRoute#>)
+        print("ON DISMISS OF PUSH")
+
+        let routes = (!routes.isEmpty ? routes : rootRoutes)
+        if let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) {
+            print("ALL ROTUES: \(allRoutesInFrontOfCurrent.count)")
+            for route in allRoutesInFrontOfCurrent.reversed() {
+                route.onDismiss?()
+            }
+        }
+        removeRoutes(route: self.route)
+
     }
     
     private func onDismissOfSheet() {
