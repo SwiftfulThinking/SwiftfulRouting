@@ -295,8 +295,12 @@ public struct RouterView<T:View>: View, Router {
     
     private func appendRoutes(newRoutes: [AnyRoute]) {
         if useRoutesNotRootRoutes {
+            print("APPENDING ROUTES TO ROUTES")
+            print(newRoutes)
             self.routes.append(newRoutes)
         } else {
+            print("APPENDING ROUTES TO ROOTS")
+            print(newRoutes)
             self.rootRoutes.append(newRoutes)
         }
     }
