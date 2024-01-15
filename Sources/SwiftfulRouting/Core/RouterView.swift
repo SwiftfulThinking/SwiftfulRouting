@@ -134,7 +134,11 @@ public struct RouterView<T:View>: View, Router {
             route.onDismiss?()
         }
         
-        removeRoutes(route: self.route)
+        let allRoutes = !routes.isEmpty ? routes : rootRoutes
+        let newRootScreen: AnyRoute = allRoutes.flatMap({ $0 }).firstBefore(self.route) ?? self.route
+
+        
+        removeRoutes(route: newRootScreen)
 
     }
     
