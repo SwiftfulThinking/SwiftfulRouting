@@ -179,6 +179,8 @@ public struct RouterView<T:View>: View, Router {
         
         if screenToDismiss != route {
             #if DEBUG
+            print(screenToDismiss)
+            print(route)
             assertionFailure("Attempt to dismiss push that is not the view's current push.")
             #endif
             return
