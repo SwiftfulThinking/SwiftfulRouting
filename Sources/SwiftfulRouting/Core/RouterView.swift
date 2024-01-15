@@ -98,8 +98,8 @@ public struct RouterView<T:View>: View, Router {
         !routes.isEmpty
     }
     
-    private var currentRouteArray: [[AnyRoute]] {
-        useRoutesNotRootRoutes ? routes : rootRoutes
+    private var currentRouteArray: [AnyRoute] {
+        (useRoutesNotRootRoutes ? routes : rootRoutes).flatMap({ $0 })
     }
     
     private func updateRouteIsPresented(route: AnyRoute, isPresented: Bool) {
@@ -123,6 +123,7 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfLastPush() {
+        // This is for onDismiss via NavigationStack
         // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
         print("onDismissOfLastPush")
 
@@ -134,7 +135,7 @@ public struct RouterView<T:View>: View, Router {
 
         // Find the last screen in the heirarchy that is presented and is .push
         // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
-        guard let screenToDismiss = currentRouteArray.last?.last(where: { $0.isPresented && $0.segue == .push }) else {
+        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
             assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
             #endif
@@ -148,7 +149,7 @@ public struct RouterView<T:View>: View, Router {
         updateRouteIsPresented(route: screenToDismiss, isPresented: false)
         
         // New root is the screen before the screen to dismiss        
-        guard let newRootScreen: AnyRoute = currentRouteArray.flatMap({ $0 }).firstBefore(screenToDismiss) else {
+        guard let newRootScreen: AnyRoute = currentRouteArray.firstBefore(screenToDismiss) else {
             #if DEBUG
             assertionFailure("Did dismiss screen from NavigationStack but could not find new root screen.")
             #endif
@@ -160,10 +161,29 @@ public struct RouterView<T:View>: View, Router {
     }
     
     private func onDismissOfCurrentPush() {
-        // This is called within the Router of the last screen in $screens, and is dismissing this screen
+        // This is for onDismiss via NavigationView
+        // This is called within the Router of the last screen in in the stack, and is dismissing this screen
         print("ON DISMISS OF PUSH")
 
         let routes = (!routes.isEmpty ? routes : rootRoutes)
+        
+        // Dismiss the current screen
+        
+        // As a safety precaution, check that visible screen == self.route
+        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
+            #if DEBUG
+            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            #endif
+            return
+        }
+        
+        if screenToDismiss != route {
+            #if DEBUG
+            assertionFailure("Attempt to dismiss push that is not the view's current push.")
+            #endif
+            return
+        }
+
         
         // allRoutesInFrontOfCurrent should always be 0?
         let allRoutesInFrontOfCurrent = routes.flatMap({ $0 }).allAfter(route) ?? []
