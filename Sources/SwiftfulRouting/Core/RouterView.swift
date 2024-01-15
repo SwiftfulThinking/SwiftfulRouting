@@ -377,7 +377,7 @@ public struct RouterView<T:View>: View, Router {
         // Find all screens that will be dismissed
         
         var didFindCurrentScreen: Bool = false
-        var newRootScreen: AnyRoute? = nil
+        var newRootScreen: AnyRoute? = routes.first?.first
         
         for route in routes.flatMap({ $0 }).reversed() {
             if route.id == self.route.id {
