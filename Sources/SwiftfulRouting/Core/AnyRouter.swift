@@ -29,17 +29,17 @@ public struct AnyRouter: Router {
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen<T>(_ option: SegueOption, onDismiss: (() -> Void)? = nil, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreens([AnyRoute(option, onDismiss: onDismiss, destination: destination)])
+        object.enterScreenFlow([AnyRoute(option, onDismiss: onDismiss, destination: destination)])
     }
 
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
     public func showScreen(_ route: AnyRoute) {
-        object.showScreens([route])
+        object.enterScreenFlow([route])
     }
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
-    public func showScreens(_ routes: [AnyRoute]) {
-        object.showScreens(routes)
+    public func enterScreenFlow(_ routes: [AnyRoute]) {
+        object.enterScreenFlow(routes)
     }
     
     /// Shows the next screen set in the current screen flow. This would have been set previously via showScreens().
@@ -154,7 +154,7 @@ struct MockRouter: Router {
         #endif
     }
     
-    func showScreens(_ routes: [AnyRoute]) {
+    func enterScreenFlow(_ routes: [AnyRoute]) {
         printError()
     }
     

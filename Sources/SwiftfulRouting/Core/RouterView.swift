@@ -204,7 +204,7 @@ extension View {
 extension RouterViewInternal {
     
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
-    public func showScreens(_ newRoutes: [AnyRoute]) {
+    public func enterScreenFlow(_ newRoutes: [AnyRoute]) {
         guard let route = newRoutes.first else {
             assertionFailure("SwiftfulRouting: No routes found.")
             return

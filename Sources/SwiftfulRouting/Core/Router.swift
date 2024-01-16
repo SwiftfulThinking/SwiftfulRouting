@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 public protocol Router {
-    func showScreens(_ routes: [AnyRoute])
+    func enterScreenFlow(_ routes: [AnyRoute])
     func showNextScreen() throws
     func dismissScreen()
     func dismissEnvironment()
