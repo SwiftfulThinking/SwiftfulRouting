@@ -115,9 +115,9 @@ struct RouterViewInternal<Content:View>: View, Router {
                     updateRouteIsPresented(route: route, isPresented: true)
                 })
                 .showingAlert(option: alertOption, item: $alert)
-                .showingModal(configuration: modalConfiguration, item: $modal)
                 .environment(\.router, router)
         }
+        .showingModal(configuration: modalConfiguration, item: $modal)
     }
             
 }
@@ -596,7 +596,6 @@ extension RouterViewInternal {
         useDeviceBounds: Bool,
         @ViewBuilder destination: @escaping () -> T) {
             guard self.modal == nil else {
-                dismissModal()
                 return
             }
             
