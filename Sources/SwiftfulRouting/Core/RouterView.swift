@@ -100,7 +100,6 @@ struct RouterViewInternal<T:View>: View, Router {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             let router = AnyRouter(object: self)
             content(router)
-                .environment(\.router, router)
                 .showingScreen(
                     option: segueOption,
                     screens: $screens,
@@ -115,9 +114,10 @@ struct RouterViewInternal<T:View>: View, Router {
                 .onFirstAppear(perform: {
                     updateRouteIsPresented(route: route, isPresented: true)
                 })
+                .showingAlert(option: alertOption, item: $alert)
+                .showingModal(configuration: modalConfiguration, item: $modal)
+                .environment(\.router, router)
         }
-        .showingAlert(option: alertOption, item: $alert)
-        .showingModal(configuration: modalConfiguration, item: $modal)
     }
             
 }
