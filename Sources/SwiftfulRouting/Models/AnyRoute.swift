@@ -10,10 +10,10 @@ import SwiftUI
 
 public struct AnyRoute: Identifiable, Hashable {
     public let id = UUID().uuidString
-    let segue: SegueOption
-    let onDismiss: (() -> Void)?
-    let destination: (AnyRouter) -> any View
-    private(set) var isPresented: Bool = false
+    public var segue: SegueOption
+    public var onDismiss: (() -> Void)?
+    public var destination: (AnyRouter) -> any View
+    public var isPresented: Bool = false
     
     public init(_ segue: SegueOption, onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
         self.segue = segue
@@ -34,10 +34,6 @@ public struct AnyRoute: Identifiable, Hashable {
     
     public static func == (lhs: AnyRoute, rhs: AnyRoute) -> Bool {
         lhs.hashValue == rhs.hashValue
-    }
-    
-    mutating func updateIsPresented(to newValue: Bool) {
-        isPresented = newValue
     }
 }
 

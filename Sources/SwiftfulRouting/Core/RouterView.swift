@@ -352,10 +352,10 @@ extension RouterViewInternal {
             for (setIndex, set) in array.enumerated() {
                 for (index, someRoute) in set.enumerated() {
                     if someRoute.id == route.id {
-                        array[setIndex][index].updateIsPresented(to: isPresented)
+                        array[setIndex][index].isPresented = isPresented
                         
                         if route.id == self.route.id {
-                            self.route.updateIsPresented(to: isPresented)
+                            self.route.isPresented = isPresented
                         }
                         return
                     }
