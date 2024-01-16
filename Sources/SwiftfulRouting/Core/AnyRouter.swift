@@ -149,7 +149,9 @@ public struct AnyRouter: Router {
 struct MockRouter: Router {
     
     private func printError() {
+        #if DEBUG
         print("Routing failure: Attempt to use AnyRouter without first adding RouterView to the View heirarchy!")
+        #endif
     }
     
     func showScreens(_ routes: [AnyRoute]) {
@@ -172,11 +174,11 @@ struct MockRouter: Router {
         printError()
     }
     
-    func pushScreenStack(destinations: [(AnyRouter) -> any View]) {
+    func pushScreenStack(destinations: [PushRoute]) {
         printError()
     }
-    
-    func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
+
+    func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, destination: @escaping (AnyRouter) -> V) where V : View {
         printError()
     }
     
