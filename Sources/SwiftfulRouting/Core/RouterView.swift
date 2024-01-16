@@ -32,13 +32,13 @@ public struct RouterView<T:View>: View {
     }
 }
 
-struct RouterViewInternal<T:View>: View, Router {
+struct RouterViewInternal<Content:View>: View, Router {
     
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.openURL) var openURL
 
     let addNavigationView: Bool
-    let content: (AnyRouter) -> T
+    let content: (AnyRouter) -> Content
  
     // Routable methods
     @State private var route: AnyRoute
@@ -74,7 +74,7 @@ struct RouterViewInternal<T:View>: View, Router {
     @State private var modalConfiguration: ModalConfiguration = .default
     @State private var modal: AnyDestination? = nil
         
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
