@@ -1,3 +1,8 @@
+<p align="left">
+    <img src="https://github.com/SwiftfulThinking/SwiftfulRouting/assets/44950578/a66e097f-5501-4480-ae9e-48d2809efae7" alt="SwiftfulRouting Swifts" width="50%" />
+</p>
+
+
 # SwiftfulRouting  🤙
 
 SwiftfulRouting is a native, declarative framework that enables programmatic navigation in SwiftUI applications. 
