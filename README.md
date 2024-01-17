@@ -353,7 +353,7 @@ router.showAlert(.alert, title: "Title goes here", subtitle: "Subtitle goes here
 }
 
 // Confirmation Dialog
-router.showAlert(.alert, title: "Title goes here", subtitle: "Subtitle goes here!") {
+router.showAlert(.confirmationDialog, title: "Title goes here", subtitle: "Subtitle goes here!") {
      Button("A") {
                         
      }
