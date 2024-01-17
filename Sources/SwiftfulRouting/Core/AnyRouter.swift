@@ -8,21 +8,57 @@
 import Foundation
 import SwiftUI
 
+public struct RouterEnvironmentKey: EnvironmentKey {
+    public static let defaultValue: AnyRouter = AnyRouter(object: MockRouter())
+}
+
+public extension EnvironmentValues {
+    var router: AnyRouter {
+        get { self[RouterEnvironmentKey.self] }
+        set { self[RouterEnvironmentKey.self] = newValue }
+    }
+}
+
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Router {
     private let object: any Router
-    
+
     public init(object: any Router) {
         self.object = object
     }
     
-    public var screens: [AnyDestination] {
-        object.screens
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen<T>(_ option: SegueOption, onDismiss: (() -> Void)? = nil, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
+        object.enterScreenFlow([AnyRoute(option, onDismiss: onDismiss, destination: destination)])
+    }
+
+    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
+    public func showScreen(_ route: AnyRoute) {
+        object.enterScreenFlow([route])
     }
     
-    /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen<T>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.showScreen(option, destination: destination)
+    /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
+    public func enterScreenFlow(_ routes: [AnyRoute]) {
+        object.enterScreenFlow(routes)
+    }
+    
+    /// Shows the next screen set in the current screen flow. This would have been set previously via showScreens().
+    public func showNextScreen() throws {
+        try object.showNextScreen()
+    }
+    
+    /// If there is a next screen in the current screen flow, go to it. Otherwise, flow is complete and dismiss the environment.
+    public func showNextScreenOrDismissEnvironment() {
+        do {
+            try showNextScreen()
+        } catch {
+            dismissEnvironment()
+        }
+    }
+    
+    /// Dismiss the top-most presented environment (this would be the top-most sheet or fullScreenCover).
+    public func dismissEnvironment() {
+        object.dismissEnvironment()
     }
     
     /// Dismiss the top-most presented screen in the current Environment. Same as calling presentationMode.wrappedValue.dismiss().
@@ -30,23 +66,24 @@ public struct AnyRouter: Router {
         object.dismissScreen()
     }
 
-    /// Dismiss all NavigationLinks in NavigationStack heirarchy.
+    /// Push a stack of screens and show the last one immediately.
     @available(iOS 16, *)
-    public func pushScreens(destinations: [(AnyRouter) -> any View]) {
-        object.pushScreens(destinations: destinations)
+    public func pushScreenStack(destinations: [PushRoute]) {
+        object.pushScreenStack(destinations: destinations)
     }
     
+    /// Show a resizeable sheet on top of the current context.
     @available(iOS 16, *)
-    public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, destination: @escaping (AnyRouter) -> V) where V : View {
-        object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, destination: destination)
+    public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> V) where V : View {
+        object.showResizableSheet(sheetDetents: sheetDetents, selection: selection, showDragIndicator: showDragIndicator, onDismiss: onDismiss, destination: destination)
     }
         
     /// Dismiss all NavigationLinks in NavigationStack heirarchy.
     ///
     ///  WARNING: Does not dismiss Sheet or FullScreenCover.
     @available(iOS 16, *)
-    public func popToRoot() {
-        object.popToRoot()
+    public func dismissScreenStack() {
+        object.dismissScreenStack()
     }
     
     /// Show any Alert or ConfirmationDialog.
@@ -107,4 +144,63 @@ public struct AnyRouter: Router {
         object.showSafari(url)
     }
 
+}
+
+struct MockRouter: Router {
+    
+    private func printError() {
+        #if DEBUG
+        print("Routing failure: Attempt to use AnyRouter without first adding RouterView to the View heirarchy!")
+        #endif
+    }
+    
+    func enterScreenFlow(_ routes: [AnyRoute]) {
+        printError()
+    }
+    
+    func showNextScreen() throws {
+        printError()
+    }
+    
+    func dismissScreen() {
+        printError()
+    }
+    
+    func dismissEnvironment() {
+        printError()
+    }
+    
+    func dismissScreenStack() {
+        printError()
+    }
+    
+    func pushScreenStack(destinations: [PushRoute]) {
+        printError()
+    }
+
+    func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, destination: @escaping (AnyRouter) -> V) where V : View {
+        printError()
+    }
+    
+    func showAlert<T>(_ option: AlertOption, title: String, subtitle: String?, alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) where T : View {
+        printError()
+    }
+    
+    func dismissAlert() {
+        printError()
+    }
+    
+    func showModal<V>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, destination: @escaping () -> V) where V : View {
+        printError()
+    }
+    
+    func dismissModal() {
+        printError()
+    }
+    
+    func showSafari(_ url: @escaping () -> URL) {
+        printError()
+    }
+    
+    
 }

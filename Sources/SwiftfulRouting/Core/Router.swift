@@ -9,18 +9,19 @@ import SwiftUI
 import Combine
 
 public protocol Router {
-    var screens: [AnyDestination] { get }
-    func showScreen<V:View>(_ option: SegueOption, @ViewBuilder destination: @escaping (AnyRouter) -> V)
+    func enterScreenFlow(_ routes: [AnyRoute])
+    func showNextScreen() throws
     func dismissScreen()
+    func dismissEnvironment()
+    @available(iOS 16, *)
+    func dismissScreenStack()
 
     @available(iOS 16, *)
-    func pushScreens(destinations: [(AnyRouter) -> any View])
+    func pushScreenStack(destinations: [PushRoute])
+    
     
     @available(iOS 16, *)
-    func popToRoot()
-    
-    @available(iOS 16, *)
-    func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, @ViewBuilder destination: @escaping (AnyRouter) -> V)
+    func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, @ViewBuilder destination: @escaping (AnyRouter) -> V)
     
     func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?)
     
