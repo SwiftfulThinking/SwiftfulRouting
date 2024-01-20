@@ -47,8 +47,8 @@ struct ModalSupportView: View {
                                 .transition(AnyTransition.opacity.animation(.easeInOut))
 //                                .animation(data.configuration.animation, value: selection?.id)
                                 .onTapGesture {
-//                                    onDismissModal(data)
-                                    showSelection = false
+                                    onDismissModal(data)
+//                                    showSelection = false
                                 }
                         } else {
                             EmptyView()
