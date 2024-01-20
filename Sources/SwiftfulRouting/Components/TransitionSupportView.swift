@@ -34,15 +34,6 @@ struct TransitionSupportView: View {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
-                        data.destination.destination
-                            .id(data.id + currentTransition.rawValue)
-                            .transition(
-                                .asymmetric(
-                                    insertion: currentTransition.insertion,
-                                    removal: currentTransition.removal
-                                )
-                            )
-                    } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -55,6 +46,15 @@ struct TransitionSupportView: View {
                         } else {
                             EmptyView()
                         }
+                    } else {
+                        data.destination.destination
+                            .id(data.id + currentTransition.rawValue)
+                            .transition(
+                                .asymmetric(
+                                    insertion: currentTransition.insertion,
+                                    removal: currentTransition.removal
+                                )
+                            )
                     }
                 }
             }
