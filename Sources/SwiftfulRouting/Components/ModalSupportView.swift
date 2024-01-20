@@ -42,12 +42,13 @@ struct ModalSupportView: View {
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
                         data.destination.destination
-                        .id(data.id + currentTransition.rawValue)
-//                        .onTapGesture {
-//                            onDismissModal(data)
-//        //                                    showSelection = false
-//                        }
-                        .transition(.move(edge: .bottom))
+                            .id(data.id + currentTransition.rawValue)
+                        //                        .onTapGesture {
+                        //                            onDismissModal(data)
+                        //        //                                    showSelection = false
+                        //                        }
+                            .transition(.move(edge: .bottom))
+                            .zIndex(2)
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
@@ -57,6 +58,7 @@ struct ModalSupportView: View {
                                 .onTapGesture {
                                     onDismissModal(data)
                                 }
+                                .zIndex(1)
                         } else {
                             EmptyView()
                         }
