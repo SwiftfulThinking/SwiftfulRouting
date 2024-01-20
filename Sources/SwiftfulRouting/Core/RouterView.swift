@@ -634,11 +634,13 @@ extension RouterViewInternal {
     
     public func dismissModal(id: String? = nil) {
         if let id {
-            if let index = modals.lastIndex(where: { $0.id == id }) {
-                modals.remove(at: index)
+            if let index = modals.lastIndex(where: { $0.id == id && !$0.didDismiss }) {
+                modals[index].dismiss()
             }
         } else {
-            modals.removeLast()
+            if let index = modals.lastIndex(where: { !$0.didDismiss }) {
+                modals[index].dismiss()
+            }
         }
     }
     

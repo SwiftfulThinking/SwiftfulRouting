@@ -12,9 +12,14 @@ struct AnyModalWithDestination: Identifiable, Equatable {
     let id = UUID().uuidString
     let configuration: ModalConfiguration
     let destination: AnyDestination
+    private(set) var didDismiss: Bool = false
     
     static func == (lhs: AnyModalWithDestination, rhs: AnyModalWithDestination) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.didDismiss == rhs.didDismiss
+    }
+    
+    mutating func dismiss() {
+        didDismiss = true
     }
 }
 
@@ -36,13 +41,17 @@ struct ModalSupportView: View {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
 //                LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
 //                    if showView1 {
-                        data.destination.destination
-                            .id(data.id + currentTransition.rawValue)
-                            .transition(.move(edge: .bottom))
-                            .onTapGesture {
-                                onDismissModal(data)
+                if data.didDismiss {
+                    EmptyView()
+                } else {
+                    data.destination.destination
+                        .id(data.id + currentTransition.rawValue)
+                        .transition(.move(edge: .bottom))
+                        .onTapGesture {
+                            onDismissModal(data)
 //                                    showSelection = false
-                            }
+                        }
+                }
 //                    } else {
 //                        if let backgroundColor = data.configuration.backgroundColor {
 //                            backgroundColor
