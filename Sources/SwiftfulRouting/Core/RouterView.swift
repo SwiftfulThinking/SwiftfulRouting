@@ -130,7 +130,9 @@ struct RouterViewInternal<Content:View>: View, Router {
                 .showingAlert(option: alertOption, item: $alert)
                 .environment(\.router, router)
         }
-        .showingModal(items: modals)
+        .showingModal(items: modals, onDismissModal: { info in
+            dismissModal(id: info.id)
+        })
     }
             
 }
@@ -206,8 +208,8 @@ extension View {
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(items: [AnyModalWithDestination]) -> some View {
-        modifier(ModalViewModifier(items: items))
+    func showingModal(items: [AnyModalWithDestination], onDismissModal: @escaping (AnyModalWithDestination) -> Void) -> some View {
+        modifier(ModalViewModifier(items: items, onDismissModal: onDismissModal))
     }
     
 }
@@ -630,8 +632,14 @@ extension RouterViewInternal {
 //            self.modal = AnyDestination(destination())
         }
     
-    public func dismissModal() {
-//        self.modal = nil
+    public func dismissModal(id: String? = nil) {
+        if let id {
+            if let index = modals.lastIndex(where: { $0.id == id }) {
+                modals.remove(at: index)
+            }
+        } else {
+            modals.removeLast()
+        }
     }
     
     private func createModalDestination<V:View>(configuration: ModalConfiguration, destination: () -> V) -> AnyDestination {

@@ -24,6 +24,7 @@ struct ModalSupportView: View {
 
     let allowSimultaneous: Bool
     let transitions: [AnyModalWithDestination]
+    let onDismissModal: (AnyModalWithDestination) -> Void
     
     var currentTransition: TransitionOption {
         transitions.last?.configuration.transition ?? .slide
@@ -45,9 +46,9 @@ struct ModalSupportView: View {
                                 .edgesIgnoringSafeArea(.all)
                                 .transition(AnyTransition.opacity.animation(.easeInOut))
                                 .animation(data.configuration.animation, value: selection?.id)
-                            //                        .onTapGesture {
-                            //                            item.wrappedValue = nil
-                            //                        }
+                                .onTapGesture {
+                                    onDismissModal(data)
+                                }
                         } else {
                             EmptyView()
                         }
