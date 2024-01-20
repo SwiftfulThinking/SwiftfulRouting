@@ -36,31 +36,31 @@ struct TransitionSupportView: View {
     var body: some View {
         ZStack {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
-//                ZStack {
-//                    if let backgroundColor = data {
-//                        backgroundColor
-//                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                            .edgesIgnoringSafeArea(.all)
-//                            .transition(AnyTransition.opacity.animation(configuration.animation))
-//    //                        .onTapGesture {
-//    //                            item.wrappedValue = nil
-//    //                        }
-//                            .zIndex(1)
-//                    }
-//
-                data.destination.destination
-                        .id(data.id + currentTransition.rawValue)
-                        .transition(
-                            .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
-                            )
-                        )
-//                        .frame(configuration: configuration)
-//                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
-//    //                    .transition(configuration.transition)
-//                        .zIndex(3)
-//                }
+                ZStack {
+                    if let backgroundColor = data.configuration.backgroundColor {
+                        backgroundColor
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .edgesIgnoringSafeArea(.all)
+                            .transition(AnyTransition.opacity.animation(.easeInOut))
+                        //                        .onTapGesture {
+                        //                            item.wrappedValue = nil
+                        //                        }
+                            .zIndex(1)
+                    }
+                    //
+                    data.destination.destination
+                    //                        .frame(configuration: configuration)
+                    //                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
+                    //    //                    .transition(configuration.transition)
+                        .zIndex(3)
+                }
+                .id(data.id + currentTransition.rawValue)
+                .transition(
+                    .asymmetric(
+                        insertion: currentTransition.insertion,
+                        removal: currentTransition.removal
+                    )
+                )
             }
             .animation(.easeInOut, value: selection?.id)
         }
