@@ -43,14 +43,17 @@ struct ModalSupportView: View {
 //                    if showView1 {
                 if data.didDismiss {
                     EmptyView()
+                        .onAppear {
+                            print("did dismiss")
+                        }
                 } else {
                     data.destination.destination
                         .id(data.id + currentTransition.rawValue)
-                        .transition(.move(edge: .bottom))
                         .onTapGesture {
                             onDismissModal(data)
 //                                    showSelection = false
                         }
+                        .transition(.move(edge: .bottom))
                 }
 //                    } else {
 //                        if let backgroundColor = data.configuration.backgroundColor {
