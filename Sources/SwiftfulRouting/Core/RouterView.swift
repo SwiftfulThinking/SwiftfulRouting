@@ -619,13 +619,20 @@ extension RouterViewInternal {
     public func dismissModal(id: String? = nil) {
         if let id {
             if let index = modals.lastIndex(where: { $0.id == id && !$0.didDismiss }) {
-//                modals[index].dismiss()
-                modals.remove(at: index)
+                modals[index].dismiss()
+                
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 0)
+                    modals.remove(at: index)
+                }
             }
         } else {
             if let index = modals.lastIndex(where: { !$0.didDismiss }) {
-//                modals[index].dismiss()
-                modals.remove(at: index)
+                modals[index].dismiss()
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 0)
+                    modals.remove(at: index)
+                }
             }
         }
     }
