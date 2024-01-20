@@ -25,6 +25,7 @@ struct ModalSupportView: View {
     let allowSimultaneous: Bool
     let transitions: [AnyModalWithDestination]
     let onDismissModal: (AnyModalWithDestination) -> Void
+    @State private var showSelection: Bool = true
     
     var currentTransition: TransitionOption {
         transitions.last?.configuration.transition ?? .slide
@@ -35,19 +36,24 @@ struct ModalSupportView: View {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
-                        data.destination.destination
-                            .id(data.id + currentTransition.rawValue)
-                            .transition(data.configuration.transition.insertion)
-//                            .animation(data.configuration.animation, value: selection?.id)
+                        if showSelection {
+                            data.destination.destination
+                                .id(data.id + currentTransition.rawValue)
+                                .transition(data.configuration.transition.insertion)
+                                .animation(data.configuration.animation, value: selection?.id)
+                        } else {
+                            EmptyView()
+                        }
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.all)
                                 .transition(AnyTransition.opacity.animation(.easeInOut))
-//                                .animation(data.configuration.animation, value: selection?.id)
+                                .animation(data.configuration.animation, value: selection?.id)
                                 .onTapGesture {
-                                    onDismissModal(data)
+//                                    onDismissModal(data)
+                                    showSelection = false
                                 }
                         } else {
                             EmptyView()
@@ -55,7 +61,7 @@ struct ModalSupportView: View {
                     }
                 }
             }
-            .animation(.linear, value: selection?.id)
+            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
         }
         .onFirstAppear {
             selection = transitions.last
