@@ -38,7 +38,10 @@ struct TransitionSupportView: View {
             .animation(.default, value: selection?.id)
         }
         .onChange(of: destinationStack, perform: { newValue in
-            selection = newValue.last
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                selection = newValue.last
+            }
         })
     }
 }
