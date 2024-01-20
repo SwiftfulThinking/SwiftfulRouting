@@ -74,7 +74,7 @@ struct RouterViewInternal<Content:View>: View, Router {
 //    @State private var modalConfiguration: ModalConfiguration = .default
 //    @State private var modal: AnyDestination? = nil
     
-    @State private var modals: [(ModalConfiguration, AnyDestination)] = []
+    @State private var modals: [AnyDestination] = []
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
@@ -195,7 +195,7 @@ extension View {
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(items: [(ModalConfiguration, AnyDestination)]) -> some View {
+    func showingModal(items: [AnyDestination]) -> some View {
         modifier(ModalViewModifier(items: items))
     }
     
@@ -600,7 +600,7 @@ extension RouterViewInternal {
             let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
             let dest = AnyDestination(destination())
             
-            self.modals.append((config, dest))
+            self.modals.append(dest)
     }
     
     public func showModal<T:View>(
