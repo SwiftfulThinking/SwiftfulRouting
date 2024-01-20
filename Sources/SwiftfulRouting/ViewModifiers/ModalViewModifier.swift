@@ -26,14 +26,14 @@ extension View {
     @ViewBuilder func frame(configuration: ModalConfiguration) -> some View {
         if configuration.useDeviceBounds {
             self
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
                 .ignoresSafeArea()
                 .onAppear {
                     print("IGNORING")
                 }
         } else {
             self
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
                 .onAppear {
                     print("DONT IGNORE")
                 }
