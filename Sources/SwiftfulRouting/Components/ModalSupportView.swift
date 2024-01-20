@@ -44,7 +44,7 @@ struct ModalSupportView: View {
                         data.destination.destination
                             .frame(configuration: data.configuration)
                             .edgesIgnoringSafeArea(data.configuration.useDeviceBounds ? .all : [])
-                            .id(data.id + currentTransition.rawValue)
+//                            .id(data.id + currentTransition.rawValue)
                             .transition(data.configuration.transition.insertion)
                             .zIndex(2)
                     } else {
