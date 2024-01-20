@@ -39,7 +39,30 @@ struct ModalSupportView: View {
     var body: some View {
         ZStack {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
-//                LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
+                LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
+                    if showView1 {
+                        data.destination.destination
+                        .id(data.id + currentTransition.rawValue)
+//                        .onTapGesture {
+//                            onDismissModal(data)
+//        //                                    showSelection = false
+//                        }
+                        .transition(.move(edge: .bottom))
+                    } else {
+                        if let backgroundColor = data.configuration.backgroundColor {
+                            backgroundColor
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.all)
+                                .transition(AnyTransition.opacity.animation(.easeInOut))
+                                .onTapGesture {
+                                    onDismissModal(data)
+                                }
+                        } else {
+                            EmptyView()
+                        }
+                    }
+                    
+                    
 //                    if showView1 {
 //                ZStack {
 //                    if data.didDismiss {
@@ -56,13 +79,6 @@ struct ModalSupportView: View {
 //                            }
 //                    }
 //                }
-                data.destination.destination
-                .id(data.id + currentTransition.rawValue)
-                .onTapGesture {
-                    onDismissModal(data)
-//                                    showSelection = false
-                }
-                .transition(.move(edge: .bottom))
 //                    } else {
 //                        if let backgroundColor = data.configuration.backgroundColor {
 //                            backgroundColor
