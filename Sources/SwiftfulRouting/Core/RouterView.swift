@@ -616,22 +616,6 @@ extension RouterViewInternal {
             self.modals.append(AnyModalWithDestination(configuration: config, destination: dest))
     }
     
-    public func showModal<T:View>(
-        transition: AnyTransition,
-        animation: Animation,
-        alignment: Alignment,
-        backgroundColor: Color?,
-        backgroundEffect: BackgroundEffect?,
-        useDeviceBounds: Bool,
-        @ViewBuilder destination: @escaping () -> T) {
-//            guard self.modal == nil else {
-//                return
-//            }
-//            
-//            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds)
-//            self.modal = AnyDestination(destination())
-        }
-    
     public func dismissModal(id: String? = nil) {
         if let id {
             if let index = modals.lastIndex(where: { $0.id == id && !$0.didDismiss }) {

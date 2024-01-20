@@ -121,23 +121,11 @@ public struct AnyRouter: Router {
         @ViewBuilder destination: @escaping () -> T) where T : View {
         object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds, destination: destination)
     }
-    
-    /// Show any Modal over the current Environment.
-    public func showModal<T>(
-        transition: AnyTransition = AnyTransition.opacity.animation(.default),
-        animation: Animation = .default,
-        alignment: Alignment = .center,
-        backgroundColor: Color? = Color.black.opacity(0.001),
-        backgroundEffect: BackgroundEffect? = nil,
-        useDeviceBounds: Bool = true,
-        @ViewBuilder destination: @escaping () -> T) where T : View {
-        object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds, destination: destination)
-    }
-    
+        
     /// Convenience method for a simple modal appearing over the current Environment in the center of the screen.
     public func showBasicModal<T>(@ViewBuilder destination: @escaping () -> T) where T : View {
         showModal(
-            transition: AnyTransition.opacity.animation(.easeInOut),
+            transition: .opacity,
             animation: .easeInOut,
             alignment: .center,
             backgroundColor: Color.black.opacity(0.4),
@@ -201,10 +189,6 @@ struct MockRouter: Router {
     }
     
     func showModal<V>(transition: TransitionOption, animation: Animation, alignment: Alignment, backgroundColor: Color?, useDeviceBounds: Bool, destination: @escaping () -> V) where V : View {
-        printError()
-    }
-    
-    func showModal<V>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     
