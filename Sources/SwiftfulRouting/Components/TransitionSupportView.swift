@@ -13,34 +13,34 @@ struct TransitionSupportView: View {
     @State private var selection: AnyDestination? = nil
 
     let allowSimultaneous: Bool
-    let destinations: [AnyDestination]
+    let transitions: [(transition: TransitionOption, destination: AnyDestination)]
     
-//    var currentTransition: TransitionOption {
-//        destinations.last?.config.transition ?? .slide
-//    }
+    var currentTransition: TransitionOption {
+        transitions.last?.transition ?? .slide
+    }
     
-//    var destinationStack: [AnyDestination] {
-//        transitions.map({ $0.destination })
-//    }
+    var destinationStack: [AnyDestination] {
+        transitions.map({ $0.destination })
+    }
     
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: destinations) { data in
+            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: destinationStack) { data in
                 data.destination
-                    .id(data.id + (TransitionOption.bottom.rawValue))
+                    .id(data.id + currentTransition.rawValue)
                     .transition(
                         .asymmetric(
-                            insertion: .move(edge: .trailing),
-                            removal: .move(edge: .leading)
+                            insertion: currentTransition.insertion,
+                            removal: currentTransition.removal
                         )
                     )
             }
             .animation(.easeInOut, value: selection?.id)
         }
         .onFirstAppear {
-            selection = destinations.last
+            selection = destinationStack.last
         }
-        .onChange(of: destinations, perform: { newValue in
+        .onChange(of: destinationStack, perform: { newValue in
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 0)
                 selection = newValue.last
