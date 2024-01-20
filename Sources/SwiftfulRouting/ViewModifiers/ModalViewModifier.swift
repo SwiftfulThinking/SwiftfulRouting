@@ -25,9 +25,12 @@ extension View {
     
     @ViewBuilder func frame(configuration: ModalConfiguration) -> some View {
         if configuration.useDeviceBounds {
-            frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
+            self
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
+                .ignoresSafeArea()
         } else {
-            frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
+            self
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
         }
     }
     
