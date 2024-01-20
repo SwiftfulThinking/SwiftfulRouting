@@ -35,18 +35,43 @@ struct TransitionSupportView: View {
     
     var body: some View {
         ZStack {
-            if let backgroundColor = transitions.last?.configuration.backgroundColor {
-                backgroundColor
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .edgesIgnoringSafeArea(.all)
-                    .transition(AnyTransition.opacity.animation(.easeInOut))
-                //                        .onTapGesture {
-                //                            item.wrappedValue = nil
-                //                        }
-                    .zIndex(1)
-            }
+//            if let backgroundColor = transitions.last?.configuration.backgroundColor {
+//                backgroundColor
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                    .edgesIgnoringSafeArea(.all)
+//                    .transition(AnyTransition.opacity.animation(.easeInOut))
+//                //                        .onTapGesture {
+//                //                            item.wrappedValue = nil
+//                //                        }
+//                    .zIndex(1)
+//            }
             
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
+                LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
+                    if showView1 {
+                        data.destination.destination
+                            .id(data.id + currentTransition.rawValue)
+                            .transition(
+                                .asymmetric(
+                                    insertion: currentTransition.insertion,
+                                    removal: currentTransition.removal
+                                )
+                            )
+                    } else {
+                        if let backgroundColor = data.configuration.backgroundColor {
+                            backgroundColor
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.all)
+                                .transition(AnyTransition.opacity.animation(.easeInOut))
+                            //                        .onTapGesture {
+                            //                            item.wrappedValue = nil
+                            //                        }
+                                .zIndex(1)
+                        } else {
+                            EmptyView()
+                        }
+                    }
+                }
 //                ZStack {
 //                    if let backgroundColor = data.configuration.backgroundColor {
 //                        backgroundColor
@@ -59,14 +84,6 @@ struct TransitionSupportView: View {
 //                            .zIndex(1)
 //                    }
                     //
-                    data.destination.destination
-                        .id(data.id + currentTransition.rawValue)
-                        .transition(
-                            .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
-                            )
-                        )
                     //                        .frame(configuration: configuration)
                     //                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
                     //    //                    .transition(configuration.transition)
