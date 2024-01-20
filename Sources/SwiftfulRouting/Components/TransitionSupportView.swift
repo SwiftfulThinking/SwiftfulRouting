@@ -46,21 +46,23 @@ struct TransitionSupportView: View {
                         //                            item.wrappedValue = nil
                         //                        }
                             .zIndex(1)
+                            .compositingGroup()
                     }
                     //
                     data.destination.destination
-                        .id(data.id + currentTransition.rawValue)
-                        .transition(
-                            .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
-                            )
-                        )
+
                     //                        .frame(configuration: configuration)
                     //                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
                     //    //                    .transition(configuration.transition)
                         .zIndex(3)
                 }
+                .id(data.id + currentTransition.rawValue)
+                .transition(
+                    .asymmetric(
+                        insertion: currentTransition.insertion,
+                        removal: currentTransition.removal
+                    )
+                )
             }
             .animation(.easeInOut, value: selection?.id)
         }
