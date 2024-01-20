@@ -42,11 +42,9 @@ struct ModalSupportView: View {
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
                         data.destination.destination
+                            .frame(configuration: data.configuration)
+                            .edgesIgnoringSafeArea(data.configuration.useDeviceBounds ? .all : [])
                             .id(data.id + currentTransition.rawValue)
-                        //                        .onTapGesture {
-                        //                            onDismissModal(data)
-                        //        //                                    showSelection = false
-                        //                        }
                             .transition(data.configuration.transition.insertion)
                             .zIndex(2)
                     } else {
@@ -63,39 +61,6 @@ struct ModalSupportView: View {
                             EmptyView()
                         }
                     }
-                    
-                    
-//                    if showView1 {
-//                ZStack {
-//                    if data.didDismiss {
-//                        EmptyView()
-//                            .onAppear {
-//                                print("did dismiss")
-//                            }
-//                    } else {
-//                            .onAppear {
-//                                print("showing")
-//                            }
-//                            .onDisappear {
-//                                print("hiding")
-//                            }
-//                    }
-//                }
-//                    } else {
-//                        if let backgroundColor = data.configuration.backgroundColor {
-//                            backgroundColor
-//                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                                .edgesIgnoringSafeArea(.all)
-//                                .transition(AnyTransition.opacity.animation(.easeInOut))
-////                                .animation(data.configuration.animation, value: selection?.id)
-//                                .onTapGesture {
-//                                    onDismissModal(data)
-////                                    showSelection = false
-//                                }
-//                        } else {
-//                            EmptyView()
-//                        }
-//                    }
                 }
 //                .animation(transitions.last?.configuration.animation ?? .default, value: showSelection)
             }
