@@ -71,6 +71,7 @@ struct ModalSupportView: View {
 //                .animation(transitions.last?.configuration.animation ?? .default, value: showSelection)
             }
             .animation(.linear, value: selection?.id)
+            .animation(.linear, value: selection?.didDismiss)
 //            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
         }
         .onFirstAppear {
