@@ -28,9 +28,15 @@ extension View {
             self
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
                 .ignoresSafeArea()
+                .onAppear {
+                    print("IGNORING")
+                }
         } else {
             self
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
+                .onAppear {
+                    print("DONT IGNORE")
+                }
         }
     }
     
