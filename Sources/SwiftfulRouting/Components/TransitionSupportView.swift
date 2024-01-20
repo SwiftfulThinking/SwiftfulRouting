@@ -42,7 +42,6 @@ struct TransitionSupportView: View {
                             //                        .onTapGesture {
                             //                            item.wrappedValue = nil
                             //                        }
-                                .zIndex(1)
                         } else {
                             EmptyView()
                         }
