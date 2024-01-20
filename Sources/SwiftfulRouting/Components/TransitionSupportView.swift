@@ -42,7 +42,7 @@ struct TransitionSupportView: View {
         }
         .onChange(of: destinations, perform: { newValue in
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                try? await Task.sleep(nanoseconds: 0)
                 selection = newValue.last
             }
         })
