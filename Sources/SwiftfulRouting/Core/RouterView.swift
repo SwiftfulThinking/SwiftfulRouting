@@ -622,7 +622,7 @@ extension RouterViewInternal {
                 modals[index].dismiss()
                 
                 Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 0)
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
                     modals.remove(at: index)
                 }
             }
@@ -630,7 +630,7 @@ extension RouterViewInternal {
             if let index = modals.lastIndex(where: { !$0.didDismiss }) {
                 modals[index].dismiss()
                 Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 0)
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
                     modals.remove(at: index)
                 }
             }
