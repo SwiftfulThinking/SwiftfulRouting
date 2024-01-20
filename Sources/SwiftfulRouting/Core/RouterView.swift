@@ -74,8 +74,17 @@ struct RouterViewInternal<Content:View>: View, Router {
 //    @State private var modalConfiguration: ModalConfiguration = .default
 //    @State private var modal: AnyDestination? = nil
     
-    @State private var modals: [(transition: TransitionOption, destination: AnyDestination)] = [
-        (.identity, AnyDestination(EmptyView()))
+    @State private var modals: [AnyModelWithDestination] = [
+        AnyModelWithDestination(
+            configuration: ModalConfiguration(
+                transition: .identity,
+                animation: .default,
+                alignment: .center,
+                backgroundColor: nil,
+                useDeviceBounds: true
+            ),
+            destination: AnyDestination(EmptyView())
+        )
     ]
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
@@ -197,7 +206,7 @@ extension View {
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(items: [(transition: TransitionOption, destination: AnyDestination)]) -> some View {
+    func showingModal(items: [AnyModelWithDestination]) -> some View {
         modifier(ModalViewModifier(items: items))
     }
     
@@ -602,7 +611,7 @@ extension RouterViewInternal {
             let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
             let dest = createModalDestination(configuration: config, destination: destination)
             
-            self.modals.append((transition, dest))
+            self.modals.append(AnyModelWithDestination(configuration: config, destination: dest))
     }
     
     public func showModal<T:View>(
@@ -628,22 +637,22 @@ extension RouterViewInternal {
     private func createModalDestination<V:View>(configuration: ModalConfiguration, destination: () -> V) -> AnyDestination {
         AnyDestination(
             ZStack {
-                if let backgroundColor = configuration.backgroundColor {
-                    backgroundColor
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .edgesIgnoringSafeArea(.all)
-                        .transition(AnyTransition.opacity.animation(configuration.animation))
-//                        .onTapGesture {
-//                            item.wrappedValue = nil
-//                        }
-                        .zIndex(1)
-                }
+//                if let backgroundColor = configuration.backgroundColor {
+//                    backgroundColor
+//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                        .edgesIgnoringSafeArea(.all)
+//                        .transition(AnyTransition.opacity.animation(configuration.animation))
+////                        .onTapGesture {
+////                            item.wrappedValue = nil
+////                        }
+//                        .zIndex(1)
+//                }
 
                 destination()
-                    .frame(configuration: configuration)
-                    .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
-//                    .transition(configuration.transition)
-                    .zIndex(3)
+//                    .frame(configuration: configuration)
+//                    .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
+////                    .transition(configuration.transition)
+//                    .zIndex(3)
             }
             
 //            if let view = item.wrappedValue?.destination {

@@ -8,15 +8,25 @@
 import Foundation
 import SwiftUI
 
+struct AnyModelWithDestination: Identifiable, Equatable {
+    let id = UUID().uuidString
+    let configuration: ModalConfiguration
+    let destination: AnyDestination
+    
+    static func == (lhs: AnyModelWithDestination, rhs: AnyModelWithDestination) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 struct TransitionSupportView: View {
     
-    @State private var selection: AnyDestination? = nil
+    @State private var selection: AnyModelWithDestination? = nil
 
     let allowSimultaneous: Bool
-    let transitions: [(transition: TransitionOption, destination: AnyDestination)]
+    let transitions: [AnyModelWithDestination]
     
     var currentTransition: TransitionOption {
-        transitions.last?.transition ?? .slide
+        transitions.last?.configuration.transition ?? .slide
     }
     
     var destinationStack: [AnyDestination] {
@@ -25,22 +35,39 @@ struct TransitionSupportView: View {
     
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: destinationStack) { data in
-                data.destination
-                    .id(data.id + currentTransition.rawValue)
-                    .transition(
-                        .asymmetric(
-                            insertion: currentTransition.insertion,
-                            removal: currentTransition.removal
-                        )
-                    )
+            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
+//                ZStack {
+//                    if let backgroundColor = data {
+//                        backgroundColor
+//                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                            .edgesIgnoringSafeArea(.all)
+//                            .transition(AnyTransition.opacity.animation(configuration.animation))
+//    //                        .onTapGesture {
+//    //                            item.wrappedValue = nil
+//    //                        }
+//                            .zIndex(1)
+//                    }
+//
+                data.destination.destination
+//                        .id(data.id + currentTransition.rawValue)
+//                        .transition(
+//                            .asymmetric(
+//                                insertion: currentTransition.insertion,
+//                                removal: currentTransition.removal
+//                            )
+//                        )
+//                        .frame(configuration: configuration)
+//                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
+//    //                    .transition(configuration.transition)
+//                        .zIndex(3)
+//                }
             }
             .animation(.easeInOut, value: selection?.id)
         }
         .onFirstAppear {
-            selection = destinationStack.last
+            selection = transitions.last
         }
-        .onChange(of: destinationStack, perform: { newValue in
+        .onChange(of: transitions, perform: { newValue in
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 0)
                 selection = newValue.last

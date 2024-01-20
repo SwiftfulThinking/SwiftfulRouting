@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ModalViewModifier: ViewModifier {
     
-    let items: [(transition: TransitionOption, destination: AnyDestination)]
+    let items: [AnyModelWithDestination]
     
     func body(content: Content) -> some View {
         content
