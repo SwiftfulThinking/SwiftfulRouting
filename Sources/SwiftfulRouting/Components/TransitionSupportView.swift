@@ -35,7 +35,7 @@ struct TransitionSupportView: View {
                         )
                     )
             }
-            .animation(.default, value: selection?.id)
+            .animation(.easeInOut, value: selection?.id)
         }
         .onChange(of: destinations, perform: { newValue in
             Task { @MainActor in
