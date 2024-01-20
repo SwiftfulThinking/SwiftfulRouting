@@ -49,6 +49,12 @@ struct ModalSupportView: View {
                             }
                     } else {
                         data.destination.destination
+                            .onAppear {
+                                print("showing")
+                            }
+                            .onDisappear {
+                                print("hiding")
+                            }
                     }
                 }
                 .id(data.id + currentTransition.rawValue)
@@ -86,6 +92,7 @@ struct ModalSupportView: View {
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 0)
                 selection = newValue.last
+                print("on change to : \(newValue.last?.id ?? "")")
             }
         })
     }
