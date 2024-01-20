@@ -49,13 +49,13 @@ struct TransitionSupportView: View {
 //                    }
 //
                 data.destination.destination
-//                        .id(data.id + currentTransition.rawValue)
-//                        .transition(
-//                            .asymmetric(
-//                                insertion: currentTransition.insertion,
-//                                removal: currentTransition.removal
-//                            )
-//                        )
+                        .id(data.id + currentTransition.rawValue)
+                        .transition(
+                            .asymmetric(
+                                insertion: currentTransition.insertion,
+                                removal: currentTransition.removal
+                            )
+                        )
 //                        .frame(configuration: configuration)
 //                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
 //    //                    .transition(configuration.transition)
