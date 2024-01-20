@@ -10,12 +10,12 @@ import SwiftUI
 
 struct ModalViewModifier: ViewModifier {
     
-    let items: [AnyModelWithDestination]
+    let items: [AnyModalWithDestination]
     
     func body(content: Content) -> some View {
         content
             .overlay(
-                TransitionSupportView(allowSimultaneous: true, transitions: items)
+                ModalSupportView(allowSimultaneous: true, transitions: items)
 
 //                ZStack {
 //                    TransitionSupportView(allowSimultaneous: <#T##Bool#>, transitions: <#T##[(config: ModalConfiguration, destination: AnyDestination)]#>)

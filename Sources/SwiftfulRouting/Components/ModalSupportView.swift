@@ -8,22 +8,22 @@
 import Foundation
 import SwiftUI
 
-struct AnyModelWithDestination: Identifiable, Equatable {
+struct AnyModalWithDestination: Identifiable, Equatable {
     let id = UUID().uuidString
     let configuration: ModalConfiguration
     let destination: AnyDestination
     
-    static func == (lhs: AnyModelWithDestination, rhs: AnyModelWithDestination) -> Bool {
+    static func == (lhs: AnyModalWithDestination, rhs: AnyModalWithDestination) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-struct TransitionSupportView: View {
+struct ModalSupportView: View {
     
-    @State private var selection: AnyModelWithDestination? = nil
+    @State private var selection: AnyModalWithDestination? = nil
 
     let allowSimultaneous: Bool
-    let transitions: [AnyModelWithDestination]
+    let transitions: [AnyModalWithDestination]
     
     var currentTransition: TransitionOption {
         transitions.last?.configuration.transition ?? .slide

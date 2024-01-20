@@ -74,8 +74,8 @@ struct RouterViewInternal<Content:View>: View, Router {
 //    @State private var modalConfiguration: ModalConfiguration = .default
 //    @State private var modal: AnyDestination? = nil
     
-    @State private var modals: [AnyModelWithDestination] = [
-        AnyModelWithDestination(
+    @State private var modals: [AnyModalWithDestination] = [
+        AnyModalWithDestination(
             configuration: ModalConfiguration(
                 transition: .identity,
                 animation: .default,
@@ -206,7 +206,7 @@ extension View {
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(items: [AnyModelWithDestination]) -> some View {
+    func showingModal(items: [AnyModalWithDestination]) -> some View {
         modifier(ModalViewModifier(items: items))
     }
     
@@ -611,7 +611,7 @@ extension RouterViewInternal {
             let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
             let dest = createModalDestination(configuration: config, destination: destination)
             
-            self.modals.append(AnyModelWithDestination(configuration: config, destination: dest))
+            self.modals.append(AnyModalWithDestination(configuration: config, destination: dest))
     }
     
     public func showModal<T:View>(
