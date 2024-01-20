@@ -15,7 +15,9 @@ struct ModalViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .overlay(
-                TransitionSupportView(allowSimultaneous: true, destinations: items)
+                ZStack {
+                    TransitionSupportView(allowSimultaneous: true, destinations: items)
+                }
                 
 //                ZStack {
 //                    TransitionSupportView(allowSimultaneous: <#T##Bool#>, transitions: <#T##[(config: ModalConfiguration, destination: AnyDestination)]#>)
