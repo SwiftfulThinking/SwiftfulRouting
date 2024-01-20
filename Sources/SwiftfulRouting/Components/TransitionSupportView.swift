@@ -74,6 +74,7 @@ struct TransitionSupportView: View {
 //                }
             }
             .animation(.easeInOut, value: selection?.id)
+            .zIndex(2)
         }
         .onFirstAppear {
             selection = transitions.last
