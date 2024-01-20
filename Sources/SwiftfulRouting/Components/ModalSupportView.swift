@@ -36,12 +36,7 @@ struct ModalSupportView: View {
                     if showView1 {
                         data.destination.destination
                             .id(data.id + currentTransition.rawValue)
-                            .transition(
-                                .asymmetric(
-                                    insertion: currentTransition.insertion,
-                                    removal: currentTransition.removal
-                                )
-                            )
+                            .transition(data.configuration.transition.insertion)
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
@@ -57,7 +52,7 @@ struct ModalSupportView: View {
                     }
                 }
             }
-            .animation(.easeInOut, value: selection?.id)
+            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
         }
         .onFirstAppear {
             selection = transitions.last
@@ -475,3 +470,61 @@ extension Array where Element : Identifiable {
     }
 
 }
+
+
+
+
+/*
+ struct ModalSupportView: View {
+     
+     @State private var selection: AnyModalWithDestination? = nil
+
+     let allowSimultaneous: Bool
+     let transitions: [AnyModalWithDestination]
+     
+     var currentTransition: TransitionOption {
+         transitions.last?.configuration.transition ?? .slide
+     }
+     
+     var body: some View {
+         ZStack {
+             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
+                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
+                     if showView1 {
+                         data.destination.destination
+                             .id(data.id + currentTransition.rawValue)
+                             .transition(
+                                 .asymmetric(
+                                     insertion: currentTransition.insertion,
+                                     removal: currentTransition.removal
+                                 )
+                             )
+                     } else {
+                         if let backgroundColor = data.configuration.backgroundColor {
+                             backgroundColor
+                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                 .edgesIgnoringSafeArea(.all)
+                                 .transition(AnyTransition.opacity.animation(.easeInOut))
+                             //                        .onTapGesture {
+                             //                            item.wrappedValue = nil
+                             //                        }
+                         } else {
+                             EmptyView()
+                         }
+                     }
+                 }
+             }
+             .animation(.easeInOut, value: selection?.id)
+         }
+         .onFirstAppear {
+             selection = transitions.last
+         }
+         .onChange(of: transitions, perform: { newValue in
+             Task { @MainActor in
+                 try? await Task.sleep(nanoseconds: 0)
+                 selection = newValue.last
+             }
+         })
+     }
+ }
+ */
