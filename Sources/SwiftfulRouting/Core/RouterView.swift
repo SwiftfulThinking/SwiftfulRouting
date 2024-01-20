@@ -81,7 +81,7 @@ struct RouterViewInternal<Content:View>: View, Router {
                 animation: .default,
                 alignment: .center,
                 backgroundColor: nil,
-                useDeviceBounds: true
+                ignoreSafeArea: true
             ),
             destination: AnyDestination(EmptyView())
         )
@@ -607,10 +607,10 @@ extension RouterViewInternal {
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?, 
-        useDeviceBounds: Bool,
+        ignoreSafeArea: Bool,
         destination: @escaping () -> V) where V : View {
         
-            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
+            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea)
             let dest = createModalDestination(configuration: config, destination: destination)
             
             self.modals.append(AnyModalWithDestination(configuration: config, destination: dest))

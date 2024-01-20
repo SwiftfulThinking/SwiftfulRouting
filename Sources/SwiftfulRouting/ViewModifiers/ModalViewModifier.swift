@@ -24,19 +24,13 @@ struct ModalViewModifier: ViewModifier {
 extension View {
     
     @ViewBuilder func frame(configuration: ModalConfiguration) -> some View {
-        if configuration.useDeviceBounds {
+        if configuration.ignoreSafeArea {
             self
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
                 .ignoresSafeArea()
-                .onAppear {
-                    print("IGNORING")
-                }
         } else {
             self
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
-                .onAppear {
-                    print("DONT IGNORE")
-                }
         }
     }
     

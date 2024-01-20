@@ -13,14 +13,14 @@ public struct ModalConfiguration {
     let animation: Animation
     let alignment: Alignment
     let backgroundColor: Color?
-    let useDeviceBounds: Bool
+    let ignoreSafeArea: Bool
     
     static let `default` = ModalConfiguration(
         transition: .bottom,
         animation: .easeInOut,
         alignment: .bottom,
         backgroundColor: nil,
-        useDeviceBounds: true
+        ignoreSafeArea: true
     )
 }
 
