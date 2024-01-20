@@ -27,7 +27,7 @@ public protocol Router {
     
     func dismissAlert()
     
-    func showModal<V:View>(transition: TransitionOption, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, @ViewBuilder destination: @escaping () -> V)
+    func showModal<V:View>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, @ViewBuilder destination: @escaping () -> V)
     func dismissModal(id: String?)
     
     func showSafari(_ url: @escaping () -> URL)

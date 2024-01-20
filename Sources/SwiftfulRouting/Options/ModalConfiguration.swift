@@ -9,14 +9,14 @@ import Foundation
 import SwiftUI
 
 public struct ModalConfiguration {
-    let transition: TransitionOption
+    let transition: AnyTransition
     let animation: Animation
     let alignment: Alignment
     let backgroundColor: Color?
     let ignoreSafeArea: Bool
     
     static let `default` = ModalConfiguration(
-        transition: .bottom,
+        transition: .move(edge: .bottom),
         animation: .easeInOut,
         alignment: .bottom,
         backgroundColor: nil,

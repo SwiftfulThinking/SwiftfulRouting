@@ -113,7 +113,7 @@ public struct AnyRouter: Router {
     }
     
     public func showModal<T>(
-        transition: TransitionOption,
+        transition: AnyTransition,
         animation: Animation = .default,
         alignment: Alignment = .center,
         backgroundColor: Color? = Color.black.opacity(0.001),
@@ -188,7 +188,7 @@ struct MockRouter: Router {
         printError()
     }
     
-    func showModal<V>(transition: TransitionOption, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
+    func showModal<V>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     

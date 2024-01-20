@@ -31,11 +31,7 @@ struct ModalSupportView: View {
     let transitions: [AnyModalWithDestination]
     let onDismissModal: (AnyModalWithDestination) -> Void
     @State private var showSelection: Bool = true
-    
-    var currentTransition: TransitionOption {
-        transitions.last?.configuration.transition ?? .slide
-    }
-    
+        
     var body: some View {
         ZStack {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
@@ -43,9 +39,7 @@ struct ModalSupportView: View {
                     if showView1 {
                         data.destination.destination
                             .frame(configuration: data.configuration)
-//                            .edgesIgnoringSafeArea(data.configuration.useDeviceBounds ? .all : [])
-//                            .id(data.id + currentTransition.rawValue)
-                            .transition(data.configuration.transition.insertion)
+                            .transition(data.configuration.transition)
                             .zIndex(2)
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
@@ -62,7 +56,6 @@ struct ModalSupportView: View {
                         }
                     }
                 }
-//                .animation(transitions.last?.configuration.animation ?? .default, value: showSelection)
             }
             .animation(.linear, value: selection?.id)
             .animation(.linear, value: selection?.didDismiss)

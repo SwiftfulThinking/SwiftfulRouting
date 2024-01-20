@@ -603,7 +603,7 @@ extension RouterViewInternal {
 extension RouterViewInternal {
     
     public func showModal<V>(
-        transition: TransitionOption,
+        transition: AnyTransition,
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?, 
