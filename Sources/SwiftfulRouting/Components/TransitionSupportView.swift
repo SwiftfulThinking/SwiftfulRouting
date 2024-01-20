@@ -30,8 +30,8 @@ struct TransitionSupportView: View {
                     .id(data.id + (currentTransition.rawValue))
                     .transition(
                         .asymmetric(
-                            insertion: currentTransition.insertion,
-                            removal: currentTransition.removal
+                            insertion: .move(edge: .trailing),
+                            removal: .move(edge: .leading)
                         )
                     )
             }
