@@ -116,7 +116,7 @@ public struct AnyRouter: Router {
         transition: AnyTransition = .identity,
         animation: Animation = .smooth,
         alignment: Alignment = .center,
-        backgroundColor: Color? = Color.black.opacity(0.001),
+        backgroundColor: Color? = nil,
         ignoreSafeArea: Bool = true,
         @ViewBuilder destination: @escaping () -> T) where T : View {
         object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea, destination: destination)
