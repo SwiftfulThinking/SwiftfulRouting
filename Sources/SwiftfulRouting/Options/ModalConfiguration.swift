@@ -9,20 +9,19 @@ import Foundation
 import SwiftUI
 
 public struct ModalConfiguration {
-    let transition: AnyTransition
+    let transition: TransitionOption
     let animation: Animation
     let alignment: Alignment
     let backgroundColor: Color?
-    let backgroundEffect: BackgroundEffect?
     let useDeviceBounds: Bool
     
     static let `default` = ModalConfiguration(
-        transition: .move(edge: .bottom),
+        transition: .bottom,
         animation: .easeInOut,
         alignment: .bottom,
         backgroundColor: nil,
-        backgroundEffect: nil,
-        useDeviceBounds: true)
+        useDeviceBounds: true
+    )
 }
 
 public struct BackgroundEffect {

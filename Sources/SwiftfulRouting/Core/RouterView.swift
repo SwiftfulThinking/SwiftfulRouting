@@ -71,8 +71,10 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var alert: AnyAlert? = nil
     
     // Modals
-    @State private var modalConfiguration: ModalConfiguration = .default
-    @State private var modal: AnyDestination? = nil
+//    @State private var modalConfiguration: ModalConfiguration = .default
+//    @State private var modal: AnyDestination? = nil
+    
+    @State private var modals: [(ModalConfiguration, AnyDestination)] = []
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
@@ -117,7 +119,7 @@ struct RouterViewInternal<Content:View>: View, Router {
                 .showingAlert(option: alertOption, item: $alert)
                 .environment(\.router, router)
         }
-        .showingModal(configuration: modalConfiguration, item: $modal)
+        .showingModal(items: modals)
     }
             
 }
@@ -193,8 +195,8 @@ extension View {
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
-        modifier(ModalViewModifier(configuration: configuration, item: item))
+    func showingModal(items: [(ModalConfiguration, AnyDestination)]) -> some View {
+        modifier(ModalViewModifier(items: items))
     }
     
 }
@@ -587,6 +589,20 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
+    public func showModal<V>(
+        transition: TransitionOption,
+        animation: Animation,
+        alignment: Alignment,
+        backgroundColor: Color?, 
+        useDeviceBounds: Bool,
+        destination: @escaping () -> V) where V : View {
+        
+            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds)
+            let dest = AnyDestination(destination())
+            
+            self.modals.append((config, dest))
+    }
+    
     public func showModal<T:View>(
         transition: AnyTransition,
         animation: Animation,
@@ -595,16 +611,16 @@ extension RouterViewInternal {
         backgroundEffect: BackgroundEffect?,
         useDeviceBounds: Bool,
         @ViewBuilder destination: @escaping () -> T) {
-            guard self.modal == nil else {
-                return
-            }
-            
-            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds)
-            self.modal = AnyDestination(destination())
+//            guard self.modal == nil else {
+//                return
+//            }
+//            
+//            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds)
+//            self.modal = AnyDestination(destination())
         }
     
     public func dismissModal() {
-        self.modal = nil
+//        self.modal = nil
     }
 
 }

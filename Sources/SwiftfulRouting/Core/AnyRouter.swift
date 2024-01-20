@@ -112,6 +112,16 @@ public struct AnyRouter: Router {
         object.dismissAlert()
     }
     
+    public func showModal<T>(
+        transition: TransitionOption,
+        animation: Animation = .default,
+        alignment: Alignment = .center,
+        backgroundColor: Color? = Color.black.opacity(0.001),
+        useDeviceBounds: Bool = true,
+        @ViewBuilder destination: @escaping () -> T) where T : View {
+        object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, useDeviceBounds: useDeviceBounds, destination: destination)
+    }
+    
     /// Show any Modal over the current Environment.
     public func showModal<T>(
         transition: AnyTransition = AnyTransition.opacity.animation(.default),
@@ -187,6 +197,10 @@ struct MockRouter: Router {
     }
     
     func dismissAlert() {
+        printError()
+    }
+    
+    func showModal<V>(transition: TransitionOption, animation: Animation, alignment: Alignment, backgroundColor: Color?, useDeviceBounds: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     
