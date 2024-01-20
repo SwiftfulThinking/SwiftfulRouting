@@ -36,21 +36,16 @@ struct ModalSupportView: View {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
-                        if showSelection {
-                            data.destination.destination
-                                .id(data.id + currentTransition.rawValue)
-                                .transition(data.configuration.transition.insertion)
-                                .animation(data.configuration.animation, value: selection?.id)
-                        } else {
-                            EmptyView()
-                        }
+                        data.destination.destination
+                            .id(data.id + currentTransition.rawValue)
+                            .transition(.move(edge: .bottom))
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.all)
                                 .transition(AnyTransition.opacity.animation(.easeInOut))
-                                .animation(data.configuration.animation, value: selection?.id)
+//                                .animation(data.configuration.animation, value: selection?.id)
                                 .onTapGesture {
 //                                    onDismissModal(data)
                                     showSelection = false
@@ -60,9 +55,9 @@ struct ModalSupportView: View {
                         }
                     }
                 }
+                .animation(transitions.last?.configuration.animation ?? .default, value: showSelection)
             }
             .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
-            .animation(transitions.last?.configuration.animation ?? .default, value: showSelection)
         }
         .onFirstAppear {
             selection = transitions.last
