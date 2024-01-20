@@ -113,8 +113,8 @@ public struct AnyRouter: Router {
     }
     
     public func showModal<T>(
-        transition: AnyTransition,
-        animation: Animation = .default,
+        transition: AnyTransition = .identity,
+        animation: Animation = .smooth,
         alignment: Alignment = .center,
         backgroundColor: Color? = Color.black.opacity(0.001),
         ignoreSafeArea: Bool = true,
