@@ -29,23 +29,8 @@ struct TransitionSupportView: View {
         transitions.last?.configuration.transition ?? .slide
     }
     
-    var destinationStack: [AnyDestination] {
-        transitions.map({ $0.destination })
-    }
-    
     var body: some View {
         ZStack {
-//            if let backgroundColor = transitions.last?.configuration.backgroundColor {
-//                backgroundColor
-//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                    .edgesIgnoringSafeArea(.all)
-//                    .transition(AnyTransition.opacity.animation(.easeInOut))
-//                //                        .onTapGesture {
-//                //                            item.wrappedValue = nil
-//                //                        }
-//                    .zIndex(1)
-//            }
-            
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
@@ -72,26 +57,8 @@ struct TransitionSupportView: View {
                         }
                     }
                 }
-//                ZStack {
-//                    if let backgroundColor = data.configuration.backgroundColor {
-//                        backgroundColor
-//                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                            .edgesIgnoringSafeArea(.all)
-//                            .transition(AnyTransition.opacity.animation(.easeInOut))
-//                        //                        .onTapGesture {
-//                        //                            item.wrappedValue = nil
-//                        //                        }
-//                            .zIndex(1)
-//                    }
-                    //
-                    //                        .frame(configuration: configuration)
-                    //                        .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
-                    //    //                    .transition(configuration.transition)
-//                        .zIndex(3)
-//                }
             }
             .animation(.easeInOut, value: selection?.id)
-            .zIndex(2)
         }
         .onFirstAppear {
             selection = transitions.last
