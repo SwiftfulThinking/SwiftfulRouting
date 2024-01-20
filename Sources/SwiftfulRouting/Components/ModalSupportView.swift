@@ -94,7 +94,7 @@ struct ModalSupportView: View {
 //                            EmptyView()
 //                        }
 //                    }
-//                }
+                }
 //                .animation(transitions.last?.configuration.animation ?? .default, value: showSelection)
             }
             .animation(.linear, value: selection?.id)
