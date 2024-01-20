@@ -37,6 +37,9 @@ struct TransitionSupportView: View {
             }
             .animation(.easeInOut, value: selection?.id)
         }
+        .onFirstAppear {
+            selection = destinations.last
+        }
         .onChange(of: destinations, perform: { newValue in
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
