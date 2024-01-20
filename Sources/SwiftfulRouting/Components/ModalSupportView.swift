@@ -38,14 +38,14 @@ struct ModalSupportView: View {
                         data.destination.destination
                             .id(data.id + currentTransition.rawValue)
                             .transition(data.configuration.transition.insertion)
-                            .animation(data.configuration.animation, value: selection?.id)
+//                            .animation(data.configuration.animation, value: selection?.id)
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.all)
                                 .transition(AnyTransition.opacity.animation(.easeInOut))
-                                .animation(data.configuration.animation, value: selection?.id)
+//                                .animation(data.configuration.animation, value: selection?.id)
                                 .onTapGesture {
                                     onDismissModal(data)
                                 }
@@ -55,7 +55,7 @@ struct ModalSupportView: View {
                     }
                 }
             }
-            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
+            .animation(.linear, value: selection?.id)
         }
         .onFirstAppear {
             selection = transitions.last
