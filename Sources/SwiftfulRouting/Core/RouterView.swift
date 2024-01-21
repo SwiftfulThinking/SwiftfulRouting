@@ -702,7 +702,7 @@ extension RouterViewInternal {
         print(selectedTransition)
         if let index = allTransitions.firstIndex(where: { $0.id == self.selectedTransition.id }), allTransitions.indices.contains(index - 1) {
             
-//            self.transition = option
+            self.transition = transition.reversed
 
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_000_000)

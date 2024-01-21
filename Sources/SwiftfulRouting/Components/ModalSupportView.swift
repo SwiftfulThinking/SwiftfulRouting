@@ -133,5 +133,64 @@ public enum TransitionOption: String, CaseIterable {
 
         }
     }
+    
+    var reversed: TransitionOption {
+        switch self {
+        case .trailing: return .leading
+        case .trailingCover: return .leadingCover
+        case .leading: return .trailing
+        case .leadingCover: return .trailingCover
+        case .top: return .bottom
+        case .topCover: return .bottomCover
+        case .bottom: return .top
+        case .bottomCover: return .topCover
+        case .identity: return .identity
+        }
+    }
+    
+    var reverseInsertion: AnyTransition {
+        switch self {
+        case .trailing, .trailingCover:
+            return .move(edge: .leading)
+        case .leading, .leadingCover:
+            return .move(edge: .trailing)
+        case .top, .topCover:
+            return .move(edge: .bottom)
+        case .bottom, .bottomCover:
+            return .move(edge: .top)
+//        case .scale:
+//            return .scale.animation(.default)
+//        case .opacity:
+//            return .opacity.animation(.default)
+//        case .slide, .slideCover:
+//            return .slide.animation(.default)
+        case .identity:
+            return .identity
+        }
+    }
+    
+    var reverseRemoval: AnyTransition {
+        switch self {
+        case .trailingCover, .leadingCover, .topCover, .bottomCover:
+            return AnyTransition.opacity.animation(.easeInOut.delay(1))
+        case .trailing:
+            return .move(edge: .trailing)
+        case .leading:
+            return .move(edge: .leading)
+        case .top:
+            return .move(edge: .top)
+        case .bottom:
+            return .move(edge: .bottom)
+//        case .scale:
+//            return .scale.animation(.easeInOut)
+//        case .opacity:
+//            return .opacity.animation(.easeInOut)
+//        case .slide:
+//            return .slide.animation(.easeInOut)
+        case .identity:
+            return .identity
+
+        }
+    }
 }
 
