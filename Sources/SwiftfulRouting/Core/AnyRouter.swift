@@ -142,12 +142,12 @@ public struct AnyRouter: Router {
         object.dismissAllModals()
     }
     
-    public func transitionScreen<T>(id: String? = nil, _ option: TransitionOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.transitionScreen(id: id, option, destination: destination)
+    public func transitionScreen<T>(_ option: TransitionOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
+        object.transitionScreen(option, destination: destination)
     }
     
-    public func dismissTransition(id: String? = nil) {
-        
+    public func dismissTransition() {
+        object.dismissTransition()
     }
     
     public func dismissAllTransitions() {
@@ -217,11 +217,11 @@ struct MockRouter: Router {
         printError()
     }
     
-    func transitionScreen<T>(id: String?, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+    func transitionScreen<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
         printError()
     }
     
-    func dismissTransition(id: String?) {
+    func dismissTransition() {
         printError()
     }
     

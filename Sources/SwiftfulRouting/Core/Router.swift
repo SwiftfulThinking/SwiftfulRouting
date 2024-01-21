@@ -31,8 +31,8 @@ public protocol Router {
     func dismissModal(id: String?)
     func dismissAllModals()
     
-    func transitionScreen<T>(id: String?, _ option: TransitionOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View
-    func dismissTransition(id: String?)
+    func transitionScreen<T>(_ option: TransitionOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View
+    func dismissTransition()
     func dismissAllTransitions()
 
         

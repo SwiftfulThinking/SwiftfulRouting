@@ -10,6 +10,7 @@ import SwiftUI
 
 struct AnyTransitionWithDestination: Identifiable, Equatable {
     let id: String
+    let transition: TransitionOption
     let destination: (AnyRouter) -> AnyDestination
     
 //    init<T:View>(id: String, transition: TransitionOption = .trailing, destination: (AnyRouter) -> T) {
@@ -19,7 +20,7 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
 //    }
     
     static var root: AnyTransitionWithDestination {
-        AnyTransitionWithDestination(id: "root", destination: { _ in
+        AnyTransitionWithDestination(id: "root", transition: .identity, destination: { _ in
             AnyDestination(EmptyView())
         })
     }

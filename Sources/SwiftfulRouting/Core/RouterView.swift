@@ -661,7 +661,7 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
-    func transitionScreen<T>(id: String?, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+    func transitionScreen<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
 //        if let id, let existing = transitionScreens.first(where: { $0.id == id }) {
 //            transitionScreen = existing
 //        } else {
@@ -674,7 +674,8 @@ extension RouterViewInternal {
             
             
             let new = AnyTransitionWithDestination(
-                id: id ?? UUID().uuidString,
+                id: UUID().uuidString,
+                transition: option,
                 destination: { router in
                 AnyDestination(destination(router))
             })
@@ -695,7 +696,18 @@ extension RouterViewInternal {
 //        }
     }
     
-    func dismissTransition(id: String?) {
+    func dismissTransition() {
+        if let index = allTransitions.firstIndex(where: { $0.id == self.selectedTransition.id }), allTransitions.indices.contains(index - 1) {
+            
+//            self.transition = option
+
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_000_000)
+                
+                self.selectedTransition = allTransitions[index - 1]
+            }
+
+        }
 //        if let id {
 //            if let index = transitionScreens.firstIndex(where: { $0.id == id }), transitionScreens.indices.contains(index - 1) {
 //                transitionScreen = transitionScreens[index - 1]
