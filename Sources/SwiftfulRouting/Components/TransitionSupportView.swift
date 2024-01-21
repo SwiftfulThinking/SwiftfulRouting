@@ -47,7 +47,7 @@ struct TransitionSupportView<Content:View>: View {
 //                            .move(edge: .trailing)
                             .asymmetric(
                                 insertion: currentTransition.insertion,
-                                removal: TransitionOption.trailingCover.removal
+                                removal: .customRemoval(direction: currentTransition.reversed)
                             )
                         )
 //                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
@@ -61,7 +61,7 @@ struct TransitionSupportView<Content:View>: View {
 //                            .move(edge: .trailing)
                             .asymmetric(
                                 insertion: currentTransition.insertion,
-                                removal: TransitionOption.trailingCover.removal
+                                removal: .customRemoval(direction: currentTransition.reversed)
                             )
                         )
 //                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
@@ -69,5 +69,118 @@ struct TransitionSupportView<Content:View>: View {
             }
             .animation(.easeInOut, value: selection.id)
         }
+    }
+}
+
+struct CustomRemovalTransition: ViewModifier {
+    let option: TransitionOption?
+    @State private var frame: CGRect = .zero
+
+    func body(content: Content) -> some View {
+        content
+            .readingFrame { frame in
+                self.frame = frame
+            }
+            .offset(x: xOffset, y: yOffset)
+//            .overlay(
+//                Text(frame.debugDescription)
+//                    .foregroundColor(.white)
+//            )
+//            .offset(x: x, y: y)
+    }
+    
+    private var xOffset: CGFloat {
+        switch option {
+        case .trailing:
+            return frame.width
+        case .trailingCover:
+            return 0
+        case .leading:
+            return -frame.width
+        case .leadingCover:
+            return 0
+        case .top:
+            return 0
+        case .topCover:
+            return 0
+        case .bottom:
+            return 0
+        case .bottomCover:
+            return 0
+        case nil:
+            return 0
+        }
+    }
+    
+    private var yOffset: CGFloat {
+        switch option {
+        case .trailing:
+            return 0
+        case .trailingCover:
+            return 0
+        case .leading:
+            return 0
+        case .leadingCover:
+            return 0
+        case .top:
+            return -frame.height
+        case .topCover:
+            return 0
+        case .bottom:
+            return frame.height
+        case .bottomCover:
+            return 0
+        case nil:
+            return 0
+        }
+    }
+}
+
+extension AnyTransition {
+    
+    static func customRemoval(direction: TransitionOption) -> AnyTransition {
+        .modifier(
+            active: CustomRemovalTransition(option: direction),
+            identity: CustomRemovalTransition(option: nil)
+        )
+    }
+    
+}
+
+@available(iOS 14, *)
+/// Adds a transparent View and read it's frame.
+///
+/// Adds a GeometryReader with infinity frame.
+public struct FrameReader: View {
+    
+    let coordinateSpace: CoordinateSpace
+    let onChange: (_ frame: CGRect) -> Void
+    
+    public init(coordinateSpace: CoordinateSpace, onChange: @escaping (_ frame: CGRect) -> Void) {
+        self.coordinateSpace = coordinateSpace
+        self.onChange = onChange
+    }
+
+    public var body: some View {
+        GeometryReader { geo in
+            Text("")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear(perform: {
+                    onChange(geo.frame(in: coordinateSpace))
+                })
+                .onChange(of: geo.frame(in: coordinateSpace), perform: onChange)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+@available(iOS 14, *)
+public extension View {
+    
+    /// Get the frame of the View
+    ///
+    /// Adds a GeometryReader to the background of a View.
+    func readingFrame(coordinateSpace: CoordinateSpace = .global, onChange: @escaping (_ frame: CGRect) -> ()) -> some View {
+        background(FrameReader(coordinateSpace: coordinateSpace, onChange: onChange))
     }
 }
