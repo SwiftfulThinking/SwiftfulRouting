@@ -143,7 +143,7 @@ public struct AnyRouter: Router {
     }
     
     public func transitionScreen<T>(id: String? = nil, _ option: TransitionOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        
+        object.transitionScreen(id: id, option, destination: destination)
     }
     
     public func dismissTransition(id: String? = nil) {
@@ -151,7 +151,7 @@ public struct AnyRouter: Router {
     }
     
     public func dismissAllTransitions() {
-        
+        object.dismissAllTransitions()
     }
     
     /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
