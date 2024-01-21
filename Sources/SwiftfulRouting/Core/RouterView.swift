@@ -707,6 +707,9 @@ extension RouterViewInternal {
                 try? await Task.sleep(nanoseconds: 1_000_000)
                 
                 self.selectedTransition = allTransitions[index - 1]
+                
+                try? await Task.sleep(nanoseconds: 25_000)
+                allTransitions.remove(at: index)
             }
 
         }
