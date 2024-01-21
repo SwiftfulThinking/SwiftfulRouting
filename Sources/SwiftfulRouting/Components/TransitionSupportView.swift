@@ -13,12 +13,6 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
     let transition: TransitionOption
     let destination: (AnyRouter) -> AnyDestination
     
-//    init<T:View>(id: String, transition: TransitionOption = .trailing, destination: (AnyRouter) -> T) {
-//        self.id = id
-//        self.transition = transition
-//        self.destination = AnyDestination(destination(<#AnyRouter#>))
-//    }
-    
     static var root: AnyTransitionWithDestination {
         AnyTransitionWithDestination(id: "root", transition: .identity, destination: { _ in
             AnyDestination(EmptyView())
@@ -50,9 +44,6 @@ struct TransitionSupportView<Content:View>: View {
                                 removal: currentTransition.removal
                             )
                         )
-                        .onAppear {
-                            print("content appeared")
-                        }
                         .id(data.id + currentTransition.rawValue)
                 } else {
                     data.destination(router).destination
@@ -67,17 +58,5 @@ struct TransitionSupportView<Content:View>: View {
             }
             .animation(.easeInOut, value: selection.id)
         }
-//        .onFirstAppear {
-//            selection = transitions.last
-//        }
-        .onChange(of: transitions, perform: { newValue in
-//            Task { @MainActor in
-//                try? await Task.sleep(nanoseconds: 0)
-//                if let new = newValue.last(where: { !$0.didDismiss }), self.selection?.id != new.id {
-//                    self.selection = new
-                    print("on change to : \(selection.id)")
-//                }
-//            }
-        })
     }
 }
