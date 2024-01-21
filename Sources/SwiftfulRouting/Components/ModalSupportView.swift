@@ -58,8 +58,6 @@ struct ModalSupportView: View {
                 }
             }
             .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
-//            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.didDismiss)
-//            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
         }
         .onFirstAppear {
             selection = transitions.last
@@ -67,8 +65,10 @@ struct ModalSupportView: View {
         .onChange(of: transitions, perform: { newValue in
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 0)
-                selection = newValue.last(where: { !$0.didDismiss })
-                print("on change to : \(selection?.id ?? "")")
+                if let new = newValue.last(where: { !$0.didDismiss }), self.selection?.id != new.id {
+                    self.selection = new
+                    print("on change to : \(new.id)")
+                }
             }
         })
     }
