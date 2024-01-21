@@ -21,6 +21,20 @@ struct AnyModalWithDestination: Identifiable, Equatable {
     mutating func dismiss() {
         didDismiss = true
     }
+    
+    static var origin: AnyModalWithDestination {
+        AnyModalWithDestination(
+            id: "origin",
+            configuration: ModalConfiguration(
+                transition: .identity,
+                animation: .default,
+                alignment: .center,
+                backgroundColor: nil,
+                ignoreSafeArea: true
+            ),
+            destination: AnyDestination(EmptyView())
+        )
+    }
 }
 
 struct ModalSupportView: View {

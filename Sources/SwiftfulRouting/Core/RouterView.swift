@@ -71,22 +71,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var alert: AnyAlert? = nil
     
     // Modals
-//    @State private var modalConfiguration: ModalConfiguration = .default
-//    @State private var modal: AnyDestination? = nil
-    
-    @State private var modals: [AnyModalWithDestination] = [
-        AnyModalWithDestination(
-            id: "origin",
-            configuration: ModalConfiguration(
-                transition: .identity,
-                animation: .default,
-                alignment: .center,
-                backgroundColor: nil,
-                ignoreSafeArea: true
-            ),
-            destination: AnyDestination(EmptyView())
-        )
-    ]
+    @State private var modals: [AnyModalWithDestination] = [.origin]
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
