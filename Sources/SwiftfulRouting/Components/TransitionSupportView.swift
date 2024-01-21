@@ -37,7 +37,10 @@ struct TransitionSupportView<Content:View>: View {
         ZStack {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
-                    content
+                    ZStack {
+                        content
+                    }
+                    .id(data.id)
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
