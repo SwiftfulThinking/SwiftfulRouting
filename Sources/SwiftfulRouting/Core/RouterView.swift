@@ -97,7 +97,6 @@ struct RouterViewInternal<Content:View>: View, Router {
         
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
-
     }
     
     public var body: some View {
@@ -107,17 +106,9 @@ struct RouterViewInternal<Content:View>: View, Router {
                 router: router,
                 selection: $selectedTransition,
                 transitions: allTransitions,
-                content: {
-                    content(router)
-                        .onAppear {
-                            print("B")
-                        }
-                },
+                content: content,
                 currentTransition: transition
             )
-            .onAppear {
-                print("C")
-            }
             .showingScreen(
                 option: segueOption,
                 screens: $screens,
