@@ -107,24 +107,24 @@ struct RouterViewInternal<Content:View>: View, Router {
                 transitions: transitionScreens,
                 content: {
                     content(router)
-                        .showingScreen(
-                            option: segueOption,
-                            screens: $screens,
-                            screenStack: screenStack,
-                            sheetDetents: sheetDetents,
-                            sheetSelection: sheetSelection,
-                            sheetSelectionEnabled: sheetSelectionEnabled,
-                            showDragIndicator: showDragIndicator,
-                            onDismiss: onDismissOfSheet
-                        )
-                        .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                        .onFirstAppear(perform: {
-                            updateRouteIsPresented(route: route, isPresented: true)
-                        })
-                        .showingAlert(option: alertOption, item: $alert)
-                        .environment(\.router, router)
                 }
             )
+            .showingScreen(
+                option: segueOption,
+                screens: $screens,
+                screenStack: screenStack,
+                sheetDetents: sheetDetents,
+                sheetSelection: sheetSelection,
+                sheetSelectionEnabled: sheetSelectionEnabled,
+                showDragIndicator: showDragIndicator,
+                onDismiss: onDismissOfSheet
+            )
+            .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+            .onFirstAppear(perform: {
+                updateRouteIsPresented(route: route, isPresented: true)
+            })
+            .showingAlert(option: alertOption, item: $alert)
+            .environment(\.router, router)
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)
