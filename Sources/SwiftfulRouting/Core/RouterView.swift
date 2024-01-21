@@ -667,7 +667,10 @@ extension RouterViewInternal {
 //            let destination = AnyDestination(<#T##destination: View##View#>)
 //            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
 
-            self.transitionScreens.append(AnyTransitionWithDestination(id: id ?? UUID().uuidString, transition: option, destination: AnyDestination(RouterViewInternal<T>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil)))
+            let newTransition = AnyTransitionWithDestination(id: id ?? UUID().uuidString, transition: option, destination: AnyDestination(RouterViewInternal<T>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+            self.transitionScreens.append(newTransition)
+            
+            self.transitionScreen = newTransition
 
 //            self.transitionScreens.append(AnyTransitionWithDestination(id: UUID().uuidString, transition: option, destination: destination))
         }
