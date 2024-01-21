@@ -40,31 +40,20 @@ struct TransitionSupportView<Content:View>: View {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
                     content
-                        .onAppear {
-                            print("A")
-                        }
                         .transition(
-//                            .move(edge: .trailing)
                             .asymmetric(
                                 insertion: currentTransition.insertion,
                                 removal: .customRemoval(direction: currentTransition.reversed)
                             )
                         )
-//                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
-//                        .id(data.id + currentTransition.rawValue)
-                        .onAppear {
-                            print("F")
-                        }
                 } else {
                     data.destination(router).destination
                         .transition(
-//                            .move(edge: .trailing)
                             .asymmetric(
                                 insertion: currentTransition.insertion,
                                 removal: .customRemoval(direction: currentTransition.reversed)
                             )
                         )
-//                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
                 }
             }
             .animation(.easeInOut, value: selection.id)
@@ -82,11 +71,6 @@ struct CustomRemovalTransition: ViewModifier {
                 self.frame = frame
             }
             .offset(x: xOffset, y: yOffset)
-//            .overlay(
-//                Text(frame.debugDescription)
-//                    .foregroundColor(.white)
-//            )
-//            .offset(x: x, y: y)
     }
     
     private var xOffset: CGFloat {
@@ -164,7 +148,6 @@ public struct FrameReader: View {
     public var body: some View {
         GeometryReader { geo in
             Text("")
-                .ignoresSafeArea()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .onAppear(perform: {
                     onChange(geo.frame(in: coordinateSpace))
