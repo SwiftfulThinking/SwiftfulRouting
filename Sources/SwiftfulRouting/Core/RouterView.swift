@@ -134,10 +134,16 @@ struct RouterViewInternal<Content:View>: View, Router {
             })
             .showingAlert(option: alertOption, item: $alert)
             .environment(\.router, router)
+            .onAppear {
+                print("D")
+            }
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)
         })
+        .onAppear {
+            print("D")
+        }
     }
             
 }
