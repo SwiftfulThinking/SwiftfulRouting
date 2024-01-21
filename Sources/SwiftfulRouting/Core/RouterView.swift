@@ -662,26 +662,15 @@ extension RouterViewInternal {
 extension RouterViewInternal {
     
     func transitionScreen<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
-//        if let id, let existing = transitionScreens.first(where: { $0.id == id }) {
-//            transitionScreen = existing
-//        } else {
-            
-            
-//            let destination = AnyDestination(<#T##destination: View##View#>)
-//            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
-
-//            let newTransition = AnyTransitionWithDestination(id: id ?? UUID().uuidString, transition: option, destination: AnyDestination(RouterViewInternal<T>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
-            
-            
-            let new = AnyTransitionWithDestination(
-                id: UUID().uuidString,
-                transition: option,
-                destination: { router in
+        let new = AnyTransitionWithDestination(
+            id: UUID().uuidString,
+            transition: option,
+            destination: { router in
                 AnyDestination(destination(router))
-            })
+            }
+        )
         
         self.transition = option
-        
         
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_000_000)
@@ -689,17 +678,9 @@ extension RouterViewInternal {
             self.allTransitions.append(new)
             self.selectedTransition = new
         }
-
-            print("DID APPEND")
-            print("DID SET NEW: \(new)")
-//            self.transitionScreens.append(AnyTransitionWithDestination(id: UUID().uuidString, transition: option, destination: destination))
-//        }
     }
     
     func dismissTransition() {
-        print("dismissing")
-        print(allTransitions)
-        print(selectedTransition)
         if let index = allTransitions.firstIndex(where: { $0.id == self.selectedTransition.id }), allTransitions.indices.contains(index - 1) {
             self.transition = allTransitions[index].transition.reversed
 
@@ -713,13 +694,6 @@ extension RouterViewInternal {
             }
 
         }
-//        if let id {
-//            if let index = transitionScreens.firstIndex(where: { $0.id == id }), transitionScreens.indices.contains(index - 1) {
-//                transitionScreen = transitionScreens[index - 1]
-//            }
-//        } else {
-//
-//        }
     }
     
     func dismissAllTransitions() {
