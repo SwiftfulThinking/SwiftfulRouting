@@ -74,7 +74,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var modals: [AnyModalWithDestination] = [.origin]
     
     // Transitions
-    @State private var transition: TransitionOption = .identity
+    @State private var transition: TransitionOption = .trailing
     @State private var selectedTransition: AnyTransitionWithDestination = .root
     @State private var allTransitions: [AnyTransitionWithDestination] = [.root]
 
@@ -109,9 +109,15 @@ struct RouterViewInternal<Content:View>: View, Router {
                 transitions: allTransitions,
                 content: {
                     content(router)
+                        .onAppear {
+                            print("B")
+                        }
                 },
                 currentTransition: transition
             )
+            .onAppear {
+                print("C")
+            }
             .showingScreen(
                 option: segueOption,
                 screens: $screens,
@@ -128,10 +134,16 @@ struct RouterViewInternal<Content:View>: View, Router {
             })
             .showingAlert(option: alertOption, item: $alert)
             .environment(\.router, router)
+            .onAppear {
+                print("D")
+            }
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)
         })
+        .onAppear {
+            print("D")
+        }
     }
             
 }

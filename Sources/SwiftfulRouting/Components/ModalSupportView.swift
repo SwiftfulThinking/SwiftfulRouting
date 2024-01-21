@@ -79,7 +79,6 @@ struct ModalSupportView: View {
                 try? await Task.sleep(nanoseconds: 0)
                 if let new = newValue.last(where: { !$0.didDismiss }), self.selection?.id != new.id {
                     self.selection = new
-                    print("on change to : \(new.id)")
                 }
             }
         })
@@ -87,7 +86,7 @@ struct ModalSupportView: View {
 }
 
 public enum TransitionOption: String, CaseIterable {
-    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, identity //, scale, opacity, slide, slideCover
+    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover // identity //, scale, opacity, slide, slideCover
     
     var insertion: AnyTransition {
         switch self {
@@ -105,34 +104,34 @@ public enum TransitionOption: String, CaseIterable {
 //            return .opacity.animation(.default)
 //        case .slide, .slideCover:
 //            return .slide.animation(.default)
-        case .identity:
-            return .identity
+//        case .identity:
+//            return .identity
         }
     }
-    
-    var removal: AnyTransition {
-        switch self {
-        case .trailingCover, .leadingCover, .topCover, .bottomCover:
-            return AnyTransition.opacity.animation(.easeInOut.delay(1))
-        case .trailing:
-            return .move(edge: .leading)
-        case .leading:
-            return .move(edge: .trailing)
-        case .top:
-            return .move(edge: .bottom)
-        case .bottom:
-            return .move(edge: .top)
-//        case .scale:
-//            return .scale.animation(.easeInOut)
-//        case .opacity:
-//            return .opacity.animation(.easeInOut)
-//        case .slide:
-//            return .slide.animation(.easeInOut)
-        case .identity:
-            return .identity
-
-        }
-    }
+//    
+//    var removal: AnyTransition {
+//        switch self {
+//        case .trailingCover, .leadingCover, .topCover, .bottomCover:
+//            return AnyTransition.opacity.animation(.easeInOut.delay(1))
+//        case .trailing:
+//            return .move(edge: .leading)
+//        case .leading:
+//            return .move(edge: .trailing)
+//        case .top:
+//            return .move(edge: .bottom)
+//        case .bottom:
+//            return .move(edge: .top)
+////        case .scale:
+////            return .scale.animation(.easeInOut)
+////        case .opacity:
+////            return .opacity.animation(.easeInOut)
+////        case .slide:
+////            return .slide.animation(.easeInOut)
+////        case .identity:
+////            return .identity
+//
+//        }
+//    }
     
     var reversed: TransitionOption {
         switch self {
@@ -144,7 +143,7 @@ public enum TransitionOption: String, CaseIterable {
         case .topCover: return .bottom
         case .bottom: return .top
         case .bottomCover: return .top
-        case .identity: return .identity
+//        case .identity: return .identity
         }
     }
 }
