@@ -103,6 +103,7 @@ struct RouterViewInternal<Content:View>: View, Router {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             let router = AnyRouter(object: self)
             TransitionSupportView(
+                router: router,
                 selection: $transitionScreen,
                 transitions: transitionScreens,
                 content: {
@@ -667,13 +668,22 @@ extension RouterViewInternal {
 //            let destination = AnyDestination(<#T##destination: View##View#>)
 //            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
 
-            let newTransition = AnyTransitionWithDestination(id: id ?? UUID().uuidString, transition: option, destination: AnyDestination(RouterViewInternal<T>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
-            self.transitionScreens.append(newTransition)
+//            let newTransition = AnyTransitionWithDestination(id: id ?? UUID().uuidString, transition: option, destination: AnyDestination(RouterViewInternal<T>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
             
-            self.transitionScreen = newTransition
+            
+            let new = AnyTransitionWithDestination(
+                id: id ?? UUID().uuidString,
+                transition: .trailing,
+                destination: { router in
+                AnyDestination(destination(router))
+            })
+            
+            self.transitionScreens.append(new)
+            
+            self.transitionScreen = new
 
             print("DID APPEND")
-            print("DID SET NEW: \(newTransition)")
+            print("DID SET NEW: \(new)")
 //            self.transitionScreens.append(AnyTransitionWithDestination(id: UUID().uuidString, transition: option, destination: destination))
         }
     }

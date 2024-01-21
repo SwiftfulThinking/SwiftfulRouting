@@ -11,19 +11,29 @@ import SwiftUI
 struct AnyTransitionWithDestination: Identifiable, Equatable {
     let id: String
     let transition: TransitionOption
-    let destination: AnyDestination
+    let destination: (AnyRouter) -> AnyDestination
+    
+//    init<T:View>(id: String, transition: TransitionOption = .trailing, destination: (AnyRouter) -> T) {
+//        self.id = id
+//        self.transition = transition
+//        self.destination = AnyDestination(destination(<#AnyRouter#>))
+//    }
     
     static var root: AnyTransitionWithDestination {
-        AnyTransitionWithDestination(
-            id: "root",
-            transition: .identity,
-            destination: AnyDestination(EmptyView())
-        )
+        AnyTransitionWithDestination(id: "root", transition: .identity, destination: { _ in
+            AnyDestination(EmptyView())
+        })
     }
+    
+    static func == (lhs: AnyTransitionWithDestination, rhs: AnyTransitionWithDestination) -> Bool {
+        lhs.id == rhs.id
+    }
+
 }
 
 struct TransitionSupportView<Content:View>: View {
     
+    let router: AnyRouter
     @Binding var selection: AnyTransitionWithDestination
     let transitions: [AnyTransitionWithDestination]
     @ViewBuilder var content: Content
@@ -40,7 +50,7 @@ struct TransitionSupportView<Content:View>: View {
                             )
                         )
                 } else {
-                    data.destination.destination
+                    data.destination(router).destination
                         .transition(
                             .asymmetric(
                                 insertion: data.transition.insertion,
