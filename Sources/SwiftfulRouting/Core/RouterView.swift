@@ -74,7 +74,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var modals: [AnyModalWithDestination] = [.origin]
     
     // Transitions
-    @State private var transition: TransitionOption = .identity
+    @State private var transition: TransitionOption = .trailing
     @State private var selectedTransition: AnyTransitionWithDestination = .root
     @State private var allTransitions: [AnyTransitionWithDestination] = [.root]
 

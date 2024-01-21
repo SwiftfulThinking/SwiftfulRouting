@@ -14,7 +14,7 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
     let destination: (AnyRouter) -> AnyDestination
     
     static var root: AnyTransitionWithDestination {
-        AnyTransitionWithDestination(id: "root", transition: .identity, destination: { _ in
+        AnyTransitionWithDestination(id: "root", transition: .trailing, destination: { _ in
             AnyDestination(EmptyView())
         })
     }
@@ -33,14 +33,13 @@ struct TransitionSupportView<Content:View>: View {
     @ViewBuilder var content: Content
     let currentTransition: TransitionOption
         
+    // problem is that when .transition changes, view re-renders and re-appears. Need to update the view's transition but not re-render the view
+    
     var body: some View {
         ZStack {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
-                    ZStack {
-                        Text("Hello")
-                        content
-                    }
+                    content
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,

@@ -87,7 +87,7 @@ struct ModalSupportView: View {
 }
 
 public enum TransitionOption: String, CaseIterable {
-    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, identity //, scale, opacity, slide, slideCover
+    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover // identity //, scale, opacity, slide, slideCover
     
     var insertion: AnyTransition {
         switch self {
@@ -105,8 +105,8 @@ public enum TransitionOption: String, CaseIterable {
 //            return .opacity.animation(.default)
 //        case .slide, .slideCover:
 //            return .slide.animation(.default)
-        case .identity:
-            return .identity
+//        case .identity:
+//            return .identity
         }
     }
     
@@ -128,8 +128,8 @@ public enum TransitionOption: String, CaseIterable {
 //            return .opacity.animation(.easeInOut)
 //        case .slide:
 //            return .slide.animation(.easeInOut)
-        case .identity:
-            return .identity
+//        case .identity:
+//            return .identity
 
         }
     }
@@ -144,7 +144,7 @@ public enum TransitionOption: String, CaseIterable {
         case .topCover: return .bottom
         case .bottom: return .top
         case .bottomCover: return .top
-        case .identity: return .identity
+//        case .identity: return .identity
         }
     }
 }
