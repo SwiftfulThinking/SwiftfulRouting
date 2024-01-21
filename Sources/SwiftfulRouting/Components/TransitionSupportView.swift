@@ -42,8 +42,9 @@ struct TransitionSupportView<Content:View>: View {
         ZStack {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
-                    content
-                        .id(data.id + currentTransition.rawValue)
+                    ZStack {
+                        content
+                    }
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
@@ -53,15 +54,16 @@ struct TransitionSupportView<Content:View>: View {
                         .onAppear {
                             print("content appeared")
                         }
+                        .id(data.id + currentTransition.rawValue)
                 } else {
                     data.destination(router).destination
-                        .id(data.id + currentTransition.rawValue)
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
                                 removal: currentTransition.removal
                             )
                         )
+                        .id(data.id + currentTransition.rawValue)
                 }
             }
             .animation(.easeInOut, value: selection.id)
