@@ -87,7 +87,7 @@ struct ModalSupportView: View {
 }
 
 public enum TransitionOption: String, CaseIterable {
-    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, scale, opacity, identity, slide, slideCover
+    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, identity //, scale, opacity, slide, slideCover
     
     var insertion: AnyTransition {
         switch self {
@@ -99,12 +99,12 @@ public enum TransitionOption: String, CaseIterable {
             return .move(edge: .top)
         case .bottom, .bottomCover:
             return .move(edge: .bottom)
-        case .scale:
-            return .scale.animation(.default)
-        case .opacity:
-            return .opacity.animation(.default)
-        case .slide, .slideCover:
-            return .slide.animation(.default)
+//        case .scale:
+//            return .scale.animation(.default)
+//        case .opacity:
+//            return .opacity.animation(.default)
+//        case .slide, .slideCover:
+//            return .slide.animation(.default)
         case .identity:
             return .identity
         }
@@ -112,7 +112,7 @@ public enum TransitionOption: String, CaseIterable {
     
     var removal: AnyTransition {
         switch self {
-        case .trailingCover, .leadingCover, .topCover, .bottomCover, .slideCover:
+        case .trailingCover, .leadingCover, .topCover, .bottomCover:
             return AnyTransition.opacity.animation(.easeInOut.delay(1))
         case .trailing:
             return .move(edge: .leading)
@@ -122,12 +122,12 @@ public enum TransitionOption: String, CaseIterable {
             return .move(edge: .bottom)
         case .bottom:
             return .move(edge: .top)
-        case .scale:
-            return .scale.animation(.easeInOut)
-        case .opacity:
-            return .opacity.animation(.easeInOut)
-        case .slide:
-            return .slide.animation(.easeInOut)
+//        case .scale:
+//            return .scale.animation(.easeInOut)
+//        case .opacity:
+//            return .opacity.animation(.easeInOut)
+//        case .slide:
+//            return .slide.animation(.easeInOut)
         case .identity:
             return .identity
 
