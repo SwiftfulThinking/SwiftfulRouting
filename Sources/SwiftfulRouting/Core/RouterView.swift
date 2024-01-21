@@ -683,7 +683,7 @@ extension RouterViewInternal {
         
         
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 25_000)
+            try? await Task.sleep(nanoseconds: 1_000_000)
             
             self.allTransitions.append(new)
             self.selectedTransition = new

@@ -86,7 +86,7 @@ struct ModalSupportView: View {
     }
 }
 
-public enum TransitionOption: String {
+public enum TransitionOption: String, CaseIterable {
     case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, scale, opacity, identity, slide, slideCover
     
     var insertion: AnyTransition {
