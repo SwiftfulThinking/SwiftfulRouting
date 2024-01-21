@@ -682,12 +682,12 @@ extension RouterViewInternal {
         self.transition = option
         
         
-//        Task { @MainActor in
-//            try? await Task.sleep(nanoseconds: 1_000_000_000)
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 25_000)
             
             self.allTransitions.append(new)
             self.selectedTransition = new
-//        }
+        }
 
             print("DID APPEND")
             print("DID SET NEW: \(new)")
