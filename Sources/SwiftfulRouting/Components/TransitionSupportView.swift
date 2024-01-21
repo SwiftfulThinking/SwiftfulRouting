@@ -42,15 +42,9 @@ struct TransitionSupportView<Content:View>: View {
         ZStack {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
-                    ZStack {
-                        Text("Hi")
-                        content
-                    }
+                    content
                         .transition(
-                            .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
-                            )
+                            .scale
                         )
                         .onAppear {
                             print("content appeared")
