@@ -673,7 +673,7 @@ extension RouterViewInternal {
             
             let new = AnyTransitionWithDestination(
                 id: id ?? UUID().uuidString,
-                transition: .trailing,
+                transition: option,
                 destination: { router in
                 AnyDestination(destination(router))
             })
