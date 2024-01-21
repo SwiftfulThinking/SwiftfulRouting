@@ -41,10 +41,11 @@ struct TransitionSupportView<Content:View>: View {
                 if data == transitions.first {
                     content
                         .transition(
-                            .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
-                            )
+                            .move(edge: .trailing)
+//                            .asymmetric(
+//                                insertion: currentTransition.insertion,
+//                                removal: currentTransition.removal
+//                            )
                         )
                         .id(data.id + currentTransition.rawValue)
                 } else {
