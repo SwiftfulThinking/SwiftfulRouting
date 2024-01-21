@@ -45,8 +45,8 @@ struct TransitionSupportView<Content:View>: View {
                     content
                         .transition(
                             .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
+                                insertion: currentTransition.insertion.animation(.easeInOut),
+                                removal: currentTransition.removal.animation(.easeInOut)
                             )
                         )
                         .id(data.id + currentTransition.rawValue)
@@ -54,8 +54,8 @@ struct TransitionSupportView<Content:View>: View {
                     data.destination(router).destination
                         .transition(
                             .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: currentTransition.removal
+                                insertion: currentTransition.insertion.animation(.easeInOut),
+                                removal: currentTransition.removal.animation(.easeInOut)
                             )
                         )
                         .id(data.id + currentTransition.rawValue)
