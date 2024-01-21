@@ -723,6 +723,15 @@ extension RouterViewInternal {
     }
     
     func dismissAllTransitions() {
-        selectedTransition = allTransitions.first ?? .root
+        self.transition = .trailing.reversed
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_000_000)
+            
+            self.selectedTransition = allTransitions.first ?? .root
+            
+            try? await Task.sleep(nanoseconds: 25_000)
+            self.allTransitions = [allTransitions.first ?? .root]
+        }
     }
 }
