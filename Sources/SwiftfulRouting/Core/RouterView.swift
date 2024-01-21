@@ -611,7 +611,7 @@ extension RouterViewInternal {
         destination: @escaping () -> V) where V : View {
         
             let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea)
-            let dest = createModalDestination(configuration: config, destination: destination)
+            let dest = AnyDestination(destination())
             
             self.modals.append(AnyModalWithDestination(configuration: config, destination: dest))
     }
@@ -635,46 +635,6 @@ extension RouterViewInternal {
                 }
             }
         }
-    }
-    
-    private func createModalDestination<V:View>(configuration: ModalConfiguration, destination: () -> V) -> AnyDestination {
-        AnyDestination(
-            ZStack {
-//                if let backgroundColor = configuration.backgroundColor {
-//                    backgroundColor
-//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                        .edgesIgnoringSafeArea(.all)
-//                        .transition(AnyTransition.opacity.animation(configuration.animation))
-////                        .onTapGesture {
-////                            item.wrappedValue = nil
-////                        }
-//                        .zIndex(1)
-//                }
-
-                destination()
-//                    .frame(configuration: configuration)
-//                    .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
-////                    .transition(configuration.transition)
-//                    .zIndex(3)
-            }
-            
-//            if let view = item.wrappedValue?.destination {
-//            //
-//            
-//                                    if let backgroundEffect = configuration.backgroundEffect {
-//                                        VisualEffectViewRepresentable(effect: backgroundEffect.effect)
-//                                            .opacity(backgroundEffect.opacity)
-//                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                                            .edgesIgnoringSafeArea(.all)
-//                                            .transition(AnyTransition.opacity.animation(configuration.animation))
-//                                            .onTapGesture {
-//                                                item.wrappedValue = nil
-//                                            }
-//                                            .zIndex(2)
-//                                    }
-            
-            //                    }
-        )
     }
 
 }
