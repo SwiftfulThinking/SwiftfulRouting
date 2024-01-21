@@ -47,6 +47,9 @@ struct TransitionSupportView<Content:View>: View {
 //                                removal: currentTransition.removal
 //                            )
                         )
+                        .onAppear {
+                            print(data.id)
+                        }
 //                        .id(data.id + currentTransition.rawValue)
                 } else {
                     data.destination(router).destination
