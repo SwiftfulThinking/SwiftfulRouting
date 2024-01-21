@@ -54,14 +54,14 @@ struct TransitionSupportView<Content:View>: View {
 //        .onFirstAppear {
 //            selection = transitions.last
 //        }
-//        .onChange(of: transitions, perform: { newValue in
+        .onChange(of: transitions, perform: { newValue in
 //            Task { @MainActor in
 //                try? await Task.sleep(nanoseconds: 0)
 //                if let new = newValue.last(where: { !$0.didDismiss }), self.selection?.id != new.id {
 //                    self.selection = new
-//                    print("on change to : \(new.id)")
+                    print("on change to : \(selection.id)")
 //                }
 //            }
-//        })
+        })
     }
 }
