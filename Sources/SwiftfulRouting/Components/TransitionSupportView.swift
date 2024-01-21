@@ -44,12 +44,13 @@ struct TransitionSupportView<Content:View>: View {
                             print("A")
                         }
                         .transition(
-                            .move(edge: .trailing)
-//                            .asymmetric(
-//                                insertion: currentTransition.insertion,
-//                                removal: currentTransition.removal
-//                            )
+//                            .move(edge: .trailing)
+                            .asymmetric(
+                                insertion: currentTransition.insertion,
+                                removal: TransitionOption.trailingCover.removal
+                            )
                         )
+                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
 //                        .id(data.id + currentTransition.rawValue)
                         .onAppear {
                             print("F")
@@ -57,13 +58,13 @@ struct TransitionSupportView<Content:View>: View {
                 } else {
                     data.destination(router).destination
                         .transition(
-                            .move(edge: .trailing)
-//                            .asymmetric(
-//                                insertion: currentTransition.insertion,
-//                                removal: currentTransition.removal
-//                            )
+//                            .move(edge: .trailing)
+                            .asymmetric(
+                                insertion: currentTransition.insertion,
+                                removal: TransitionOption.trailingCover.removal
+                            )
                         )
-//                        .id(data.id + currentTransition.rawValue)
+                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
                 }
             }
             .animation(.easeInOut, value: selection.id)
