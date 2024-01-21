@@ -123,11 +123,11 @@ public enum TransitionOption: String, CaseIterable {
         case .bottom:
             return .move(edge: .top)
         case .scale:
-            return .scale.animation(.default)
+            return .scale.animation(.easeInOut)
         case .opacity:
-            return .opacity.animation(.default)
+            return .opacity.animation(.easeInOut)
         case .slide:
-            return .slide.animation(.default)
+            return .slide.animation(.easeInOut)
         case .identity:
             return .identity
 
