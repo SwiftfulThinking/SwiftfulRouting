@@ -49,6 +49,9 @@ struct TransitionSupportView<Content:View>: View {
                                 removal: currentTransition.removal
                             )
                         )
+                        .onAppear {
+                            print("content appeared")
+                        }
                         .id(data.id + currentTransition.rawValue)
                 } else {
                     data.destination(router).destination
