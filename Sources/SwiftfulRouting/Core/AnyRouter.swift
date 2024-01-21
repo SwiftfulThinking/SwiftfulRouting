@@ -126,7 +126,7 @@ public struct AnyRouter: Router {
     /// Convenience method for a simple modal appearing over the current Environment in the center of the screen.
     public func showBasicModal<T>(@ViewBuilder destination: @escaping () -> T) where T : View {
         showModal(
-            transition: .opacity,
+            transition: AnyTransition.opacity.animation(.easeInOut),
             animation: .easeInOut,
             alignment: .center,
             backgroundColor: Color.black.opacity(0.4),
