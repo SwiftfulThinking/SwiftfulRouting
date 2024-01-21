@@ -37,6 +37,10 @@ struct TransitionSupportView<Content:View>: View {
     @Binding var selection: AnyTransitionWithDestination
     let transitions: [AnyTransitionWithDestination]
     @ViewBuilder var content: Content
+    
+    private var currentTransition: TransitionOption {
+        selection.transition
+    }
         
     var body: some View {
         ZStack {
@@ -45,16 +49,16 @@ struct TransitionSupportView<Content:View>: View {
                     content
                         .transition(
                             .asymmetric(
-                                insertion: data.transition.insertion,
-                                removal: data.transition.removal
+                                insertion: currentTransition.insertion,
+                                removal: currentTransition.removal
                             )
                         )
                 } else {
                     data.destination(router).destination
                         .transition(
                             .asymmetric(
-                                insertion: data.transition.insertion,
-                                removal: data.transition.removal
+                                insertion: currentTransition.insertion,
+                                removal: currentTransition.removal
                             )
                         )
                 }
