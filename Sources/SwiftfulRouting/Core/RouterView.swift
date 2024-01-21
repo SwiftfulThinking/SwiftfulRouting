@@ -701,8 +701,7 @@ extension RouterViewInternal {
         print(allTransitions)
         print(selectedTransition)
         if let index = allTransitions.firstIndex(where: { $0.id == self.selectedTransition.id }), allTransitions.indices.contains(index - 1) {
-            
-            self.transition = transition.reversed
+            self.transition = allTransitions[index].transition.reversed
 
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_000_000)
