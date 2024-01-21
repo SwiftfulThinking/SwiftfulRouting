@@ -44,11 +44,10 @@ struct TransitionSupportView<Content:View>: View {
                 if data == transitions.first {
                     content
                         .transition(
-                            selection.id == data.id ? currentTransition.insertion : currentTransition.removal
-//                            .asymmetric(
-//                                insertion: currentTransition.insertion,
-//                                removal: currentTransition.removal
-//                            )
+                            .asymmetric(
+                                insertion: currentTransition.insertion,
+                                removal: currentTransition.removal
+                            )
                         )
                         .onAppear {
                             print("content appeared")
@@ -57,11 +56,10 @@ struct TransitionSupportView<Content:View>: View {
                 } else {
                     data.destination(router).destination
                         .transition(
-                            selection.id == data.id ? currentTransition.insertion : currentTransition.removal
-//                            .asymmetric(
-//                                insertion: currentTransition.insertion,
-//                                removal: currentTransition.removal
-//                            )
+                            .asymmetric(
+                                insertion: currentTransition.insertion,
+                                removal: currentTransition.removal
+                            )
                         )
                         .id(data.id + currentTransition.rawValue)
                 }
