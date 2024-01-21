@@ -41,14 +41,12 @@ struct ModalSupportView: View {
     
     @State private var selection: AnyModalWithDestination? = nil
 
-    let allowSimultaneous: Bool
     let transitions: [AnyModalWithDestination]
     let onDismissModal: (AnyModalWithDestination) -> Void
-    @State private var showSelection: Bool = true
         
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
+            LazyZStack(allowSimultaneous: true, selection: selection, items: transitions) { data in
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
                         data.destination.destination
@@ -88,8 +86,8 @@ struct ModalSupportView: View {
     }
 }
 
-public enum TransitionOption: String {
-    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, scale, opacity, identity, slide, slideCover
+public enum TransitionOption: String, CaseIterable {
+    case trailing, trailingCover, leading, leadingCover, top, topCover, bottom, bottomCover, identity //, scale, opacity, slide, slideCover
     
     var insertion: AnyTransition {
         switch self {
@@ -101,12 +99,12 @@ public enum TransitionOption: String {
             return .move(edge: .top)
         case .bottom, .bottomCover:
             return .move(edge: .bottom)
-        case .scale:
-            return .scale.animation(.default)
-        case .opacity:
-            return .opacity.animation(.default)
-        case .slide, .slideCover:
-            return .slide.animation(.default)
+//        case .scale:
+//            return .scale.animation(.default)
+//        case .opacity:
+//            return .opacity.animation(.default)
+//        case .slide, .slideCover:
+//            return .slide.animation(.default)
         case .identity:
             return .identity
         }
@@ -114,8 +112,8 @@ public enum TransitionOption: String {
     
     var removal: AnyTransition {
         switch self {
-        case .trailingCover, .leadingCover, .topCover, .bottomCover, .slideCover:
-            return .identity
+        case .trailingCover, .leadingCover, .topCover, .bottomCover:
+            return AnyTransition.opacity.animation(.easeInOut.delay(1))
         case .trailing:
             return .move(edge: .leading)
         case .leading:
@@ -124,15 +122,29 @@ public enum TransitionOption: String {
             return .move(edge: .bottom)
         case .bottom:
             return .move(edge: .top)
-        case .scale:
-            return .scale.animation(.default)
-        case .opacity:
-            return .opacity.animation(.default)
-        case .slide:
-            return .slide.animation(.default)
+//        case .scale:
+//            return .scale.animation(.easeInOut)
+//        case .opacity:
+//            return .opacity.animation(.easeInOut)
+//        case .slide:
+//            return .slide.animation(.easeInOut)
         case .identity:
             return .identity
 
+        }
+    }
+    
+    var reversed: TransitionOption {
+        switch self {
+        case .trailing: return .leading
+        case .trailingCover: return .leading
+        case .leading: return .trailing
+        case .leadingCover: return .trailing
+        case .top: return .bottom
+        case .topCover: return .bottom
+        case .bottom: return .top
+        case .bottomCover: return .top
+        case .identity: return .identity
         }
     }
 }

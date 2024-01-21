@@ -72,7 +72,12 @@ struct RouterViewInternal<Content:View>: View, Router {
     
     // Modals
     @State private var modals: [AnyModalWithDestination] = [.origin]
-        
+    
+    // Transitions
+    @State private var transition: TransitionOption = .identity
+    @State private var selectedTransition: AnyTransitionWithDestination = .root
+    @State private var allTransitions: [AnyTransitionWithDestination] = [.root]
+
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
@@ -98,23 +103,31 @@ struct RouterViewInternal<Content:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             let router = AnyRouter(object: self)
-            content(router)
-                .showingScreen(
-                    option: segueOption,
-                    screens: $screens,
-                    screenStack: screenStack,
-                    sheetDetents: sheetDetents,
-                    sheetSelection: sheetSelection,
-                    sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator,
-                    onDismiss: onDismissOfSheet
-                )
-                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                .onFirstAppear(perform: {
-                    updateRouteIsPresented(route: route, isPresented: true)
-                })
-                .showingAlert(option: alertOption, item: $alert)
-                .environment(\.router, router)
+            TransitionSupportView(
+                router: router,
+                selection: $selectedTransition,
+                transitions: allTransitions,
+                content: {
+                    content(router)
+                },
+                currentTransition: transition
+            )
+            .showingScreen(
+                option: segueOption,
+                screens: $screens,
+                screenStack: screenStack,
+                sheetDetents: sheetDetents,
+                sheetSelection: sheetSelection,
+                sheetSelectionEnabled: sheetSelectionEnabled,
+                showDragIndicator: showDragIndicator,
+                onDismiss: onDismissOfSheet
+            )
+            .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+            .onFirstAppear(perform: {
+                updateRouteIsPresented(route: route, isPresented: true)
+            })
+            .showingAlert(option: alertOption, item: $alert)
+            .environment(\.router, router)
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)
@@ -641,4 +654,58 @@ extension RouterViewInternal {
         }
     }
 
+}
+
+
+// MARK: Transitions
+
+extension RouterViewInternal {
+    
+    func transitionScreen<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        let new = AnyTransitionWithDestination(
+            id: UUID().uuidString,
+            transition: option,
+            destination: { router in
+                AnyDestination(destination(router))
+            }
+        )
+        
+        self.transition = option
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_000_000)
+            
+            self.allTransitions.append(new)
+            self.selectedTransition = new
+        }
+    }
+    
+    func dismissTransition() {
+        if let index = allTransitions.firstIndex(where: { $0.id == self.selectedTransition.id }), allTransitions.indices.contains(index - 1) {
+            self.transition = allTransitions[index].transition.reversed
+
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_000_000)
+                
+                self.selectedTransition = allTransitions[index - 1]
+                
+                try? await Task.sleep(nanoseconds: 25_000)
+                allTransitions.remove(at: index)
+            }
+
+        }
+    }
+    
+    func dismissAllTransitions() {
+        self.transition = .trailing.reversed
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_000_000)
+            
+            self.selectedTransition = allTransitions.first ?? .root
+            
+            try? await Task.sleep(nanoseconds: 25_000)
+            self.allTransitions = [allTransitions.first ?? .root]
+        }
+    }
 }
