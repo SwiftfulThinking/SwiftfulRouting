@@ -164,6 +164,7 @@ public struct FrameReader: View {
     public var body: some View {
         GeometryReader { geo in
             Text("")
+                .ignoresSafeArea()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .onAppear(perform: {
                     onChange(geo.frame(in: coordinateSpace))
