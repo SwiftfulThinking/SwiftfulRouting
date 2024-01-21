@@ -41,8 +41,9 @@ struct TransitionSupportView<Content:View>: View {
                 if data == transitions.first {
                     content
                         .onAppear {
-                            print("A")
+                            print("A :: \(data.id)")
                         }
+                        .id(data.id)
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
