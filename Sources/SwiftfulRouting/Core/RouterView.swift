@@ -672,6 +672,8 @@ extension RouterViewInternal {
             
             self.transitionScreen = newTransition
 
+            print("DID APPEND")
+            print("DID SET NEW: \(newTransition)")
 //            self.transitionScreens.append(AnyTransitionWithDestination(id: UUID().uuidString, transition: option, destination: destination))
         }
     }
