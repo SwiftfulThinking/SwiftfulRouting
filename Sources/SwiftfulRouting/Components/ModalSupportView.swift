@@ -113,7 +113,7 @@ public enum TransitionOption: String, CaseIterable {
     var removal: AnyTransition {
         switch self {
         case .trailingCover, .leadingCover, .topCover, .bottomCover, .slideCover:
-            return AnyTransition.identity.animation(.easeInOut.delay(1))
+            return AnyTransition.opacity.animation(.easeInOut.delay(1))
         case .trailing:
             return .move(edge: .leading)
         case .leading:
