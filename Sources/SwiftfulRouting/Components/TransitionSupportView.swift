@@ -10,7 +10,6 @@ import SwiftUI
 
 struct AnyTransitionWithDestination: Identifiable, Equatable {
     let id: String
-    let transition: TransitionOption
     let destination: (AnyRouter) -> AnyDestination
     
 //    init<T:View>(id: String, transition: TransitionOption = .trailing, destination: (AnyRouter) -> T) {
@@ -20,7 +19,7 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
 //    }
     
     static var root: AnyTransitionWithDestination {
-        AnyTransitionWithDestination(id: "root", transition: .identity, destination: { _ in
+        AnyTransitionWithDestination(id: "root", destination: { _ in
             AnyDestination(EmptyView())
         })
     }
@@ -37,10 +36,7 @@ struct TransitionSupportView<Content:View>: View {
     @Binding var selection: AnyTransitionWithDestination
     let transitions: [AnyTransitionWithDestination]
     @ViewBuilder var content: Content
-    
-    private var currentTransition: TransitionOption {
-        selection.transition
-    }
+    let currentTransition: TransitionOption
         
     var body: some View {
         ZStack {

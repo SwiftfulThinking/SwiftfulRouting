@@ -74,9 +74,10 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var modals: [AnyModalWithDestination] = [.origin]
     
     // Transitions
-    @State private var transitionScreen: AnyTransitionWithDestination = .root
-    @State private var transitionScreens: [AnyTransitionWithDestination] = [.root]
-        
+    @State private var transition: TransitionOption = .identity
+    @State private var selectedTransition: AnyTransitionWithDestination = .root
+    @State private var allTransitions: [AnyTransitionWithDestination] = [.root]
+
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
@@ -104,11 +105,12 @@ struct RouterViewInternal<Content:View>: View, Router {
             let router = AnyRouter(object: self)
             TransitionSupportView(
                 router: router,
-                selection: $transitionScreen,
-                transitions: transitionScreens,
+                selection: $selectedTransition,
+                transitions: allTransitions,
                 content: {
                     content(router)
-                }
+                },
+                currentTransition: transition
             )
             .showingScreen(
                 option: segueOption,
@@ -660,9 +662,9 @@ extension RouterViewInternal {
 extension RouterViewInternal {
     
     func transitionScreen<T>(id: String?, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
-        if let id, let existing = transitionScreens.first(where: { $0.id == id }) {
-            transitionScreen = existing
-        } else {
+//        if let id, let existing = transitionScreens.first(where: { $0.id == id }) {
+//            transitionScreen = existing
+//        } else {
             
             
 //            let destination = AnyDestination(<#T##destination: View##View#>)
@@ -673,19 +675,21 @@ extension RouterViewInternal {
             
             let new = AnyTransitionWithDestination(
                 id: id ?? UUID().uuidString,
-                transition: option,
                 destination: { router in
                 AnyDestination(destination(router))
             })
+        
+        self.transition = option
+        
+        
             
-            self.transitionScreens.append(new)
-            
-            self.transitionScreen = new
+            self.allTransitions.append(new)
+            self.selectedTransition = new
 
             print("DID APPEND")
             print("DID SET NEW: \(new)")
 //            self.transitionScreens.append(AnyTransitionWithDestination(id: UUID().uuidString, transition: option, destination: destination))
-        }
+//        }
     }
     
     func dismissTransition(id: String?) {
@@ -699,6 +703,6 @@ extension RouterViewInternal {
     }
     
     func dismissAllTransitions() {
-        transitionScreen = transitionScreens.first ?? .root
+        selectedTransition = allTransitions.first ?? .root
     }
 }
