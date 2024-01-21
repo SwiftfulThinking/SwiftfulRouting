@@ -71,8 +71,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var alert: AnyAlert? = nil
     
     // Modals
-    @State private var modalConfiguration: ModalConfiguration = .default
-    @State private var modal: AnyDestination? = nil
+    @State private var modals: [AnyModalWithDestination] = [.origin]
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
@@ -117,7 +116,9 @@ struct RouterViewInternal<Content:View>: View, Router {
                 .showingAlert(option: alertOption, item: $alert)
                 .environment(\.router, router)
         }
-        .showingModal(configuration: modalConfiguration, item: $modal)
+        .showingModal(items: modals, onDismissModal: { info in
+            dismissModal(id: info.id)
+        })
     }
             
 }
@@ -193,8 +194,8 @@ extension View {
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
-        modifier(ModalViewModifier(configuration: configuration, item: item))
+    func showingModal(items: [AnyModalWithDestination], onDismissModal: @escaping (AnyModalWithDestination) -> Void) -> some View {
+        modifier(ModalViewModifier(items: items, onDismissModal: onDismissModal))
     }
     
 }
@@ -587,24 +588,57 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
-    public func showModal<T:View>(
+    public func showModal<V>(
+        id: String? = nil,
         transition: AnyTransition,
         animation: Animation,
         alignment: Alignment,
-        backgroundColor: Color?,
-        backgroundEffect: BackgroundEffect?,
-        useDeviceBounds: Bool,
-        @ViewBuilder destination: @escaping () -> T) {
-            guard self.modal == nil else {
-                return
-            }
+        backgroundColor: Color?, 
+        ignoreSafeArea: Bool,
+        destination: @escaping () -> V) where V : View {
+        
+            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea)
+            let dest = AnyDestination(destination())
             
-            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds)
-            self.modal = AnyDestination(destination())
-        }
+            self.modals.append(AnyModalWithDestination(id: id ?? UUID().uuidString, configuration: config, destination: dest))
+    }
     
-    public func dismissModal() {
-        self.modal = nil
+    public func dismissModal(id: String? = nil) {
+        if let id {
+            if let index = modals.lastIndex(where: { $0.id == id && !$0.didDismiss }) {
+                modals[index].dismiss()
+                
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 25_000)
+                    modals.remove(at: index)
+                }
+            }
+        } else {
+            if let index = modals.lastIndex(where: { !$0.didDismiss }) {
+                modals[index].dismiss()
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 25_000)
+                    modals.remove(at: index)
+                }
+            }
+        }
+    }
+    
+    public func dismissAllModals() {
+        // Dismiss all modals
+        for (index, modal) in modals.enumerated() {
+            // Don't dismiss "origin" view
+            if index > 0 && !modal.didDismiss {
+                modals[index].dismiss()
+            }
+        }
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 25_000)
+            
+            // Reset array to "origin"
+            modals = [modals.first!]
+        }
     }
 
 }
