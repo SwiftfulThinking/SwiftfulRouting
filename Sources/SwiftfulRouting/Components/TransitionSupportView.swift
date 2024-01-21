@@ -24,7 +24,7 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
 
 struct TransitionSupportView<Content:View>: View {
     
-    @Binding var selection: AnyTransitionWithDestination?
+    @Binding var selection: AnyTransitionWithDestination
     let transitions: [AnyTransitionWithDestination]
     @ViewBuilder var content: Content
         
@@ -49,11 +49,11 @@ struct TransitionSupportView<Content:View>: View {
                         )
                 }
             }
-            .animation(.easeInOut, value: selection?.id)
+            .animation(.easeInOut, value: selection.id)
         }
-        .onFirstAppear {
-            selection = transitions.last
-        }
+//        .onFirstAppear {
+//            selection = transitions.last
+//        }
 //        .onChange(of: transitions, perform: { newValue in
 //            Task { @MainActor in
 //                try? await Task.sleep(nanoseconds: 0)

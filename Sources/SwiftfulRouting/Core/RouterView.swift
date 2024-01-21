@@ -74,7 +74,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var modals: [AnyModalWithDestination] = [.origin]
     
     // Transitions
-    @State private var transitionScreen: AnyTransitionWithDestination? = nil
+    @State private var transitionScreen: AnyTransitionWithDestination = .root
     @State private var transitionScreens: [AnyTransitionWithDestination] = [.root]
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
@@ -651,4 +651,39 @@ extension RouterViewInternal {
         }
     }
 
+}
+
+
+// MARK: Transitions
+
+extension RouterViewInternal {
+    
+    func transitionScreen<T>(id: String?, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        if let id, let existing = transitionScreens.first(where: { $0.id == id }) {
+            transitionScreen = existing
+        } else {
+            
+            
+//            let destination = AnyDestination(<#T##destination: View##View#>)
+//            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+
+            self.transitionScreens.append(AnyTransitionWithDestination(id: id ?? UUID().uuidString, transition: option, destination: AnyDestination(RouterViewInternal<T>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil)))
+
+//            self.transitionScreens.append(AnyTransitionWithDestination(id: UUID().uuidString, transition: option, destination: destination))
+        }
+    }
+    
+    func dismissTransition(id: String?) {
+//        if let id {
+//            if let index = transitionScreens.firstIndex(where: { $0.id == id }), transitionScreens.indices.contains(index - 1) {
+//                transitionScreen = transitionScreens[index - 1]
+//            }
+//        } else {
+//
+//        }
+    }
+    
+    func dismissAllTransitions() {
+        transitionScreen = transitionScreens.first ?? .root
+    }
 }
