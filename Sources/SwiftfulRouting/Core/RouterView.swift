@@ -642,7 +642,8 @@ extension RouterViewInternal {
     public func dismissAllModals() {
         // Dismiss all modals
         for (index, modal) in modals.enumerated() {
-            if !modal.didDismiss {
+            // Don't dismiss "origin" view
+            if index > 0 && !modal.didDismiss {
                 modals[index].dismiss()
             }
         }
@@ -650,7 +651,7 @@ extension RouterViewInternal {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 25_000)
             
-            // Reset array to origin
+            // Reset array to "origin"
             modals = [modals.first!]
         }
     }
