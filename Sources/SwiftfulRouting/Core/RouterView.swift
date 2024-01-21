@@ -697,6 +697,9 @@ extension RouterViewInternal {
     }
     
     func dismissTransition() {
+        print("dismissing")
+        print(allTransitions)
+        print(selectedTransition)
         if let index = allTransitions.firstIndex(where: { $0.id == self.selectedTransition.id }), allTransitions.indices.contains(index - 1) {
             
 //            self.transition = option
