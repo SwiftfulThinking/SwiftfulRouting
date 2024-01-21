@@ -53,6 +53,7 @@ struct TransitionSupportView<Content:View>: View {
                             print("content appeared")
                         }
                         .id(data.id + currentTransition.rawValue)
+                        .id(data.id)
                 } else {
                     data.destination(router).destination
                         .transition(
