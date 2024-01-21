@@ -137,13 +137,13 @@ public enum TransitionOption: String, CaseIterable {
     var reversed: TransitionOption {
         switch self {
         case .trailing: return .leading
-        case .trailingCover: return .leading
+        case .trailingCover: return .identity
         case .leading: return .trailing
-        case .leadingCover: return .trailing
+        case .leadingCover: return .identity
         case .top: return .bottom
-        case .topCover: return .bottom
+        case .topCover: return .identity
         case .bottom: return .top
-        case .bottomCover: return .top
+        case .bottomCover: return .identity
         case .identity: return .identity
         }
     }
