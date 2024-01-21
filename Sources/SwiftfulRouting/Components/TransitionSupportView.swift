@@ -49,6 +49,7 @@ struct TransitionSupportView<Content:View>: View {
                                 removal: currentTransition.removal
                             )
                         )
+                        .id(data.id + currentTransition.rawValue)
                 } else {
                     data.destination(router).destination
                         .transition(
@@ -57,6 +58,7 @@ struct TransitionSupportView<Content:View>: View {
                                 removal: currentTransition.removal
                             )
                         )
+                        .id(data.id + currentTransition.rawValue)
                 }
             }
             .animation(.easeInOut, value: selection.id)
