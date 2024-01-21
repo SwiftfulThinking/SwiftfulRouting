@@ -72,6 +72,10 @@ struct RouterViewInternal<Content:View>: View, Router {
     
     // Modals
     @State private var modals: [AnyModalWithDestination] = [.origin]
+    
+    // Transitions
+    @State private var transitionScreen: AnyTransitionWithDestination? = nil
+    @State private var transitionScreens: [AnyTransitionWithDestination] = [.root]
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
@@ -98,23 +102,29 @@ struct RouterViewInternal<Content:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             let router = AnyRouter(object: self)
-            content(router)
-                .showingScreen(
-                    option: segueOption,
-                    screens: $screens,
-                    screenStack: screenStack,
-                    sheetDetents: sheetDetents,
-                    sheetSelection: sheetSelection,
-                    sheetSelectionEnabled: sheetSelectionEnabled,
-                    showDragIndicator: showDragIndicator,
-                    onDismiss: onDismissOfSheet
-                )
-                .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
-                .onFirstAppear(perform: {
-                    updateRouteIsPresented(route: route, isPresented: true)
-                })
-                .showingAlert(option: alertOption, item: $alert)
-                .environment(\.router, router)
+            TransitionSupportView(
+                selection: $transitionScreen,
+                transitions: transitionScreens,
+                content: {
+                    content(router)
+                        .showingScreen(
+                            option: segueOption,
+                            screens: $screens,
+                            screenStack: screenStack,
+                            sheetDetents: sheetDetents,
+                            sheetSelection: sheetSelection,
+                            sheetSelectionEnabled: sheetSelectionEnabled,
+                            showDragIndicator: showDragIndicator,
+                            onDismiss: onDismissOfSheet
+                        )
+                        .onFirstAppear(perform: setEnvironmentRouterIfNeeded)
+                        .onFirstAppear(perform: {
+                            updateRouteIsPresented(route: route, isPresented: true)
+                        })
+                        .showingAlert(option: alertOption, item: $alert)
+                        .environment(\.router, router)
+                }
+            )
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)

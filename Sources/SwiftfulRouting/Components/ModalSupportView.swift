@@ -41,14 +41,12 @@ struct ModalSupportView: View {
     
     @State private var selection: AnyModalWithDestination? = nil
 
-    let allowSimultaneous: Bool
     let transitions: [AnyModalWithDestination]
     let onDismissModal: (AnyModalWithDestination) -> Void
-    @State private var showSelection: Bool = true
         
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
+            LazyZStack(allowSimultaneous: true, selection: selection, items: transitions) { data in
                 LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
                     if showView1 {
                         data.destination.destination

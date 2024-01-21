@@ -16,7 +16,7 @@ struct ModalViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .overlay(
-                ModalSupportView(allowSimultaneous: true, transitions: items, onDismissModal: onDismissModal)
+                ModalSupportView(transitions: items, onDismissModal: onDismissModal)
             )
     }
 }
