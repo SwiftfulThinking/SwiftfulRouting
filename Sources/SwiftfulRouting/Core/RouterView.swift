@@ -109,9 +109,15 @@ struct RouterViewInternal<Content:View>: View, Router {
                 transitions: allTransitions,
                 content: {
                     content(router)
+                        .onAppear {
+                            print("B")
+                        }
                 },
                 currentTransition: transition
             )
+            .onAppear {
+                print("C")
+            }
             .showingScreen(
                 option: segueOption,
                 screens: $screens,
