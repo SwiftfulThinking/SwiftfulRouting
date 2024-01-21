@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct AnyModalWithDestination: Identifiable, Equatable {
-    let id = UUID().uuidString
+    let id: String
     let configuration: ModalConfiguration
     let destination: AnyDestination
     private(set) var didDismiss: Bool = false

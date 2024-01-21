@@ -76,6 +76,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     
     @State private var modals: [AnyModalWithDestination] = [
         AnyModalWithDestination(
+            id: "origin",
             configuration: ModalConfiguration(
                 transition: .identity,
                 animation: .default,
@@ -603,6 +604,7 @@ extension RouterViewInternal {
 extension RouterViewInternal {
     
     public func showModal<V>(
+        id: String? = nil,
         transition: AnyTransition,
         animation: Animation,
         alignment: Alignment,
@@ -613,7 +615,7 @@ extension RouterViewInternal {
             let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea)
             let dest = AnyDestination(destination())
             
-            self.modals.append(AnyModalWithDestination(configuration: config, destination: dest))
+            self.modals.append(AnyModalWithDestination(id: id ?? UUID().uuidString, configuration: config, destination: dest))
     }
     
     public func dismissModal(id: String? = nil) {

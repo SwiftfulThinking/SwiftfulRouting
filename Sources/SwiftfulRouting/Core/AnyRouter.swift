@@ -113,13 +113,14 @@ public struct AnyRouter: Router {
     }
     
     public func showModal<T>(
+        id: String? = nil,
         transition: AnyTransition = .identity,
         animation: Animation = .smooth,
         alignment: Alignment = .center,
         backgroundColor: Color? = nil,
         ignoreSafeArea: Bool = true,
         @ViewBuilder destination: @escaping () -> T) where T : View {
-        object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea, destination: destination)
+            object.showModal(id: id, transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea, destination: destination)
     }
         
     /// Convenience method for a simple modal appearing over the current Environment in the center of the screen.
@@ -188,7 +189,7 @@ struct MockRouter: Router {
         printError()
     }
     
-    func showModal<V>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
+    func showModal<V>(id: String?, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     
