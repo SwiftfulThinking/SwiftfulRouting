@@ -38,6 +38,7 @@ struct TransitionSupportView<Content:View>: View {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
                     content
+                        .id(data.id)
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
@@ -47,6 +48,7 @@ struct TransitionSupportView<Content:View>: View {
                         .id(data.id + currentTransition.rawValue)
                 } else {
                     data.destination(router).destination
+                        .id(data.id)
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
