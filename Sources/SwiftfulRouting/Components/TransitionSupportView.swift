@@ -50,7 +50,7 @@ struct TransitionSupportView<Content:View>: View {
                                 removal: TransitionOption.trailingCover.removal
                             )
                         )
-                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
+//                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
 //                        .id(data.id + currentTransition.rawValue)
                         .onAppear {
                             print("F")
@@ -64,7 +64,7 @@ struct TransitionSupportView<Content:View>: View {
                                 removal: TransitionOption.trailingCover.removal
                             )
                         )
-                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
+//                        .id(data.id + (data.id == selection.id ? currentTransition.rawValue : ""))
                 }
             }
             .animation(.easeInOut, value: selection.id)
