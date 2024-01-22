@@ -7,19 +7,32 @@
 
 import SwiftUI
 
+extension UserDefaults {
+    
+    static var lastModuleId: String {
+        get {
+            standard.string(forKey: "last_module_id") ?? AnyTransitionWithDestination.root.id
+        }
+        set {
+            standard.set(newValue, forKey: "last_module_id")
+        }
+    }
+}
+
 /// RouterView adds modifiers for segues, alerts, and modals. If you are already within a Navigation heirarchy, set addNavigationView = false.
 public struct RouterView<Content:View>: View, ModuleDelegate {
     
     let addNavigationView: Bool
     let screens: Binding<[AnyDestination]>?
-    let content: (AnyRouter) -> Content
+    let content: (_ router: AnyRouter, _ lastModuleId: String) -> Content
     
     // Modules
     @State private var moduleTransition: TransitionOption = .trailing
     @State private var selectedModule: AnyTransitionWithDestination = .root
     @State private var allModules: [AnyTransitionWithDestination] = [.root]
+    @AppStorage("last_module_id") private var lastModuleId: String = AnyTransitionWithDestination.root.id
 
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter, String) -> Content) {
         self.addNavigationView = addNavigationView
         self.screens = screens
         self.content = content
@@ -33,7 +46,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             selection: $selectedModule,
             modules: allModules,
             content: { router in
-                content(router)
+                content(router, lastModuleId)
             },
             currentTransition: moduleTransition
         )
@@ -56,6 +69,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             
             self.allModules.append(new)
             self.selectedModule = new
+            self.lastModuleId = new.id
         }
     }
     
@@ -195,7 +209,7 @@ struct RouterViewInternal<Content:View>: View, Router {
 
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
-        RouterView { router in
+        RouterView { (router, lastModuleId) in
             Text("Hi")
                 .onTapGesture {
                     router.showScreen(.push) { router in
