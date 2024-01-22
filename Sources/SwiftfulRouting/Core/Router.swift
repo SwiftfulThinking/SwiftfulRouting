@@ -39,7 +39,7 @@ public protocol Router: ModuleDelegate {
 }
 
 public protocol ModuleDelegate {
-    func transitionModule<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View
+    func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View
     func dismissModule()
     func dismissAllModules()
 }

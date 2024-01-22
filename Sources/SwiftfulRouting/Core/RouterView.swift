@@ -53,7 +53,10 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
     }
     
     
-    public func transitionModule<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+    public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        // Note: lastModuleId is not the AnyTransitionWithDestination's id
+        self.lastModuleId = id
+
         let new = AnyTransitionWithDestination(
             id: UUID().uuidString,
             transition: option,
@@ -69,7 +72,6 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             
             self.allModules.append(new)
             self.selectedModule = new
-            self.lastModuleId = new.id
         }
     }
     
@@ -786,15 +788,15 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
-    func transitionModule<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
-        moduleDelegate.transitionModule(option, destination: destination)
+    public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        moduleDelegate.transitionModule(id: id, option, destination: destination)
     }
     
-    func dismissModule() {
+    public func dismissModule() {
         moduleDelegate.dismissModule()
     }
     
-    func dismissAllModules() {
+    public func dismissAllModules() {
         moduleDelegate.dismissAllModules()
     }
 }
