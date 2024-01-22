@@ -159,6 +159,17 @@ public struct AnyRouter: Router {
         object.showSafari(url)
     }
 
+    public func transitionModule<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        object.transitionModule(option, destination: destination)
+    }
+    
+    public func dismissModule() {
+        object.dismissModule()
+    }
+    
+    public func dismissAllModules() {
+        object.dismissAllModules()
+    }
 }
 
 struct MockRouter: Router {
@@ -233,5 +244,16 @@ struct MockRouter: Router {
         printError()
     }
     
+    func transitionModule<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        printError()
+    }
+    
+    func dismissModule() {
+        printError()
+    }
+    
+    func dismissAllModules() {
+        printError()
+    }
     
 }

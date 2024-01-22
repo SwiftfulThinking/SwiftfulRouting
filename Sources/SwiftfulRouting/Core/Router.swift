@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-public protocol Router {
+public protocol Router: ModuleDelegate {
     func enterScreenFlow(_ routes: [AnyRoute])
     func showNextScreen() throws
     func dismissScreen()
@@ -34,7 +34,12 @@ public protocol Router {
     func transitionScreen<T>(_ option: TransitionOption, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View
     func dismissTransition()
     func dismissAllTransitions()
-
         
     func showSafari(_ url: @escaping () -> URL)
+}
+
+public protocol ModuleDelegate {
+    func transitionModule<T>(_ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View
+    func dismissModule()
+    func dismissAllModules()
 }
