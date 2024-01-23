@@ -66,7 +66,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             }
         )
         
-        self.moduleTransition = option
+//        self.moduleTransition = option
         
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_000_000)
