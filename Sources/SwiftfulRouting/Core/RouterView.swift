@@ -66,7 +66,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             }
         )
         
-//        self.moduleTransition = option
+        self.moduleTransition = option
         
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_000_000)
@@ -179,13 +179,14 @@ struct RouterViewInternal<Content:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             let router = AnyRouter(object: self)
-            TransitionSupportView(
-                router: router,
-                selection: $selectedTransition,
-                transitions: allTransitions,
-                content: content,
-                currentTransition: transition
-            )
+//            TransitionSupportView(
+//                router: router,
+//                selection: $selectedTransition,
+//                transitions: allTransitions,
+//                content: content,
+//                currentTransition: transition
+//            )
+            content(router)
             .showingScreen(
                 option: segueOption,
                 screens: $screens,
