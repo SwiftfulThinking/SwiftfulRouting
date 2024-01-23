@@ -32,6 +32,9 @@ struct ModuleSupportView<Content:View>: View {
                         environmentRouter: nil,
                         content: content
                     )
+                    .onAppear {
+                        print("DID APPEAR!!!!!")
+                    }
 //                    .background(Color.red)
 //                    RouterView(addNavigationView: addNavigationView, screens: screens) { router in
 //                        content(router)
