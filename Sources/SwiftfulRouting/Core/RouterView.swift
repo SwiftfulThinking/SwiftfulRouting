@@ -37,7 +37,6 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
         self.addNavigationView = addNavigationView
         self.screens = screens
         self.content = content
-        print("LOADING: \(UserDefaults.lastModuleId)")
         self._lastModuleId = State(wrappedValue: UserDefaults.lastModuleId)
     }
 
@@ -59,7 +58,6 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
     public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
         // Note: lastModuleId is not the AnyTransitionWithDestination's id
         UserDefaults.lastModuleId = id
-        print("did set as : \(id)")
 
         let new = AnyTransitionWithDestination(
             id: UUID().uuidString,
