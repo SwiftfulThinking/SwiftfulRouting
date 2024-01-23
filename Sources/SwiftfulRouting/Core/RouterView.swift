@@ -57,7 +57,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
     
     public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
         // Note: lastModuleId is not the AnyTransitionWithDestination's id
-        self.lastModuleId = id
+        UserDefaults.lastModuleId = id
         print("did set as : \(id)")
 
         let new = AnyTransitionWithDestination(
