@@ -30,7 +30,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
     @State private var moduleTransition: TransitionOption = .trailing
     @State private var selectedModule: AnyTransitionWithDestination = .root
     @State private var allModules: [AnyTransitionWithDestination] = [.root]
-    @AppStorage("last_module_id") private var lastModuleId: String = AnyTransitionWithDestination.root.id
+    @AppStorage("last_module_id") private var lastModuleId: String?
 
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter, String) -> Content) {
         self.addNavigationView = addNavigationView
@@ -46,7 +46,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             selection: $selectedModule,
             modules: allModules,
             content: { router in
-                content(router, lastModuleId)
+                content(router, lastModuleId ?? AnyTransitionWithDestination.root.id)
             },
             currentTransition: moduleTransition
         )
@@ -56,6 +56,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
     public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
         // Note: lastModuleId is not the AnyTransitionWithDestination's id
         self.lastModuleId = id
+        print("did set as : \(id)")
 
         let new = AnyTransitionWithDestination(
             id: UUID().uuidString,
