@@ -37,6 +37,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
         self.addNavigationView = addNavigationView
         self.screens = screens
         self.content = content
+        print("LOADING: \(UserDefaults.lastModuleId)")
         self._lastModuleId = State(wrappedValue: UserDefaults.lastModuleId)
     }
 
