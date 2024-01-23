@@ -179,14 +179,13 @@ struct RouterViewInternal<Content:View>: View, Router {
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
             let router = AnyRouter(object: self)
-//            TransitionSupportView(
-//                router: router,
-//                selection: $selectedTransition,
-//                transitions: allTransitions,
-//                content: content,
-//                currentTransition: transition
-//            )
-            content(router)
+            TransitionSupportView(
+                router: router,
+                selection: $selectedTransition,
+                transitions: allTransitions,
+                content: content,
+                currentTransition: transition
+            )
             .showingScreen(
                 option: segueOption,
                 screens: $screens,
