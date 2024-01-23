@@ -7,29 +7,105 @@
 
 import SwiftUI
 
+extension UserDefaults {
+    
+    static var lastModuleId: String {
+        get {
+            standard.string(forKey: "last_module_id") ?? AnyTransitionWithDestination.root.id
+        }
+        set {
+            standard.set(newValue, forKey: "last_module_id")
+        }
+    }
+}
+
 /// RouterView adds modifiers for segues, alerts, and modals. If you are already within a Navigation heirarchy, set addNavigationView = false.
-public struct RouterView<T:View>: View {
+public struct RouterView<Content:View>: View, ModuleDelegate {
     
     let addNavigationView: Bool
     let screens: Binding<[AnyDestination]>?
-    let content: (AnyRouter) -> T
+    let content: (_ router: AnyRouter, _ lastModuleId: String) -> Content
     
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter) -> T) {
+    // Modules
+    @State private var moduleTransition: TransitionOption = .trailing
+    @State private var selectedModule: AnyTransitionWithDestination = .root
+    @State private var allModules: [AnyTransitionWithDestination] = [.root]
+    
+    @State private var lastModuleId: String
+
+    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter, String) -> Content) {
         self.addNavigationView = addNavigationView
         self.screens = screens
         self.content = content
+        self._lastModuleId = State(wrappedValue: UserDefaults.lastModuleId)
     }
 
     public var body: some View {
-        RouterViewInternal(
-            addNavigationView: addNavigationView,
+        ModuleSupportView(
+            addNavigationView: addNavigationView, 
+            moduleDelegate: self,
             screens: screens,
-            route: nil,
-            routes: nil,
-            environmentRouter: nil,
-            content: content
+            selection: $selectedModule,
+            modules: allModules,
+            content: { router in
+                content(router, lastModuleId)
+            },
+            currentTransition: moduleTransition
         )
     }
+    
+    
+    public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        // Note: lastModuleId is not the AnyTransitionWithDestination's id
+        UserDefaults.lastModuleId = id
+
+        let new = AnyTransitionWithDestination(
+            id: UUID().uuidString,
+            transition: option,
+            destination: { router in
+                AnyDestination(destination(router))
+            }
+        )
+        
+        self.moduleTransition = option
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_000_000)
+            
+            self.allModules.append(new)
+            self.selectedModule = new
+        }
+    }
+    
+    public func dismissModule() {
+        if let index = allModules.firstIndex(where: { $0.id == selectedModule.id }), allModules.indices.contains(index - 1) {
+            self.moduleTransition = allModules[index].transition.reversed
+            
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_000_000)
+                
+                self.selectedModule = allModules[index - 1]
+                
+                try? await Task.sleep(nanoseconds: 25_000)
+                allModules.remove(at: index)
+            }
+            
+        }
+    }
+    
+    public func dismissAllModules() {
+         self.moduleTransition = .trailing.reversed
+
+         Task { @MainActor in
+             try? await Task.sleep(nanoseconds: 1_000_000)
+             
+             self.selectedModule = allModules.first ?? .root
+             
+             try? await Task.sleep(nanoseconds: 25_000)
+             self.allModules = [allModules.first ?? .root]
+         }
+     }
+
 }
 
 struct RouterViewInternal<Content:View>: View, Router {
@@ -38,6 +114,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @Environment(\.openURL) var openURL
 
     let addNavigationView: Bool
+    let moduleDelegate: ModuleDelegate
     let content: (AnyRouter) -> Content
  
     // Routable methods
@@ -78,7 +155,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var selectedTransition: AnyTransitionWithDestination = .root
     @State private var allTransitions: [AnyTransitionWithDestination] = [.root]
 
-    public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
+    public init(addNavigationView: Bool = true, moduleDelegate: ModuleDelegate, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
         self._screenStack = screens ?? .constant([])
         
@@ -97,7 +174,7 @@ struct RouterViewInternal<Content:View>: View, Router {
         
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
-
+        self.moduleDelegate = moduleDelegate
     }
     
     public var body: some View {
@@ -107,17 +184,9 @@ struct RouterViewInternal<Content:View>: View, Router {
                 router: router,
                 selection: $selectedTransition,
                 transitions: allTransitions,
-                content: {
-                    content(router)
-                        .onAppear {
-                            print("B")
-                        }
-                },
+                content: content,
                 currentTransition: transition
             )
-            .onAppear {
-                print("C")
-            }
             .showingScreen(
                 option: segueOption,
                 screens: $screens,
@@ -134,23 +203,17 @@ struct RouterViewInternal<Content:View>: View, Router {
             })
             .showingAlert(option: alertOption, item: $alert)
             .environment(\.router, router)
-            .onAppear {
-                print("D")
-            }
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)
         })
-        .onAppear {
-            print("D")
-        }
     }
             
 }
 
 struct RouterView_Previews: PreviewProvider {
     static var previews: some View {
-        RouterView { router in
+        RouterView { (router, lastModuleId) in
             Text("Hi")
                 .onTapGesture {
                     router.showScreen(.push) { router in
@@ -274,7 +337,7 @@ extension RouterViewInternal {
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, moduleDelegate: self, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -283,16 +346,16 @@ extension RouterViewInternal {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, moduleDelegate: self, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 } else {
                     // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screenStack.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, moduleDelegate: self, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, moduleDelegate: self, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
             }
         }
     }
@@ -314,7 +377,7 @@ extension RouterViewInternal {
         destinations.forEach { route in
             localRoutes.append(route)
             
-            let view = AnyDestination(RouterViewInternal<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
+            let view = AnyDestination(RouterViewInternal<AnyView>(addNavigationView: false, moduleDelegate: self, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
             }), onDismiss: route.onDismiss)
             localStack.append(view)
@@ -347,7 +410,7 @@ extension RouterViewInternal {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+        self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, moduleDelegate: self, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         
         // Resizable binding is within current Router, so onFirstAppear of newRoute will never execute
         // Manually mark as isPresented
@@ -719,5 +782,23 @@ extension RouterViewInternal {
             try? await Task.sleep(nanoseconds: 25_000)
             self.allTransitions = [allTransitions.first ?? .root]
         }
+    }
+}
+
+
+// Modules
+
+extension RouterViewInternal {
+    
+    public func transitionModule<T>(id: String, _ option: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        moduleDelegate.transitionModule(id: id, option, destination: destination)
+    }
+    
+    public func dismissModule() {
+        moduleDelegate.dismissModule()
+    }
+    
+    public func dismissAllModules() {
+        moduleDelegate.dismissAllModules()
     }
 }

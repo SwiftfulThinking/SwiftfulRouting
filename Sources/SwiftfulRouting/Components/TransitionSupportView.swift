@@ -30,16 +30,14 @@ struct TransitionSupportView<Content:View>: View {
     let router: AnyRouter
     @Binding var selection: AnyTransitionWithDestination
     let transitions: [AnyTransitionWithDestination]
-    @ViewBuilder var content: Content
+    @ViewBuilder var content: (AnyRouter) -> Content
     let currentTransition: TransitionOption
-        
-    // problem is that when .transition changes, view re-renders and re-appears. Need to update the view's transition but not re-render the view
     
     var body: some View {
         ZStack {
             LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
                 if data == transitions.first {
-                    content
+                    content(router)
                         .transition(
                             .asymmetric(
                                 insertion: currentTransition.insertion,
