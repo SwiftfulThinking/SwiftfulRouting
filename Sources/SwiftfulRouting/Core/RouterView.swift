@@ -30,12 +30,14 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
     @State private var moduleTransition: TransitionOption = .trailing
     @State private var selectedModule: AnyTransitionWithDestination = .root
     @State private var allModules: [AnyTransitionWithDestination] = [.root]
-    @AppStorage("last_module_id") private var lastModuleId: String?
+    
+    @State private var lastModuleId: String
 
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, @ViewBuilder content: @escaping (AnyRouter, String) -> Content) {
         self.addNavigationView = addNavigationView
         self.screens = screens
         self.content = content
+        self._lastModuleId = State(wrappedValue: UserDefaults.lastModuleId)
     }
 
     public var body: some View {
@@ -46,7 +48,7 @@ public struct RouterView<Content:View>: View, ModuleDelegate {
             selection: $selectedModule,
             modules: allModules,
             content: { router in
-                content(router, lastModuleId ?? AnyTransitionWithDestination.root.id)
+                content(router, lastModuleId)
             },
             currentTransition: moduleTransition
         )
