@@ -13,10 +13,9 @@ Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
-    
-SwiftUI is a declarative framework, and therefore, a SwiftUI router must be declarative by nature. Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. The solution herein is to declare modifiers to support all possible routing in advance. The result is a Router struct that is fully decoupled from the View and added into the Environment on each screen.
+Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. However, SwiftUI is declarative, and so we must declare the view heirarchy in advance. The solution herein is to convert SwiftUI's declarative code to behave as programmatic code by connecting view modifiers to support the routing in advance.
 
-As you segue to a new screen, the framework adds a set ViewModifers to the root of the destination View that will support all potential navigation routes. Currently, the framework can simultaneously support 1 active Segue, 1 active Alert, and 1 active Modal on each View in the heirarchy. The ViewModifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. 
+As you segue to a new screen, the framework adds a set view modifiers to the root of the destination View that will support all potential navigation routes. The modifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. 
 
 - The ViewModifiers are in `RouterView.swift -> body`.
 - Accessible routing methods are in `AnyRouter.swift`. 
