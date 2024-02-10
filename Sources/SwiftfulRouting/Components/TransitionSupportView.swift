@@ -157,7 +157,7 @@ public struct FrameReader: View {
 }
 
 @available(iOS 14, *)
-public extension View {
+extension View {
     
     /// Get the frame of the View
     ///
