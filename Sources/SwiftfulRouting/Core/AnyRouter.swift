@@ -90,11 +90,11 @@ public struct AnyRouter: Router {
     ///
     ///  WARNING: Alert modifiers were deprecated between iOS 14 & iOS 15. iOS 15+ will use '@ViewBuilder alert' parameter, while iOS 14 and below will use 'buttonsiOS13' parameter.
     @available(iOS 15, *)
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
+    public func showAlert<T:View>(_ option: DialogOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T) where T : View {
         object.showAlert(option, title: title, subtitle: subtitle, alert: alert, buttonsiOS13: nil)
     }
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]? = nil) where T : View {
+    public func showAlert<T:View>(_ option: DialogOption, title: String, subtitle: String? = nil, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]? = nil) where T : View {
         object.showAlert(option, title: title, subtitle: subtitle, alert: alert, buttonsiOS13: buttonsiOS13)
     }
     
@@ -210,7 +210,7 @@ struct MockRouter: Router {
         printError()
     }
     
-    func showAlert<T>(_ option: AlertOption, title: String, subtitle: String?, alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) where T : View {
+    func showAlert<T>(_ option: DialogOption, title: String, subtitle: String?, alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) where T : View {
         printError()
     }
     

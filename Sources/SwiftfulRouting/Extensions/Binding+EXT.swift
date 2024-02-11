@@ -32,7 +32,7 @@ extension Binding where Value == AnyDestination? {
 
 extension Binding where Value == AnyAlert? {
     
-    init(if selected: AlertOption, is option: AlertOption, value: Binding<AnyAlert?>) {
+    init(if selected: DialogOption, is option: DialogOption, value: Binding<AnyAlert?>) {
         self.init {
             selected == option ? value.wrappedValue : nil
         } set: { newValue in
