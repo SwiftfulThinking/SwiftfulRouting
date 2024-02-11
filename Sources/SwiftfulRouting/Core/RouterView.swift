@@ -207,7 +207,7 @@ extension RouterViewInternal {
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func enterScreenFlow(_ newRoutes: [AnyRoute]) {
         guard let route = newRoutes.first else {
-            assertionFailure("SwiftfulRouting: No routes found.")
+            print(printPrefix + "You must include at least one Route to enterScreenFlow.")
             return
         }
         
@@ -423,7 +423,7 @@ extension RouterViewInternal {
         // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
         guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
-            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            print(printPrefix + "Failed to dismiss push from NavigationStack. Could not find a screen to dismiss.")
             #endif
             return
         }
@@ -437,7 +437,7 @@ extension RouterViewInternal {
         
         guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
-            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            print(printPrefix + "Failed to dismiss .push from NavigationStack. Could not find a screen to dismiss.")
             #endif
             return
         }
@@ -445,7 +445,7 @@ extension RouterViewInternal {
         // As a safety precaution, check that visible screen == self.route
         if screenToDismiss != route {
             #if DEBUG
-            assertionFailure("Attempt to dismiss push that is not the view's current push.")
+            print(printPrefix + "Failed to dismiss push. Visible screen found is not the user's current screen.")
             #endif
             return
         }
@@ -463,7 +463,7 @@ extension RouterViewInternal {
         // New root is the screen before the screen to dismiss
         guard let newRootScreen = currentRouteArray.firstBefore(screenToDismiss) else {
             #if DEBUG
-            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            print(printPrefix + "Failed to remove routing flows after screen dismissal. This may cause undefined behavior.")
             #endif
             return
         }
@@ -481,7 +481,7 @@ extension RouterViewInternal {
         // The Sheet being dismissed is actually the firstAfter current route
         guard let allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
             #if DEBUG
-            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            print(printPrefix + "Failed to execute onDismiss methods and remove routing flows after screen dismissal. This may cause undefined behavior.")
             #endif
             return
         }
@@ -544,7 +544,7 @@ extension RouterViewInternal {
         
         guard didFindCurrentScreen, newRootScreen != nil else {
             #if DEBUG
-            assertionFailure("Failed to find screens when dismissing screenStack.")
+            print(printPrefix + "Failed to dismiss screens screenStack. Could not find user's active screens.")
             #endif
             return
         }
