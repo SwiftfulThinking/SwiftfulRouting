@@ -67,7 +67,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var isResizableSheet: Bool = false
 
     // Alerts
-    @State private var alertOption: AlertOption = .alert
+    @State private var alertOption: DialogOption = .alert
     @State private var alert: AnyAlert? = nil
     
     // Modals
@@ -188,7 +188,7 @@ extension View {
             }
     }
 
-    @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
+    @ViewBuilder func showingAlert(option: DialogOption, item: Binding<AnyAlert?>) -> some View {
         self
             .modifier(ConfirmationDialogViewModifier(option: option, item: item))
             .modifier(AlertViewModifier(option: option, item: item))
@@ -568,7 +568,7 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
+    public func showAlert<T:View>(_ option: DialogOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
         guard self.alert == nil else {
             dismissAlert()
             return
