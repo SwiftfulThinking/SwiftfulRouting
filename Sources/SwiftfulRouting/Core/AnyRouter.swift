@@ -172,11 +172,13 @@ public struct AnyRouter: Router {
     }
 }
 
+let printPrefix = "🕊️ SwiftfulRouting 🕊️ -> "
+
 struct MockRouter: Router {
     
     private func printError() {
         #if DEBUG
-        print("Routing failure: Attempt to use AnyRouter without first adding RouterView to the View heirarchy!")
+        print(printPrefix + "Please add a RouterView to the View heirarchy before using Router. There is no Router in the environment!")
         #endif
     }
     
