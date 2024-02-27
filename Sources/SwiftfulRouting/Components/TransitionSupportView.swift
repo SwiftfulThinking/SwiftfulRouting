@@ -33,10 +33,11 @@ struct TransitionSupportView<Content:View>: View {
     let transitions: [AnyTransitionWithDestination]
     @Binding var selection: AnyTransitionWithDestination
     @ViewBuilder var content: (AnyRouter) -> Content
+    let onDidSwipeBack: () -> Void
     
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: false, selection: selection, items: transitions) { data in
+            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
                 if data == transitions.first {
                     content(router)
                         .transition(
@@ -47,14 +48,21 @@ struct TransitionSupportView<Content:View>: View {
                         )
                         .zIndex(1)
                 } else {
-                    data.destination(router).destination
-                        .transition(
-                            .asymmetric(
-                                insertion: currentTransition.insertion,
-                                removal: .customRemoval(direction: currentTransition.reversed)
-                            )
+                    SwipeBackSupportContainer(
+                        insertionTransition: data.transition,
+                        swipeThreshold: 30,
+                        content: {
+                            data.destination(router).destination
+                        },
+                        onDidSwipeBack: onDidSwipeBack
+                    )
+                    .transition(
+                        .asymmetric(
+                            insertion: currentTransition.insertion,
+                            removal: .customRemoval(direction: currentTransition.reversed)
                         )
-                        .zIndex(Double(transitions.firstIndex(of: data) ?? 1) + 1)
+                    )
+                    .zIndex(Double(transitions.firstIndex(of: data) ?? 1) + 1)
                 }
             }
             .animation(.easeInOut, value: selection.id)
@@ -92,6 +100,9 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
             selection: $selectedScreen,
             content: { router in
                 content(self)
+            },
+            onDidSwipeBack: {
+                dismissTransition()
             }
         )
     }

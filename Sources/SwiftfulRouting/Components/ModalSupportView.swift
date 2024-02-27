@@ -146,5 +146,47 @@ public enum TransitionOption: String, CaseIterable {
 //        case .identity: return .identity
         }
     }
+    
+    var asAlignment: Alignment {
+        switch self {
+        case .trailing:
+            return .trailing
+        case .trailingCover:
+            return .trailing
+        case .leading:
+            return .leading
+        case .leadingCover:
+            return .leading
+        case .top:
+            return .top
+        case .topCover:
+            return .top
+        case .bottom:
+            return .bottom
+        case .bottomCover:
+            return .bottom
+        }
+    }
+    
+    var asAxis: Axis.Set {
+        switch self {
+        case .trailing:
+            return .horizontal
+        case .trailingCover:
+            return .horizontal
+        case .leading:
+            return .horizontal
+        case .leadingCover:
+            return .horizontal
+        case .top:
+            return .vertical
+        case .topCover:
+            return .vertical
+        case .bottom:
+            return .vertical
+        case .bottomCover:
+            return .vertical
+        }
+    }
 }
 
