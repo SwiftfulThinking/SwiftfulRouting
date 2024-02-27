@@ -92,7 +92,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
     private var overlayWidth: CGFloat? {
         switch insertionTransition {
         case .trailing, .trailingCover, .leading, .leadingCover:
-            return 65
+            return 24
         default:
             return nil
         }
@@ -101,7 +101,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
     private var overlayHeight: CGFloat? {
         switch insertionTransition {
         case .top, .topCover, .bottom, .bottomCover:
-            return 80
+            return 30
         default:
             return nil
         }
