@@ -50,7 +50,7 @@ struct TransitionSupportView<Content:View>: View {
                 } else {
                     SwipeBackSupportContainer(
                         insertionTransition: data.transition,
-                        swipeThreshold: 30,
+                        swipeThreshold: 16,
                         content: {
                             data.destination(router).destination
                         },
