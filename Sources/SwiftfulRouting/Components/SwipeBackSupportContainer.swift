@@ -116,7 +116,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
     }
 }
 
-fileprivate struct DragGestureViewModifier: ViewModifier {
+private struct DragGestureViewModifier: ViewModifier {
     
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
@@ -233,7 +233,7 @@ fileprivate struct DragGestureViewModifier: ViewModifier {
     
 }
 
-public extension View {
+private extension View {
     
     /// Add a DragGesture to a View.
     ///
