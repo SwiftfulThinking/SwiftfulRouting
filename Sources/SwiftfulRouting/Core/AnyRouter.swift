@@ -114,14 +114,14 @@ public struct AnyRouter: Router {
     
     /// Show any Modal over the current Environment.
     public func showModal<T>(
+        id: String? = nil,
         transition: AnyTransition = AnyTransition.opacity.animation(.default),
         animation: Animation = .default,
         alignment: Alignment = .center,
         backgroundColor: Color? = Color.black.opacity(0.001),
-        backgroundEffect: BackgroundEffect? = nil,
-        useDeviceBounds: Bool = true,
+        ignoreSafeArea: Bool = true,
         @ViewBuilder destination: @escaping () -> T) where T : View {
-        object.showModal(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds, destination: destination)
+            object.showModal(id: id, transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea, destination: destination)
     }
     
     /// Convenience method for a simple modal appearing over the current Environment in the center of the screen.
@@ -131,12 +131,12 @@ public struct AnyRouter: Router {
             animation: .easeInOut,
             alignment: .center,
             backgroundColor: Color.black.opacity(0.4),
-            useDeviceBounds: true,
+            ignoreSafeArea: true,
             destination: destination)
     }
     
-    public func dismissModal() {
-        object.dismissModal()
+    public func dismissModal(id: String? = nil) {
+        object.dismissModal(id: id)
     }
     
     /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
@@ -190,11 +190,11 @@ struct MockRouter: Router {
         printError()
     }
     
-    func showModal<V>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, destination: @escaping () -> V) where V : View {
+    func showModal<V>(id: String? = nil, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     
-    func dismissModal() {
+    func dismissModal(id: String? = nil) {
         printError()
     }
     

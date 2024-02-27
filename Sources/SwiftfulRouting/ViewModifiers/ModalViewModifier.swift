@@ -4,53 +4,17 @@
 //
 //  Created by Nick Sarno on 5/1/22.
 //
-
-import Foundation
 import SwiftUI
 
 struct ModalViewModifier: ViewModifier {
     
-    let configuration: ModalConfiguration
-    let item: Binding<AnyDestination?>
+    let items: [AnyModalWithDestination]
+    let onDismissModal: (AnyModalWithDestination) -> Void
     
     func body(content: Content) -> some View {
         content
             .overlay(
-                ZStack {
-                    if let view = item.wrappedValue?.destination {
-                        
-                        if let backgroundColor = configuration.backgroundColor {
-                            backgroundColor
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .edgesIgnoringSafeArea(.all)
-                                .transition(AnyTransition.opacity.animation(configuration.animation))
-                                .onTapGesture {
-                                    item.wrappedValue = nil
-                                }
-                                .zIndex(1)
-                        }
-                        
-                        if let backgroundEffect = configuration.backgroundEffect {
-                            VisualEffectViewRepresentable(effect: backgroundEffect.effect)
-                                .opacity(backgroundEffect.opacity)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .edgesIgnoringSafeArea(.all)
-                                .transition(AnyTransition.opacity.animation(configuration.animation))
-                                .onTapGesture {
-                                    item.wrappedValue = nil
-                                }
-                                .zIndex(2)
-                        }
-
-                        view
-                            .frame(configuration: configuration)
-                            .edgesIgnoringSafeArea(configuration.useDeviceBounds ? .all : [])
-                            .transition(configuration.transition)
-                            .zIndex(3)
-                    }
-                }
-                .zIndex(999)
-                .animation(configuration.animation, value: item.wrappedValue?.destination == nil)
+                ModalSupportView(transitions: items, onDismissModal: onDismissModal)
             )
     }
 }
@@ -58,13 +22,14 @@ struct ModalViewModifier: ViewModifier {
 extension View {
     
     @ViewBuilder func frame(configuration: ModalConfiguration) -> some View {
-        if configuration.useDeviceBounds {
-            frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height, alignment: configuration.alignment)
+        if configuration.ignoreSafeArea {
+            self
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
+                .ignoresSafeArea()
         } else {
-            frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
+            self
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: configuration.alignment)
         }
     }
     
 }
-
-
