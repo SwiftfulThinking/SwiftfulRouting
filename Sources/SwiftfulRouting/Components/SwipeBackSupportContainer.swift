@@ -25,7 +25,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
             
          
             Rectangle()
-                .fill(Color.black.opacity(0.001))
+                .fill(Color.red)
                 .frame(width: overlayWidth, height: overlayHeight)
                 .withDragGesture(
                     insertionTransition.reversed.asAxis,
