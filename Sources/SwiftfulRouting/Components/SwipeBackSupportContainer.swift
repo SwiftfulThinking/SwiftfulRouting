@@ -41,7 +41,17 @@ struct SwipeBackSupportContainer<Content:View>: View {
                         handleDidSwipeBackIfNeeded()
                     }
                 )
+                .padding(.top, topPadding)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: insertionTransition.reversed.asAlignment)
+        }
+    }
+    
+    private var topPadding: CGFloat? {
+        switch insertionTransition {
+        case .trailing, .trailingCover, .leading, .leadingCover:
+            return 60
+        case .top, .topCover, .bottom, .bottomCover:
+            return nil
         }
     }
     
