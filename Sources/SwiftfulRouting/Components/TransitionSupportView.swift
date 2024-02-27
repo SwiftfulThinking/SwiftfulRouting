@@ -85,7 +85,7 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
     @State private var currentTransition: TransitionOption = .trailing
     @ViewBuilder var content: (TransitionSupportRouter) -> Content
     
-    public init(router: AnyRouter, allowSimultaneous: Bool, content: @escaping (TransitionSupportRouter) -> Content) {
+    public init(router: AnyRouter, allowSimultaneous: Bool = true, content: @escaping (TransitionSupportRouter) -> Content) {
         self.router = router
         self.allowSimultaneous = allowSimultaneous
         self.content = content
