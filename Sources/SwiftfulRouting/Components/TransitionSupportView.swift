@@ -29,6 +29,7 @@ struct TransitionSupportView<Content:View>: View {
     
     let router: AnyRouter
     let allowSimultaneous: Bool
+    let allowsSwipeBack: Bool
     let currentTransition: TransitionOption
     let transitions: [AnyTransitionWithDestination]
     @Binding var selection: AnyTransitionWithDestination
@@ -48,14 +49,20 @@ struct TransitionSupportView<Content:View>: View {
                         )
                         .zIndex(1)
                 } else {
-                    SwipeBackSupportContainer(
-                        insertionTransition: data.transition,
-                        swipeThreshold: 30,
-                        content: {
+                    Group {
+                        if allowsSwipeBack {
+                            SwipeBackSupportContainer(
+                                insertionTransition: data.transition,
+                                swipeThreshold: 30,
+                                content: {
+                                    data.destination(router).destination
+                                },
+                                onDidSwipeBack: onDidSwipeBack
+                            )
+                        } else {
                             data.destination(router).destination
-                        },
-                        onDidSwipeBack: onDidSwipeBack
-                    )
+                        }
+                    }
                     .transition(
                         .asymmetric(
                             insertion: currentTransition.insertion,
@@ -80,13 +87,15 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
     
     let router: AnyRouter
     let allowSimultaneous: Bool
+    let allowsSwipeBack: Bool
     @State private var screens: [AnyTransitionWithDestination] = [.root]
     @State private var selectedScreen: AnyTransitionWithDestination = .root
     @State private var currentTransition: TransitionOption = .trailing
     @ViewBuilder var content: (TransitionSupportRouter) -> Content
     
-    public init(router: AnyRouter, allowSimultaneous: Bool = true, content: @escaping (TransitionSupportRouter) -> Content) {
+    public init(router: AnyRouter, allowsSwipeBack: Bool = true, allowSimultaneous: Bool = true, content: @escaping (TransitionSupportRouter) -> Content) {
         self.router = router
+        self.allowsSwipeBack = allowsSwipeBack
         self.allowSimultaneous = allowSimultaneous
         self.content = content
     }
@@ -95,6 +104,7 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
         TransitionSupportView(
             router: router,
             allowSimultaneous: allowSimultaneous,
+            allowsSwipeBack: allowsSwipeBack,
             currentTransition: currentTransition,
             transitions: screens,
             selection: $selectedScreen,
