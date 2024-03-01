@@ -15,7 +15,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
     var onDidSwipeBack: (() -> Void)? = nil
     
     @State private var viewOffset: CGSize = .zero
-    let animation: Animation = .smooth(duration: 0.3)
+    let animation: Animation = .smooth(duration: 0.15)
 
     var body: some View {
         ZStack {
