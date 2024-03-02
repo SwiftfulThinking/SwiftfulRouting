@@ -7,6 +7,6 @@
 
 import Foundation
 
-public enum AlertOption {
+public enum DialogOption {
     case alert, confirmationDialog
 }

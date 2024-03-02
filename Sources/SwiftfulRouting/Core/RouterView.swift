@@ -67,12 +67,11 @@ struct RouterViewInternal<Content:View>: View, Router {
     @State private var isResizableSheet: Bool = false
 
     // Alerts
-    @State private var alertOption: AlertOption = .alert
+    @State private var alertOption: DialogOption = .alert
     @State private var alert: AnyAlert? = nil
     
     // Modals
-    @State private var modalConfiguration: ModalConfiguration = .default
-    @State private var modal: AnyDestination? = nil
+    @State private var modals: [AnyModalWithDestination] = [.origin]
         
     public init(addNavigationView: Bool = true, screens: (Binding<[AnyDestination]>)? = nil, route: AnyRoute? = nil, routes: Binding<[[AnyRoute]]>? = nil, environmentRouter: Router? = nil, @ViewBuilder content: @escaping (AnyRouter) -> Content) {
         self.addNavigationView = addNavigationView
@@ -117,7 +116,9 @@ struct RouterViewInternal<Content:View>: View, Router {
                 .showingAlert(option: alertOption, item: $alert)
                 .environment(\.router, router)
         }
-        .showingModal(configuration: modalConfiguration, item: $modal)
+        .showingModal(items: modals, onDismissModal: { info in
+            dismissModal(id: info.id)
+        })
     }
             
 }
@@ -187,14 +188,14 @@ extension View {
             }
     }
 
-    @ViewBuilder func showingAlert(option: AlertOption, item: Binding<AnyAlert?>) -> some View {
+    @ViewBuilder func showingAlert(option: DialogOption, item: Binding<AnyAlert?>) -> some View {
         self
             .modifier(ConfirmationDialogViewModifier(option: option, item: item))
             .modifier(AlertViewModifier(option: option, item: item))
     }
     
-    func showingModal(configuration: ModalConfiguration, item: Binding<AnyDestination?>) -> some View {
-        modifier(ModalViewModifier(configuration: configuration, item: item))
+    func showingModal(items: [AnyModalWithDestination], onDismissModal: @escaping (AnyModalWithDestination) -> Void) -> some View {
+        modifier(ModalViewModifier(items: items, onDismissModal: onDismissModal))
     }
     
 }
@@ -206,7 +207,7 @@ extension RouterViewInternal {
     /// Show a flow of screens, segueing to the first route immediately. The following routes can be accessed via 'showNextScreen()'.
     public func enterScreenFlow(_ newRoutes: [AnyRoute]) {
         guard let route = newRoutes.first else {
-            assertionFailure("SwiftfulRouting: No routes found.")
+            print(printPrefix + "You must include at least one Route to enterScreenFlow.")
             return
         }
         
@@ -422,7 +423,7 @@ extension RouterViewInternal {
         // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
         guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
-            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            print(printPrefix + "Failed to dismiss push from NavigationStack. Could not find a screen to dismiss.")
             #endif
             return
         }
@@ -436,7 +437,7 @@ extension RouterViewInternal {
         
         guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
             #if DEBUG
-            assertionFailure("Attempt to dismiss screen from NavigationStack but could not find screen to dismiss.")
+            print(printPrefix + "Failed to dismiss .push from NavigationStack. Could not find a screen to dismiss.")
             #endif
             return
         }
@@ -444,7 +445,7 @@ extension RouterViewInternal {
         // As a safety precaution, check that visible screen == self.route
         if screenToDismiss != route {
             #if DEBUG
-            assertionFailure("Attempt to dismiss push that is not the view's current push.")
+            print(printPrefix + "Failed to dismiss push. Visible screen found is not the user's current screen.")
             #endif
             return
         }
@@ -462,7 +463,7 @@ extension RouterViewInternal {
         // New root is the screen before the screen to dismiss
         guard let newRootScreen = currentRouteArray.firstBefore(screenToDismiss) else {
             #if DEBUG
-            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            print(printPrefix + "Failed to remove routing flows after screen dismissal. This may cause undefined behavior.")
             #endif
             return
         }
@@ -480,7 +481,7 @@ extension RouterViewInternal {
         // The Sheet being dismissed is actually the firstAfter current route
         guard let allRoutesInFrontOfCurrent = currentRouteArray.allAfter(route)?.filter({ $0.isPresented }) else {
             #if DEBUG
-            assertionFailure("Did dismiss pushed screen but could not find new root screen.")
+            print(printPrefix + "Failed to execute onDismiss methods and remove routing flows after screen dismissal. This may cause undefined behavior.")
             #endif
             return
         }
@@ -543,7 +544,7 @@ extension RouterViewInternal {
         
         guard didFindCurrentScreen, newRootScreen != nil else {
             #if DEBUG
-            assertionFailure("Failed to find screens when dismissing screenStack.")
+            print(printPrefix + "Failed to dismiss screens screenStack. Could not find user's active screens.")
             #endif
             return
         }
@@ -567,7 +568,7 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
-    public func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
+    public func showAlert<T:View>(_ option: DialogOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) {
         guard self.alert == nil else {
             dismissAlert()
             return
@@ -588,23 +589,39 @@ extension RouterViewInternal {
 extension RouterViewInternal {
     
     public func showModal<T:View>(
+        id: String? = nil,
         transition: AnyTransition,
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?,
-        backgroundEffect: BackgroundEffect?,
-        useDeviceBounds: Bool,
+        ignoreSafeArea: Bool,
         @ViewBuilder destination: @escaping () -> T) {
-            guard self.modal == nil else {
-                return
-            }
+
+            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea)
+            let dest = AnyDestination(destination())
             
-            self.modalConfiguration = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, backgroundEffect: backgroundEffect, useDeviceBounds: useDeviceBounds)
-            self.modal = AnyDestination(destination())
+            self.modals.append(AnyModalWithDestination(id: id ?? UUID().uuidString, configuration: config, destination: dest))
         }
     
-    public func dismissModal() {
-        self.modal = nil
+    public func dismissModal(id: String? = nil) {
+        if let id {
+            if let index = modals.lastIndex(where: { $0.id == id && !$0.didDismiss }) {
+                modals[index].dismiss()
+                
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 25_000)
+                    modals.remove(at: index)
+                }
+            }
+        } else {
+            if let index = modals.lastIndex(where: { !$0.didDismiss }) {
+                modals[index].dismiss()
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 25_000)
+                    modals.remove(at: index)
+                }
+            }
+        }
     }
 
 }

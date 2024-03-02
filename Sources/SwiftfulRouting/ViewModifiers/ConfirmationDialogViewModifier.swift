@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ConfirmationDialogViewModifier: ViewModifier {
     
-    let option: AlertOption
+    let option: DialogOption
     let item: Binding<AnyAlert?>
 
     func body(content: Content) -> some View {
