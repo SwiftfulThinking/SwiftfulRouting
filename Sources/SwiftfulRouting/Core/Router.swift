@@ -23,12 +23,13 @@ public protocol Router {
     @available(iOS 16, *)
     func showResizableSheet<V:View>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, @ViewBuilder destination: @escaping (AnyRouter) -> V)
     
-    func showAlert<T:View>(_ option: AlertOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?)
+    func showAlert<T:View>(_ option: DialogOption, title: String, subtitle: String?, @ViewBuilder alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?)
     
     func dismissAlert()
     
-    func showModal<V:View>(transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, backgroundEffect: BackgroundEffect?, useDeviceBounds: Bool, @ViewBuilder destination: @escaping () -> V)
-    func dismissModal()
+    func showModal<V:View>(id: String?, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, ignoreSafeArea: Bool, @ViewBuilder destination: @escaping () -> V)
+    func dismissModal(id: String?)
+    func dismissAllModals()
     
     func showSafari(_ url: @escaping () -> URL)
 }
