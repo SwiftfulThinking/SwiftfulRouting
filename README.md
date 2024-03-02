@@ -91,45 +91,7 @@ RouterView { router in
 }
 ```
 
-Each `Router` object can simultaneously support 1 active Segue, 1 active Alert, and 1 active Modal. A new Router is created and added to the view heirarchy after each Segue. Refer to `AnyRouter.swift` to see all accessible methods.
-
-
-```swift
-struct MyView: View {
-
-    let router: AnyRouter
-    
-    var body: some View {
-        VStack {
-            Text("Segue")
-                .onTapGesture {
-                    router.showScreen(.push) { router in
-                        ThirdView(router: router)
-                    }
-                }
-            
-            Text("Alert")
-                .onTapGesture {
-                    router.showAlert(.alert, title: "Title") {
-                        Button("OK") {
-                            
-                        }
-                        Button("Cancel") {
-                            
-                        }
-                    }
-                }
-            
-            Text("Modal")
-                .onTapGesture {
-                    router.showModal {
-                        ChildView()
-                    }
-                }
-        }
-    }
-}
-```
+A new Router is created and added to the view heirarchy after each Segue. Refer to `AnyRouter.swift` to see all accessible methods.
 
 </details>
 
