@@ -115,10 +115,10 @@ public struct AnyRouter: Router {
     /// Show any Modal over the current Environment.
     public func showModal<T>(
         id: String? = nil,
-        transition: AnyTransition = AnyTransition.opacity.animation(.default),
-        animation: Animation = .default,
+        transition: AnyTransition = .identity,
+        animation: Animation = .smooth,
         alignment: Alignment = .center,
-        backgroundColor: Color? = Color.black.opacity(0.001),
+        backgroundColor: Color? = nil,
         ignoreSafeArea: Bool = true,
         @ViewBuilder destination: @escaping () -> T) where T : View {
             object.showModal(id: id, transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea, destination: destination)
