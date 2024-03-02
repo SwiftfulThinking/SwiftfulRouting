@@ -56,6 +56,7 @@ struct ModalSupportView: View {
                             .zIndex(2)
                             .onDisappear {
                                 print("Transition off")
+                                print(transitions)
                             }
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
