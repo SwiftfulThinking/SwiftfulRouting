@@ -54,6 +54,10 @@ struct ModalSupportView: View {
                             .frame(configuration: data.configuration)
                             .transition(data.configuration.transition)
                             .zIndex(2)
+                            .onDisappear {
+                                print("Transition off")
+                                print(transitions.count)
+                            }
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
@@ -70,7 +74,7 @@ struct ModalSupportView: View {
                     }
                 }
             }
-            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
+            .animation(transitions.last?.configuration.animation ?? .default, value: (selection?.id ?? "") + "\(transitions.count)")
         }
         .onFirstAppear {
             selection = transitions.last
