@@ -74,7 +74,7 @@ struct ModalSupportView: View {
                     }
                 }
             }
-            .animation(transitions.last?.configuration.animation ?? .default, value: selection?.id)
+            .animation(transitions.last?.configuration.animation ?? .default, value: (selection?.id ?? "") + "\(transitions.count)")
         }
         .onFirstAppear {
             selection = transitions.last
