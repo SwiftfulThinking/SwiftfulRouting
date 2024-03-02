@@ -399,6 +399,25 @@ router.showModal(transition: .move(edge: .top), animation: .easeInOut, alignment
 }
 ```
 
+You can display multiple modals simultaneously. Modals have an optional ID field, which can later be used to dismiss the modal.  
+
+```swift
+router.showModal(id: "top1") {
+     Text("Sample")
+}
+
+// Dismiss top-most modal
+router.dismissModal()
+
+// Dismiss modal by ID
+router.dismissModal(id: "top1")
+
+// Dismiss all modals
+router.dismissAllModules()
+
+```
+
+
 Additional convenience methods:
 
 ```swift
