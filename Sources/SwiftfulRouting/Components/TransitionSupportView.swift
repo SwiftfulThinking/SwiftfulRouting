@@ -50,8 +50,8 @@ struct TransitionSupportView<Content:View>: View {
                         )
                         .zIndex(1)
                 } else {
-                    Group {
-                        if allowsSwipeBack {
+//                    Group {
+//                        if allowsSwipeBack {
                             SwipeBackSupportContainer(
                                 insertionTransition: data.transition,
                                 swipeThreshold: 30,
@@ -60,10 +60,10 @@ struct TransitionSupportView<Content:View>: View {
                                 },
                                 onDidSwipeBack: onDidSwipeBack
                             )
-                        } else {
-                            data.destination(router).destination
-                        }
-                    }
+//                        } else {
+//                            data.destination(router).destination
+//                        }
+//                    }
                     .transition(
                         .asymmetric(
                             insertion: currentTransition.insertion,
