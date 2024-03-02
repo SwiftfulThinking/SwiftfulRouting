@@ -52,16 +52,16 @@ struct TransitionSupportView<Content:View>: View {
                 } else {
 //                    Group {
 //                        if allowsSwipeBack {
-                            SwipeBackSupportContainer(
-                                insertionTransition: data.transition,
-                                swipeThreshold: 30,
-                                content: {
-                                    data.destination(router).destination
-                                },
-                                onDidSwipeBack: onDidSwipeBack
-                            )
+//                            SwipeBackSupportContainer(
+//                                insertionTransition: data.transition,
+//                                swipeThreshold: 30,
+//                                content: {
+//                                    data.destination(router).destination
+//                                },
+//                                onDidSwipeBack: onDidSwipeBack
+//                            )
 //                        } else {
-//                            data.destination(router).destination
+                            data.destination(router).destination
 //                        }
 //                    }
                     .transition(
