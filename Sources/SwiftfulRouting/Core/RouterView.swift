@@ -624,4 +624,20 @@ extension RouterViewInternal {
         }
     }
 
+    public func dismissAllModals() {
+        // Dismiss all modals
+        for (index, modal) in modals.enumerated() {
+            // Don't dismiss "origin" view
+            if index > 0 && !modal.didDismiss {
+                modals[index].dismiss()
+            }
+        }
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 25_000)
+            
+            // Reset array to "origin"
+            modals = [modals.first!]
+        }
+    }
 }

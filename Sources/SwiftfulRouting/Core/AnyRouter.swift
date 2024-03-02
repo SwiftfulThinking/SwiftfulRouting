@@ -139,6 +139,10 @@ public struct AnyRouter: Router {
         object.dismissModal(id: id)
     }
     
+    public func dismissAllModals() {
+        object.dismissAllModals()
+    }
+    
     /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
     public func showSafari(_ url: @escaping () -> URL) {
         object.showSafari(url)
@@ -197,6 +201,10 @@ struct MockRouter: Router {
     }
     
     func dismissModal(id: String? = nil) {
+        printError()
+    }
+    
+    func dismissAllModals() {
         printError()
     }
     
