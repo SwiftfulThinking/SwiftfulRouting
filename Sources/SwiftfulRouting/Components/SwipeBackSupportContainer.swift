@@ -25,7 +25,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
             
          
             Rectangle()
-                .fill(Color.black.opacity(0.001))
+                .fill(Color.red.opacity(0.5))
                 .frame(width: overlayWidth, height: overlayHeight)
                 .withDragGesture(
                     insertionTransition.reversed.asAxis,
@@ -35,6 +35,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
                     onChanged: { offset in
                         if offset != .zero {
                             setViewOffset(from: offset)
+                            print("is dragging")
                         }
                     },
                     onEnded: { _ in
