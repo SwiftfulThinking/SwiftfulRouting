@@ -375,7 +375,7 @@ router.dismissModal()
 router.dismissModal(id: "top1")
 
 // Dismiss all modals
-router.dismissAllModules()
+router.dismissAllModals()
 
 ```
 
