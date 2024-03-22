@@ -92,13 +92,15 @@ struct RouterViewInternal<Content:View>: View, Router {
         
         self._environmentRouter = State(wrappedValue: environmentRouter)
         self.content = content
-
+    }
+    
+    var currentRouter: AnyRouter {
+        AnyRouter(object: self)
     }
     
     public var body: some View {
         NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
-            let router = AnyRouter(object: self)
-            content(router)
+            content(currentRouter)
                 .showingScreen(
                     option: segueOption,
                     screens: $screens,
@@ -114,11 +116,11 @@ struct RouterViewInternal<Content:View>: View, Router {
                     updateRouteIsPresented(route: route, isPresented: true)
                 })
                 .showingAlert(option: alertOption, item: $alert)
-                .environment(\.router, router)
         }
         .showingModal(items: modals, onDismissModal: { info in
             dismissModal(id: info.id)
         })
+        .environment(\.router, currentRouter)
     }
             
 }
