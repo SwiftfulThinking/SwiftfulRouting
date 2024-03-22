@@ -94,7 +94,7 @@ struct RouterViewInternal<Content:View>: View, Router {
         self.content = content
     }
     
-    var currentRouter: AnyRouter {
+    private var currentRouter: AnyRouter {
         AnyRouter(object: self)
     }
     
