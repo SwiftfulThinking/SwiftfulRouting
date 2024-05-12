@@ -295,6 +295,22 @@ Or convenience method:
 router.showNextScreenOrDismissEnvironment()
 ```
 
+Copy and paste this code into your project to enable swipe back gestures. This is not included in the SwiftUI framework by default and therefore is not automatically included herein. 
+
+
+```swift
+extension UINavigationController: UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+    
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
+    }
+}
+```
+
 </details>
 
 ## Alerts
