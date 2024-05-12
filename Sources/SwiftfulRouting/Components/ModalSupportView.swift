@@ -31,6 +31,7 @@ struct AnyModalWithDestination: Identifiable, Equatable {
                 animation: .default,
                 alignment: .center,
                 backgroundColor: nil,
+                dismissOnBackgroundTap: true,
                 ignoreSafeArea: true
             ),
             destination: AnyDestination(EmptyView())
@@ -62,9 +63,13 @@ struct ModalSupportView: View {
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.all)
                                 .transition(AnyTransition.opacity.animation(.easeInOut))
-                                .onTapGesture {
-                                    onDismissModal(data)
-                                }
+                                // Only add backgound tap gesture if needed
+                                .ifSatisfiesCondition(data.configuration.dismissOnBackgroundTap, transform: { content in
+                                    content
+                                        .onTapGesture {
+                                            onDismissModal(data)
+                                        }
+                                })
                                 .zIndex(dataIndex + 1)
                         } else {
                             EmptyView()
