@@ -47,13 +47,15 @@ struct ModalSupportView: View {
         
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: true, selection: selection, items: transitions) { data in
-                LazyZStack(allowSimultaneous: true, selection: true) { showView1 in
+            LazyZStack(allowSimultaneous: true, selection: selection, items: transitions) { (data: AnyModalWithDestination) in
+                let dataIndex: Double = Double(transitions.firstIndex(where: { $0.id == data.id }) ?? 99)
+
+                return LazyZStack(allowSimultaneous: true, selection: true) { (showView1: Bool) in
                     if showView1 {
                         data.destination.destination
                             .frame(configuration: data.configuration)
                             .transition(data.configuration.transition)
-                            .zIndex(2)
+                            .zIndex(dataIndex + 2)
                     } else {
                         if let backgroundColor = data.configuration.backgroundColor {
                             backgroundColor
@@ -63,7 +65,7 @@ struct ModalSupportView: View {
                                 .onTapGesture {
                                     onDismissModal(data)
                                 }
-                                .zIndex(1)
+                                .zIndex(dataIndex + 1)
                         } else {
                             EmptyView()
                         }
