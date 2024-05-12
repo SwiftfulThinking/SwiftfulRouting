@@ -13,6 +13,7 @@ public struct ModalConfiguration {
     let animation: Animation
     let alignment: Alignment
     let backgroundColor: Color?
+    let dismissOnBackgroundTap: Bool
     let ignoreSafeArea: Bool
     
     static let `default` = ModalConfiguration(
@@ -20,6 +21,7 @@ public struct ModalConfiguration {
         animation: .easeInOut,
         alignment: .bottom,
         backgroundColor: nil,
+        dismissOnBackgroundTap: true,
         ignoreSafeArea: true
     )
 }

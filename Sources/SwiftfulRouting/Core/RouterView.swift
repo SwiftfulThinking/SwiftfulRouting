@@ -596,10 +596,11 @@ extension RouterViewInternal {
         animation: Animation,
         alignment: Alignment,
         backgroundColor: Color?,
+        dismissOnBackgroundTap: Bool,
         ignoreSafeArea: Bool,
         @ViewBuilder destination: @escaping () -> T) {
 
-            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, ignoreSafeArea: ignoreSafeArea)
+            let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, dismissOnBackgroundTap: dismissOnBackgroundTap, ignoreSafeArea: ignoreSafeArea)
             let dest = AnyDestination(destination())
             
             self.modals.append(AnyModalWithDestination(id: id ?? UUID().uuidString, configuration: config, destination: dest))
