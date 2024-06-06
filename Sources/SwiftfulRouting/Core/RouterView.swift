@@ -519,13 +519,16 @@ extension RouterViewInternal {
         var didFindCurrentScreen: Bool = false
         var newRootScreen: AnyRoute? = currentRouteArray.first
         
+        print("CURRENT ROUTE: \(self.route.id)")
+        print("ALL ROUTES")
         // Find all screens on current stack that are ahead of current screen that are .push & isPresented
         for route in currentRouteArray.filter({ $0.isPresented }).reversed() {
+            print(route)
             if route.segue == .push {
                 screensToDismiss.append(route)
             }
             
-            if route.id == self.route.id {
+            if route.id == self.route.id || route == currentRouteArray.first {
                 didFindCurrentScreen = true
             }
             
