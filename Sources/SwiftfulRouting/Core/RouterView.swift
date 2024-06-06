@@ -527,7 +527,8 @@ extension RouterViewInternal {
             if route.segue == .push {
                 screensToDismiss.append(route)
             }
-            
+            print("CURROUTE: \(route.id)")
+            print("FIRSTROU: \(currentRouteArray.first?.id ?? "n/a")")
             if route.id == self.route.id || route == currentRouteArray.first {
                 didFindCurrentScreen = true
             }
