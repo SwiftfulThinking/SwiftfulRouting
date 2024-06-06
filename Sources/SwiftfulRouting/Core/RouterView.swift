@@ -517,19 +517,22 @@ extension RouterViewInternal {
         
         var screensToDismiss: [AnyRoute] = []
         var didFindCurrentScreen: Bool = false
-        var newRootScreen: AnyRoute? = currentRouteArray.first
+        
+        // All presented screens, first screen being the highest
+        let presentedRouteArrayReversed = currentRouteArray.filter({ $0.isPresented }).reversed()
+        var newRootScreen: AnyRoute? = presentedRouteArrayReversed.last
         
         print("CURRENT ROUTE: \(self.route.id)")
         print("ALL ROUTES")
         // Find all screens on current stack that are ahead of current screen that are .push & isPresented
-        for route in currentRouteArray.filter({ $0.isPresented }).reversed() {
+        for route in presentedRouteArrayReversed {
             print(route)
             if route.segue == .push {
                 screensToDismiss.append(route)
             }
             print("CURROUTE: \(route.id)")
-            print("FIRSTROU: \(currentRouteArray.first?.id ?? "n/a")")
-            if route.id == self.route.id || route == currentRouteArray.first {
+            print("ROOTROUTE: \(presentedRouteArrayReversed.last?.id ?? "n/a")")
+            if route.id == self.route.id || route == presentedRouteArrayReversed.last {
                 didFindCurrentScreen = true
             }
             
