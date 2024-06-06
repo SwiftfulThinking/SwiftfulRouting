@@ -522,16 +522,12 @@ extension RouterViewInternal {
         let presentedRouteArrayReversed = currentRouteArray.filter({ $0.isPresented }).reversed()
         var newRootScreen: AnyRoute? = presentedRouteArrayReversed.last
         
-        print("CURRENT ROUTE: \(self.route.id)")
-        print("ALL ROUTES")
         // Find all screens on current stack that are ahead of current screen that are .push & isPresented
         for route in presentedRouteArrayReversed {
-            print(route)
             if route.segue == .push {
                 screensToDismiss.append(route)
             }
-            print("CURROUTE: \(route.id)")
-            print("ROOTROUTE: \(presentedRouteArrayReversed.last?.id ?? "n/a")")
+
             if route.id == self.route.id || route == presentedRouteArrayReversed.last {
                 didFindCurrentScreen = true
             }
