@@ -6,7 +6,8 @@
 
 SwiftfulRouting is a native, declarative framework that enables programmatic navigation in SwiftUI applications. 
 
-Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
+- Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
+- YouTube Tutorial: https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6
 
 ## How It Works
 
@@ -423,7 +424,7 @@ Community contributions are encouraged! Please ensure that your code adheres to 
 
 Upcoming features:
 
-- [ ] Support multiple Modals per screen
+- [x] Support multiple Modals per screen
 - [ ] Add `showModule` support, for navigating between parent-level RouterView's
 - [ ] Support VisionOS
 
