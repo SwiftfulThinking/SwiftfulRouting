@@ -428,7 +428,10 @@ extension RouterViewInternal {
         
         // Remove from screens (this must align with NavigationStack $path and should occur no matter what
         screens.removeAll { screen in
-            allRoutesInFrontOfRequested.contains(where: { $0.id == screen.id })
+            let contains = allRoutesInFrontOfRequested.contains(where: { $0.id == screen.id })
+            
+            print("DID REMOVE: \(contains)")
+            return contains
         }
 
         // Dismiss all routes in reverse order
