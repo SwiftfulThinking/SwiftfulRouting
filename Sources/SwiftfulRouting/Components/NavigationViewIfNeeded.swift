@@ -73,6 +73,9 @@ struct NavigationStackTransformable<Content:View>: View {
             }
         }
         .onChange(of: path, perform: { path in
+            print("ON CHANGE TRIGGER")
+            print(path.count)
+            print(screens.count)
             if path.count < screens.count {
                 onDismissLastPush()
             }
