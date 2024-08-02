@@ -24,8 +24,10 @@ struct AnyModalWithDestination: Identifiable, Equatable {
     }
     
     static var origin: AnyModalWithDestination {
-        AnyModalWithDestination(
-            id: "origin",
+        let id = "origin"
+        
+        return AnyModalWithDestination(
+            id: id,
             configuration: ModalConfiguration(
                 transition: .identity,
                 animation: .default,
@@ -34,7 +36,7 @@ struct AnyModalWithDestination: Identifiable, Equatable {
                 dismissOnBackgroundTap: true,
                 ignoreSafeArea: true
             ),
-            destination: AnyDestination(EmptyView())
+            destination: AnyDestination(id: id, EmptyView())
         )
     }
 }

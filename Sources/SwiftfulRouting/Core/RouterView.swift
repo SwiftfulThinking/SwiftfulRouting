@@ -99,7 +99,7 @@ struct RouterViewInternal<Content:View>: View, Router {
     }
     
     public var body: some View {
-        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissLastPush: onDismissOfLastPush, screens: $screens) {
+        NavigationViewIfNeeded(addNavigationView: addNavigationView, segueOption: segueOption, onDismissCurrentPush: onDismissOfCurrentPush, onDismissStackScreens: onDismissStackScreens, screens: $screens) {
             content(currentRouter)
                 .showingScreen(
                     option: segueOption,
@@ -251,7 +251,7 @@ extension RouterViewInternal {
             // Sheet and FullScreenCover enter new Environments and require a new Navigation to be added, and don't need an environmentRouter because they will host the environment.
             self.sheetDetents = [.large]
             self.sheetSelectionEnabled = false
-            self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+            self.screens.append(AnyDestination(id: route.id, RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         } else {
             // Using existing Navigation
             // Push continues in the existing Environment and uses the existing Navigation
@@ -260,16 +260,16 @@ extension RouterViewInternal {
             if #available(iOS 16, *) {
                 if screenStack.isEmpty {
                     // We are in the root Router and should start building on $screens
-                    self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screens.append(AnyDestination(id: route.id, RouterViewInternal<V>(addNavigationView: false, screens: $screens, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 } else {
                     // We are not in the root Router and should continue off of $screenStack
-                    self.screenStack.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                    self.screenStack.append(AnyDestination(id: route.id, RouterViewInternal<V>(addNavigationView: false, screens: $screenStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
                 }
                 
             // iOS 14/15 uses NavigationView and can only push 1 view at a time
             } else {
                 // Push a new screen and don't pass view stack to child view (screens == nil)
-                self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
+                self.screens.append(AnyDestination(id: route.id, RouterViewInternal<V>(addNavigationView: false, screens: nil, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: destination), onDismiss: route.onDismiss))
             }
         }
     }
@@ -291,7 +291,7 @@ extension RouterViewInternal {
         destinations.forEach { route in
             localRoutes.append(route)
             
-            let view = AnyDestination(RouterViewInternal<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
+            let view = AnyDestination(id: route.id, RouterViewInternal<AnyView>(addNavigationView: false, screens: bindingStack, route: route, routes: routeBinding, environmentRouter: environmentRouter, content: { router in
                 AnyView(route.destination(router))
             }), onDismiss: route.onDismiss)
             localStack.append(view)
@@ -324,7 +324,7 @@ extension RouterViewInternal {
             self.sheetSelectionEnabled = false
         }
         
-        self.screens.append(AnyDestination(RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
+        self.screens.append(AnyDestination(id: route.id, RouterViewInternal<V>(addNavigationView: true, screens: nil, route: route, routes: routeBinding, environmentRouter: nil, content: destination), onDismiss: nil))
         
         // Resizable binding is within current Router, so onFirstAppear of newRoute will never execute
         // Manually mark as isPresented
@@ -412,25 +412,28 @@ extension RouterViewInternal {
 
 extension RouterViewInternal {
     
-    private func onDismissOfLastPush() {
+    private func onDismissStackScreens(_ dismissTo: AnyDestination) {
         // This is for onDismiss via NavigationStack
-        // This is called within the NavigationStack's root Router, but is dismissing the last screen in the stack
+        // This is called within the NavigationStack's root Router, but is dismissing the last screen(s) in the stack
+        // Screen stack supports dismissing multiple screens at a time.
         
-        // Remove screen from current Router's screen stack
-        // Note: even if below 'route' logic fails, the screen has already been removed from View heirarchy
-        // So removing final screen from screens should always occur?
-        screens.removeLast()
-
-        // Find the last screen in the heirarchy that is presented and is .push
-        // Note: Possible bug - this function finds the last .push, but if dev tries to dismiss a .push below the current environment, it will dismiss the one in the current environment?
-        guard let screenToDismiss = currentRouteArray.last(where: { $0.isPresented && $0.segue == .push }) else {
+        guard
+            let newBaseRoute = currentRouteArray.first(where: { $0.id == dismissTo.id }),
+            let allRoutesInFrontOfRequested = currentRouteArray.allAfter(newBaseRoute)?.filter({ $0.isPresented }) else {
             #if DEBUG
-            print(printPrefix + "Failed to dismiss push from NavigationStack. Could not find a screen to dismiss.")
+            print(printPrefix + "Failed to execute onDismiss methods and remove routing flows after screen dismissal. This may cause undefined behavior.")
             #endif
             return
         }
+
+        // Dismiss all routes in reverse order
+        for route in allRoutesInFrontOfRequested.reversed() {
+            route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
+        }
         
-        dismissScreenAndUpdateRoutes(screen: screenToDismiss)
+        // Remove flow if needed
+        removeRoutingFlowsAfterRoute(route)
     }
         
     private func onDismissOfCurrentPush() {
@@ -604,9 +607,11 @@ extension RouterViewInternal {
         @ViewBuilder destination: @escaping () -> T) {
 
             let config = ModalConfiguration(transition: transition, animation: animation, alignment: alignment, backgroundColor: backgroundColor, dismissOnBackgroundTap: dismissOnBackgroundTap, ignoreSafeArea: ignoreSafeArea)
-            let dest = AnyDestination(destination())
             
-            self.modals.append(AnyModalWithDestination(id: id ?? UUID().uuidString, configuration: config, destination: dest))
+            let id = id ?? UUID().uuidString
+            let dest = AnyDestination(id: id, destination())
+            
+            self.modals.append(AnyModalWithDestination(id: id, configuration: config, destination: dest))
         }
     
     public func dismissModal(id: String? = nil) {
