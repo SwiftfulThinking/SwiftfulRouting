@@ -417,10 +417,18 @@ extension RouterViewInternal {
         // This is called within the NavigationStack's root Router, but is dismissing the last screen(s) in the stack
         // Screen stack supports dismissing multiple screens at a time.
         
+        let newBaseRoute = currentRouteArray.first(where: { $0.id == dismissTo.id })
+        print("NEW BASE")
+        print(newBaseRoute)
+        print("ROUTE ARRAY")
+        print(currentRouteArray)
+        
         guard
             let newBaseRoute = currentRouteArray.first(where: { $0.id == dismissTo.id }),
             let allRoutesInFrontOfRequested = currentRouteArray.allAfter(newBaseRoute)?.filter({ $0.isPresented }) else {
             #if DEBUG
+            print("FAILED")
+            
             print(printPrefix + "Failed to execute onDismiss methods and remove routing flows after screen dismissal. This may cause undefined behavior.")
             #endif
             return
