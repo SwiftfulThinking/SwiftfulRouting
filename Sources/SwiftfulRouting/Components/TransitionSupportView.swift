@@ -142,30 +142,23 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
     }
     
     public func dismissTransition() {
-        let uid = UUID().uuidString
-        print("\(uid) DISMISS START")
+        guard let index = screens.firstIndex(where: { $0.id == selectedScreen.id }), screens.indices.contains(index - 1) else { return }
+        
+        let screenToDismiss = screens[index]
+        let newSelectedScreen = screens[index - 1]
+        
+        self.currentTransition = screenToDismiss.transition.reversed
 
-        if let index = screens.firstIndex(where: { $0.id == selectedScreen.id }), screens.indices.contains(index - 1) {
-            let screenToDismiss = screens[index]
-            let newSelectedScreen = screens[index - 1]
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000)
             
-            self.currentTransition = screenToDismiss.transition.reversed
-            print("\(uid) DISMISS 1: \(screens.count)")
+            selectedScreen = newSelectedScreen
 
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 100_000_000)
-                
-                selectedScreen = newSelectedScreen
-                print("\(uid) DISMISS 2: \(screens.count)")
-
-                try? await Task.sleep(nanoseconds: 25_000)
-                
-                // Due to delays above, there is edge case where dismissTransition is called multiple times and the screen could already be dismissed
-                if let index = screens.firstIndex(where: { $0.id == screenToDismiss.id }) {
-                    screens.remove(at: index)
-                    print("\(uid) DISMISS 3: \(screens.count)")
-                }
-            }
+            try? await Task.sleep(nanoseconds: 25_000)
+            
+            // Due to delays above, there is edge case where dismissTransition is called multiple times and the screen could already be dismissed
+            guard let index = screens.firstIndex(where: { $0.id == screenToDismiss.id }) else { return }
+            screens.remove(at: index)
         }
     }
     
