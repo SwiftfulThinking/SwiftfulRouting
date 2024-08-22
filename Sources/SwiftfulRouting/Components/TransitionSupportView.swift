@@ -142,16 +142,23 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
     }
     
     public func dismissTransition() {
+        let uid = UUID().uuidString
+        print("\(uid) DISMISS START")
+
         if let index = screens.firstIndex(where: { $0.id == selectedScreen.id }), screens.indices.contains(index - 1) {
             self.currentTransition = screens[index].transition.reversed
-            
+            print("\(uid) DISMISS 1: \(screens.count)")
+
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 100_000_000)
                 
                 selectedScreen = screens[index - 1]
-                
+                print("\(uid) DISMISS 2: \(screens.count)")
+
                 try? await Task.sleep(nanoseconds: 25_000)
                 screens.remove(at: index)
+                print("\(uid) DISMISS 3: \(screens.count)")
+
             }
         }
     }
