@@ -142,17 +142,23 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
     }
     
     public func dismissTransition() {
-        if let index = screens.firstIndex(where: { $0.id == selectedScreen.id }), screens.indices.contains(index - 1) {
-            self.currentTransition = screens[index].transition.reversed
+        guard let index = screens.firstIndex(where: { $0.id == selectedScreen.id }), screens.indices.contains(index - 1) else { return }
+        
+        let screenToDismiss = screens[index]
+        let newSelectedScreen = screens[index - 1]
+        
+        self.currentTransition = screenToDismiss.transition.reversed
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000)
             
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 100_000_000)
-                
-                selectedScreen = screens[index - 1]
-                
-                try? await Task.sleep(nanoseconds: 25_000)
-                screens.remove(at: index)
-            }
+            selectedScreen = newSelectedScreen
+
+            try? await Task.sleep(nanoseconds: 25_000)
+            
+            // Due to delays above, there is edge case where dismissTransition is called multiple times and the screen could already be dismissed
+            guard let index = screens.firstIndex(where: { $0.id == screenToDismiss.id }) else { return }
+            screens.remove(at: index)
         }
     }
     
