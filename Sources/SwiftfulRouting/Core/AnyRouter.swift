@@ -153,7 +153,7 @@ public struct AnyRouter: Router {
 
 let printPrefix = "🕊️ SwiftfulRouting 🕊️ -> "
 
-struct MockRouter: Router {
+public struct MockRouter: Router {
     
     private func printError() {
         #if DEBUG
@@ -161,55 +161,55 @@ struct MockRouter: Router {
         #endif
     }
     
-    func enterScreenFlow(_ routes: [AnyRoute]) {
+    public func enterScreenFlow(_ routes: [AnyRoute]) {
         printError()
     }
     
-    func showNextScreen() throws {
+    public func showNextScreen() throws {
         printError()
     }
     
-    func dismissScreen() {
+    public func dismissScreen() {
         printError()
     }
     
-    func dismissEnvironment() {
+    public func dismissEnvironment() {
         printError()
     }
     
-    func dismissScreenStack() {
+    public func dismissScreenStack() {
         printError()
     }
     
-    func pushScreenStack(destinations: [PushRoute]) {
+    public func pushScreenStack(destinations: [PushRoute]) {
         printError()
     }
 
-    func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, destination: @escaping (AnyRouter) -> V) where V : View {
+    public func showResizableSheet<V>(sheetDetents: Set<PresentationDetentTransformable>, selection: Binding<PresentationDetentTransformable>?, showDragIndicator: Bool, onDismiss: (() -> Void)?, destination: @escaping (AnyRouter) -> V) where V : View {
         printError()
     }
     
-    func showAlert<T>(_ option: DialogOption, title: String, subtitle: String?, alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) where T : View {
+    public func showAlert<T>(_ option: DialogOption, title: String, subtitle: String?, alert: @escaping () -> T, buttonsiOS13: [Alert.Button]?) where T : View {
         printError()
     }
     
-    func dismissAlert() {
+    public func dismissAlert() {
         printError()
     }
     
-    func showModal<V>(id: String? = nil, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, dismissOnBackgroundTap: Bool, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
+    public func showModal<V>(id: String? = nil, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, dismissOnBackgroundTap: Bool, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     
-    func dismissModal(id: String? = nil) {
+    public func dismissModal(id: String? = nil) {
         printError()
     }
     
-    func dismissAllModals() {
+    public func dismissAllModals() {
         printError()
     }
     
-    func showSafari(_ url: @escaping () -> URL) {
+    public func showSafari(_ url: @escaping () -> URL) {
         printError()
     }
     
