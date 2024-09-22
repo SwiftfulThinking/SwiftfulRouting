@@ -161,6 +161,10 @@ public struct MockRouter: Router {
         #endif
     }
     
+    public init() {
+        
+    }
+    
     public func enterScreenFlow(_ routes: [AnyRoute]) {
         printError()
     }
