@@ -1,6 +1,6 @@
-> ❤️ This package is provided for free. Tips appreciated: https://www.buymeacoffee.com/nicksarno
-> 
-> 🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/architecture
+❤️ This package is provided for free. Tips appreciated: https://www.buymeacoffee.com/nicksarno
+
+🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/architecture
 
 # SwiftfulRouting  🤙
 
