@@ -1,6 +1,6 @@
-<p align="left">
-    <img src="https://github.com/SwiftfulThinking/SwiftfulRouting/assets/44950578/a66e097f-5501-4480-ae9e-48d2809efae7" alt="SwiftfulRouting Swifts" width="70%" />
-</p>
+> ❤️ This package is provided for free. Tips appreciated: https://www.buymeacoffee.com/nicksarno
+> 
+> 🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/architecture
 
 # SwiftfulRouting  🤙
 
