@@ -12,6 +12,7 @@ public protocol Router {
     func enterScreenFlow(_ routes: [AnyRoute])
     func showNextScreen() throws
     func dismissScreen()
+    func dismissScreens(to: String)
     func dismissEnvironment()
     @available(iOS 16, *)
     func dismissScreenStack()

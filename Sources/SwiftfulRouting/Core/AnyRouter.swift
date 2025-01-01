@@ -65,6 +65,10 @@ public struct AnyRouter: Router {
     public func dismissScreen() {
         object.dismissScreen()
     }
+    
+    public func dismissScreens(to id: String) {
+        object.dismissScreens(to: id)
+    }
 
     /// Push a stack of screens and show the last one immediately.
     @available(iOS 16, *)
@@ -174,6 +178,10 @@ public struct MockRouter: Router {
     }
     
     public func dismissScreen() {
+        printError()
+    }
+    
+    public func dismissScreens(to id: String) {
         printError()
     }
     

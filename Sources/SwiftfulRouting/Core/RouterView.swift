@@ -502,6 +502,25 @@ extension RouterViewInternal {
         self.presentationMode.wrappedValue.dismiss()
     }
     
+    public func dismissScreens(to id: String) {
+        let identifiableRoute = AnyRoute(id: id, .push, onDismiss: nil, destination: { _ in EmptyView() })
+        guard let allRoutesInFrontOfCurrent = currentRouteArray.allAfter(identifiableRoute)?.filter({ $0.isPresented }) else {
+            #if DEBUG
+            print(printPrefix + "Failed to execute onDismiss methods and remove routing flows after screen dismissal. This may cause undefined behavior.")
+            #endif
+            return
+        }
+
+        // Dismiss all routes in reverse order
+        for route in allRoutesInFrontOfCurrent.reversed() {
+            route.onDismiss?()
+            updateRouteIsPresented(route: route, isPresented: false)
+        }
+        
+        // Remove flow if needed
+        removeRoutingFlowsAfterRoute(route)
+    }
+    
     public func dismissEnvironment() {
         if let environmentRouter {
             environmentRouter.dismissScreen()
