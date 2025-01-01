@@ -13,9 +13,9 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
     let id: String
     let transition: TransitionOption
     let destination: (AnyRouter) -> AnyDestination
-    //
+    
     static var root: AnyTransitionWithDestination {
-        AnyTransitionWithDestination(id: "root", transition: .trailing, destination: { _ in
+        AnyTransitionWithDestination(id: "root_transition", transition: .trailing, destination: { _ in
             AnyDestination(EmptyView())
         })
     }
@@ -123,11 +123,12 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
     }
     
     public func showTransition<T>(transition: TransitionOption, destination: @escaping (AnyRouter) -> T) where T : View {
+        let id = UUID().uuidString
         let new = AnyTransitionWithDestination(
-            id: UUID().uuidString,
+            id: id,
             transition: transition,
             destination: { router in
-                AnyDestination(destination(router))
+                AnyDestination(id: id, destination(router))
             }
         )
         

@@ -114,7 +114,7 @@ public struct AnyRouter: Router {
     
     /// Show any Modal over the current Environment.
     public func showModal<T>(
-        id: String? = nil,
+        id: String = UUID().uuidString,
         transition: AnyTransition = .identity,
         animation: Animation = .smooth,
         alignment: Alignment = .center,
@@ -201,7 +201,7 @@ public struct MockRouter: Router {
         printError()
     }
     
-    public func showModal<V>(id: String? = nil, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, dismissOnBackgroundTap: Bool, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
+    public func showModal<V>(id: String = UUID().uuidString, transition: AnyTransition, animation: Animation, alignment: Alignment, backgroundColor: Color?, dismissOnBackgroundTap: Bool, ignoreSafeArea: Bool, destination: @escaping () -> V) where V : View {
         printError()
     }
     

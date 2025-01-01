@@ -28,7 +28,7 @@ public struct AnyRoute: Identifiable, Hashable {
     }
     
     static var root: AnyRoute = {
-        var route = AnyRoute(id: "root", .push) { router in
+        var route = AnyRoute(.push) { router in
             AnyView(Text("Root"))
         }
         return route

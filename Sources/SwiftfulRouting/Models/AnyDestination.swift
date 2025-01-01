@@ -9,11 +9,12 @@ import Foundation
 import SwiftUI
 
 public struct AnyDestination: Identifiable, Hashable {
-    public let id = UUID().uuidString
+    public let id: String
     public let destination: AnyView
     public let onDismiss: (() -> Void)?
 
-    public init<T:View>(_ destination: T, onDismiss: (() -> Void)? = nil) {
+    public init<T:View>(id: String = UUID().uuidString, _ destination: T, onDismiss: (() -> Void)? = nil) {
+        self.id = id
         self.destination = AnyView(destination)
         self.onDismiss = onDismiss
     }
