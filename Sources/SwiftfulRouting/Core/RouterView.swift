@@ -507,7 +507,9 @@ extension RouterViewInternal {
         let identifiableRoute = AnyRoute(id: id, .push, onDismiss: nil, destination: { _ in EmptyView() })
         print("DISMISSING TO ROUTE: \(identifiableRoute.id)")
         
-        print(currentRouteArray.map({ $0.id }))
+        print("currentRouteArray " + currentRouteArray.map({ $0.id }).joined(separator: ", "))
+        print("screens " + screens.map({ $0.id }).joined(separator: ", "))
+        print("screenStack " + screenStack.map({ $0.id }).joined(separator: ", "))
 
         guard let allRoutesInFrontOfCurrent = currentRouteArray.allAfter(identifiableRoute)?.filter({ $0.isPresented }) else {
 //            #if DEBUG
