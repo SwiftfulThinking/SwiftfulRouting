@@ -28,8 +28,8 @@ public struct AnyRouter: Router {
     }
     
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.
-    public func showScreen<T>(_ option: SegueOption, onDismiss: (() -> Void)? = nil, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
-        object.enterScreenFlow([AnyRoute(option, onDismiss: onDismiss, destination: destination)])
+    public func showScreen<T>(id: String = UUID().uuidString, _ option: SegueOption, onDismiss: (() -> Void)? = nil, @ViewBuilder destination: @escaping (AnyRouter) -> T) where T : View {
+        object.enterScreenFlow([AnyRoute(id: id, option, onDismiss: onDismiss, destination: destination)])
     }
 
     /// Show any screen via Push (NavigationLink), Sheet, or FullScreenCover.

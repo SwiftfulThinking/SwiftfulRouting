@@ -9,20 +9,26 @@ import Foundation
 import SwiftUI
 
 public struct AnyRoute: Identifiable, Hashable {
-    public let id = UUID().uuidString
+    public let id: String
     public var segue: SegueOption
     public var onDismiss: (() -> Void)?
     public var destination: (AnyRouter) -> any View
     public var isPresented: Bool = false
     
-    public init(_ segue: SegueOption, onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
+    public init(
+        id: String = UUID().uuidString,
+        _ segue: SegueOption,
+        onDismiss: (() -> Void)? = nil,
+        destination: @escaping (AnyRouter) -> any View
+    ) {
+        self.id = id
         self.segue = segue
         self.onDismiss = onDismiss
         self.destination = destination
     }
     
     static var root: AnyRoute = {
-        var route = AnyRoute(.push) { router in
+        var route = AnyRoute(id: "root", .push) { router in
             AnyView(Text("Root"))
         }
         return route
@@ -40,17 +46,22 @@ public struct AnyRoute: Identifiable, Hashable {
 /// PushRoute is AnyRoute where segue == .push
 /// This is used for pushing multiple view at once onto the NavigationStack, which only allows for .push
 public struct PushRoute: Identifiable {    
-    public let id = UUID().uuidString
+    public let id: String
     let segue: SegueOption = .push
     let onDismiss: (() -> Void)?
     let destination: (AnyRouter) -> any View
     
-    public init(onDismiss: (() -> Void)? = nil, destination: @escaping (AnyRouter) -> any View) {
+    public init(
+        id: String = UUID().uuidString,
+        onDismiss: (() -> Void)? = nil,
+        destination: @escaping (AnyRouter) -> any View
+    ) {
+        self.id = id
         self.onDismiss = onDismiss
         self.destination = destination
     }
     
     var asAnyRoute: AnyRoute {
-        AnyRoute(segue, onDismiss: onDismiss, destination: destination)
+        AnyRoute(id: id, segue, onDismiss: onDismiss, destination: destination)
     }
 }
