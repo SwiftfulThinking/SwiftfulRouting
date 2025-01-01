@@ -503,13 +503,18 @@ extension RouterViewInternal {
     }
     
     public func dismissScreens(to id: String) {
+        print("DISMISSING TO ID: \(id)")
         let identifiableRoute = AnyRoute(id: id, .push, onDismiss: nil, destination: { _ in EmptyView() })
+        print("DISMISSING TO ROUTE: \(identifiableRoute.id)")
+
         guard let allRoutesInFrontOfCurrent = currentRouteArray.allAfter(identifiableRoute)?.filter({ $0.isPresented }) else {
-            #if DEBUG
+//            #if DEBUG
             print(printPrefix + "Failed to execute onDismiss methods and remove routing flows after screen dismissal. This may cause undefined behavior.")
-            #endif
+//            #endif
             return
         }
+
+        print("FOUND ROUTES: \(allRoutesInFrontOfCurrent.count)")
 
         // Dismiss all routes in reverse order
         for route in allRoutesInFrontOfCurrent.reversed() {
