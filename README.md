@@ -1,4 +1,4 @@
-### 🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/offers/REyNLwwH?coupon_code=LAUNCH3
+### 🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/offers/REyNLwwH
 
 
 # SwiftfulRouting  🤙
