@@ -28,14 +28,26 @@ import SwiftUI
 ///   - addNavigationStack: Whether to wrap the root content in a `NavigationStack`. Defaults to `true`.
 ///   - addModuleSupport: Enables showModule methods for this view heirarchy.
 ///   - content: A closure that provides the root content view, receiving an `AnyRouter` instance for navigation control.
-struct RouterView<Content: View>: View {
+public struct RouterView<Content: View>: View {
     
-    var id: String = RouterViewModel.rootId
-    var addNavigationStack: Bool = true
-    var addModuleSupport: Bool = false
+    let id: String
+    let addNavigationStack: Bool
+    let addModuleSupport: Bool
     @ViewBuilder var content: (AnyRouter) -> Content
+    
+    public init(
+        id: String? = nil,
+        addNavigationStack: Bool = true,
+        addModuleSupport: Bool = false,
+        content: @escaping (AnyRouter) -> Content
+    ) {
+        self.id = id ?? RouterViewModel.rootId
+        self.addNavigationStack = addNavigationStack
+        self.addModuleSupport = addModuleSupport
+        self.content = content
+    }
 
-    var body: some View {
+    public var body: some View {
         Group {
             if addModuleSupport {
                 ModuleSupportView(

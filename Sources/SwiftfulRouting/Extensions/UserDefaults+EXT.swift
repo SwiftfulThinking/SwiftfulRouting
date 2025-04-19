@@ -6,7 +6,7 @@
 //
 import Foundation
 
-extension UserDefaults {
+public extension UserDefaults {
     
     @MainActor
     static var lastModuleId: String {
