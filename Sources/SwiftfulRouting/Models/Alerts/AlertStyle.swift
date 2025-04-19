@@ -10,7 +10,7 @@ import SwiftUI
 public enum AlertStyle: String, CaseIterable, Hashable {
     case alert, confirmationDialog
     
-    var codeString: String {
+    public var codeString: String {
         ".\(rawValue)"
     }
 }

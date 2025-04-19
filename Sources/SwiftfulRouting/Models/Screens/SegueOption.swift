@@ -32,7 +32,7 @@ public enum SegueOption: Equatable, CaseIterable, Hashable {
         lhs.stringValue == rhs.stringValue
     }
     
-    var codeString: String {
+    public var codeString: String {
         switch self {
         case .push:
             return ".push"
@@ -43,7 +43,7 @@ public enum SegueOption: Equatable, CaseIterable, Hashable {
         }
     }
     
-    var stringValue: String {
+    public var stringValue: String {
         switch self {
         case .push:
             return "push"
@@ -54,7 +54,7 @@ public enum SegueOption: Equatable, CaseIterable, Hashable {
         }
     }
     
-    var presentsNewEnvironment: Bool {
+    public var presentsNewEnvironment: Bool {
         switch self {
         case .push:
             return false

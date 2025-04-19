@@ -15,7 +15,7 @@ public enum SegueLocation {
     /// Insert screen after the location injected screen's router
     case insertAfter(id: String)
     
-    var stringValue: String {
+    public var stringValue: String {
         switch self {
         case .insert:
             return "insert"
