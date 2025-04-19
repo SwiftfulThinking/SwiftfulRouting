@@ -18,4 +18,12 @@ extension View {
         }
     }
     
+    @ViewBuilder func ifLetCondition<T, Content: View>(_ value: T?, transform: @escaping (Self, T) -> Content) -> some View {
+        if let value {
+            transform(self, value)
+        } else {
+            self
+        }
+    }
+
 }
