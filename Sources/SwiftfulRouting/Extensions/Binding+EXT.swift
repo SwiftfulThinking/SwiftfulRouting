@@ -8,52 +8,93 @@
 import Foundation
 import SwiftUI
 
-extension Binding where Value == Bool {
+@MainActor
+extension Binding where Value == [AnyDestination] {
     
-    init<T:Any>(ifNotNil value: Binding<T?>) {
+    init(stack: [AnyDestinationStack], routerId: String, onDidDismiss: @escaping (_ lastRouteRemaining: AnyDestination?) -> Void) {
         self.init {
-            value.wrappedValue != nil
-        } set: { _ in
-            value.wrappedValue = nil
+            let index = stack.firstIndex { subStack in
+                return subStack.screens.contains(where: { $0.id == routerId })
+            }
+            guard let index, stack.indices.contains(index + 1) else {
+                return []
+            }
+            return stack[index + 1].screens
+        } set: { newValue in
+            // User manually swiped back on screen
+            
+            let index = stack.firstIndex { subStack in
+                return subStack.screens.contains(where: { $0.id == routerId })
+            }
+            guard let index, stack.indices.contains(index + 1) else {
+                return
+            }
+            
+            if newValue.count < stack[index + 1].screens.count {
+                onDidDismiss(newValue.last)
+            }
         }
     }
 }
 
+@MainActor
 extension Binding where Value == AnyDestination? {
     
-    init(if selected: SegueOption, is option: SegueOption, value: Binding<AnyDestination?>) {
+    init(stack: [AnyDestinationStack], routerId: String, segue: SegueOption, onDidDismiss: @escaping () -> Void) {
         self.init {
-            selected == option ? value.wrappedValue : nil
+            let routerStackIndex = stack.firstIndex { subStack in
+                return subStack.screens.contains(where: { $0.id == routerId })
+            }
+            
+            guard let routerStackIndex else {
+                return nil
+            }
+            
+            let routerStack = stack[routerStackIndex]
+
+            if routerStack.segue == .push, routerStack.screens.last?.id != routerId {
+                return nil
+            }
+            
+            var nextSheetStack: AnyDestinationStack?
+            if routerStack.segue == .push, stack.indices.contains(routerStackIndex + 1) {
+                nextSheetStack = stack[routerStackIndex + 1]
+            } else if stack.indices.contains(routerStackIndex + 2) {
+                nextSheetStack = stack[routerStackIndex + 2]
+            }
+
+            if let nextSegue = nextSheetStack?.segue, nextSegue == segue, let screen = nextSheetStack?.screens.first {
+                return screen
+            }
+            
+            return nil
         } set: { newValue in
-            value.wrappedValue = newValue
+            // User manually swiped down on environment
+            if newValue == nil {
+                onDidDismiss()
+            }
         }
     }
 }
 
-extension Binding where Value == AnyAlert? {
+@MainActor
+extension Binding where Value == Bool {
     
-    init(if selected: DialogOption, is option: DialogOption, value: Binding<AnyAlert?>) {
-        self.init {
-            selected == option ? value.wrappedValue : nil
-        } set: { newValue in
-            value.wrappedValue = newValue
-        }
+    init(ifAlert alert: Binding<AnyAlert?>, isStyle style: AlertStyle) {
+        self.init(get: {
+            if let alertStyle = alert.wrappedValue?.style, alertStyle == style {
+                return true
+            }
+            return false
+        }, set: { newValue in
+            if newValue == false {
+                alert.wrappedValue = nil
+            }
+        })
     }
 }
 
-extension Binding where Value == Array<AnyDestination> {
-    
-    init(if selected: SegueOption, is option: SegueOption, value: Binding<[AnyDestination]>) {
-        self.init {
-            selected == option ? value.wrappedValue : []
-        } set: { newValue in
-            value.wrappedValue = newValue
-        }
-    }
-    
-}
-
-@available(iOS 16, *)
+@MainActor
 extension Binding where Value == PresentationDetent {
     
     init(selection: Binding<PresentationDetentTransformable>) {
@@ -64,26 +105,4 @@ extension Binding where Value == PresentationDetent {
         }
     }
     
-}
-
-
-extension Binding {
-    
-    init<V:Hashable>(toLastElementIn array: Binding<[V]>) where Value == V? {
-        self.init {
-            array.wrappedValue.last
-        } set: { newValue in
-            if let newValue {
-                // Check for newValue in array before updating
-                if let index = array.wrappedValue.firstIndex(of: newValue) {
-                    array.wrappedValue[index] = newValue
-                }
-            } else {
-                // Check for last item in array before removing (not safe)
-                if array.wrappedValue.last != nil {
-                    array.wrappedValue.removeLast()
-                }
-            }
-        }
-    }
 }
