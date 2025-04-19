@@ -1,30 +1,108 @@
 ### 🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/offers/REyNLwwH
 
 
-# SwiftfulRouting  🤙
+# SwiftfulRouting 🤙
 
-SwiftfulRouting is a native, declarative framework that enables programmatic navigation in SwiftUI applications. 
+Programmatic navigation for SwiftUI applications.
+
+✅ Segues
+✅ Alerts
+✅ Modals
+✅ Transitions
+✅ Modules
 
 - Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
 - YouTube Tutorial: https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6
+
+## Quick Start (TLDR)
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Use a `RouterView` to replace `NavigationStack` in your SwiftUI code.
+
+```swift
+// Before SwiftfulRouting
+NavigationStack {
+  MyView()
+    .navigationDestination()
+    .sheet()
+    .fullScreenCover()
+    .alert()
+}
+
+// With SwiftfulRouting
+RouterView { _ in
+  MyView()
+}
+```
+
+Use a `router` to perform actions.
+
+```swift
+struct MyView: View {
+    
+    @Environment(\.router) var router
+    
+    var body: some View {
+        Text("Hello, world!")
+            .onTapGesture {
+                router.showScreen { _ in 
+                    AnotherView()
+                }
+            }
+    }
+}
+```
+
+All available methods in `router` are in `AnyRouter.swift`. Examples:
+
+```swift
+router.showScreen...
+router.showAlert...
+router.showModal...
+router.showTransition...
+router.showModule...
+router.dismissScreen...
+router.dismissAlert...
+router.dismissModal...
+router.dismissTransition...
+router.dismissModule...
+```
+
+</details>
+
 
 ## How It Works
 
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
-Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. However, SwiftUI is declarative, and so we must declare the view heirarchy in advance. The solution herein is to convert SwiftUI's declarative code to behave as programmatic code by connecting view modifiers to support the routing in advance.
-<br>
-<br>
-As you segue to a new screen, the framework adds a set view modifiers to the root of the destination View that will support all potential navigation routes. The modifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. 
-<br>
-<br>
 
-- The ViewModifiers are in `RouterView.swift -> body`.
-- Accessible routing methods are in `AnyRouter.swift`. 
-- Refer to the sample project for example implementations, UI Tests and sample MVC, MVVM and VIPER design patterns.
+As you segue to a new screen, the framework adds a set view modifiers to the root of the destination View that will support all potential navigation routes. This allows declarative code to behave as programmatic code, since the view modifiers are connected in advance. Screen destinations are erased to generic types, allowing the developer to determine the destination at the time of execution. 
 
-Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
+
+Version 6.0 adds many new features to the framework by implementing an internal `RouterViewModel` across the screen heirarchy that allows and screen's `router` to perform actions that affect the entire heirarchy. The technical solution was to introduce `[AnyDestinationStack]` which is a single array that holds bindings for all active segues in the heirarchy. 
+
+```
+// Example of what an [AnyDestinationStack] might look like:
+
+ [
+    [.fullScreenCover]
+    [.push, .push, .push, .push]
+    [.sheet]
+    []
+ ]
+```
+
+In addition to adding a `router` to the Environment, every segue immedaitely returns a `router` in the View's closure. This allows the developer to have access to the screen's routing methods before the screen is created. Leave fully decouples routing logic from the View layer and is perfect for more complex app architectures, such as MVVM or VIPER.
+
+```swift
+RouterView { router in
+  MyView(router: router)
+}
+```
 
 </details>
 
@@ -39,21 +117,29 @@ Add the package to your Xcode project.
 https://github.com/SwiftfulThinking/SwiftfulRouting.git
 ```
 
-Import the package
+Import the package.
 
 ```swift
 import SwiftfulRouting
 ```
 
-Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a Navigation heirarchy and add modifiers to support all potential segues.
+Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a NavigationStack and add modifiers to support all potential segues. This would **replace** an existing `NavigationStack` in your code.
+
+Use a `RouterView` to replace `NavigationStack` in your SwiftUI code.
 
 ```swift
-struct ContentView: View {
-    var body: some View {
-        RouterView { _ in
-            MyView()
-        }
-    }
+// Before SwiftfulRouting
+NavigationStack {
+  MyView()
+    .navigationDestination()
+    .sheet()
+    .fullScreenCover()
+    .alert()
+}
+
+// With SwiftfulRouting
+RouterView { _ in
+  MyView()
 }
 ```
 
@@ -73,25 +159,37 @@ var body: some View {
 }
 ```
 
-Instead of relying on the `Environment`, you may also pass the `Router` directly into the child views. This allows the `Router` to be fully decoupled from the View (for more complex app architectures).
+Instead of relying on the `Environment`, you can also pass the `router` directly into the child views.
 
 ```swift
 RouterView { router in
-     ContentView(router: router)
-          .onTapGesture {
-               router.showScreen(.push) { router2 in
-                    Text("View2")
-                         .onTapGesture {
-                              router2.showScreen(.push) { router3 in
-                                   Text("View3")
-                              }
-                         }
+    MyView(router: router)
+}
+```
+
+You can also use the returned `router` directly. A new `router` is created and added to the view heirarchy after each segue and are therefore unique to each screen. In the below example, the tap gesture on "View3" could call `dismissScreen()` from `router2` or `router3`, which would have different behaviors. This is done on purpose and is further explained in the docs below!
+
+```swift
+RouterView { router1 in
+    Text("View 1")
+        .onTapGesture {
+            router1.showScreen(.push) { router2 in
+                Text("View 2")
+                    .onTapGesture {
+                        router2.showScreen(.push) { router3 in
+                            Text("View3")
+                                .onTapGesture {
+                                    router3.dismissScreen() // Dismiss View3
+                                    router2.dismissScreen() // Dismiss View2 and View 3
+                                }
+                        }
+                    }
                }
           }
 }
 ```
 
-A new Router is created and added to the view heirarchy after each Segue. Refer to `AnyRouter.swift` to see all accessible methods.
+Refer to [AnyRouter.swift](https://github.com/SwiftfulThinking/SwiftfulRouting/blob/main/Sources/SwiftfulRouting/Core/AnyRouter.swift) to see all accessible methods.
 
 </details>
 
@@ -101,14 +199,15 @@ A new Router is created and added to the view heirarchy after each Segue. Refer 
 <summary> Details (Click to expand) </summary>
 <br>
     
-In order to enter the framework's view heirarchy, you must wrap your content in a RouterView. By default, your view will be wrapped in with navigation stack (iOS 16+ uses a NavigationStack, iOS 15 and below uses NavigationView). 
-- If your view is already within a navigation heirarchy, set `addNavigationView` to `FALSE`. 
-- If your view is already within a NavigationStack, use `screens` to bind to the existing stack path.
-- The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
+In order to enter the framework's view heirarchy, you must wrap your content in a `RouterView`, which will add a `NavigationStack` by default.
+
+Most apps should replace their existing `NavigationStack` with a `RouterView`, however, if you cannot remove it, you can add a `RouterView` but initialize it without a `NavigationStack`.
+
+The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
 
 ```swift
-RouterView(addNavigationView: false, screens: $existingStack) { router in
-   MyView(router: router)
+RouterView(addNavigationView: false) { router in
+   MyView()
         .navigationBarHidden(true)
         .toolbar {
         }
