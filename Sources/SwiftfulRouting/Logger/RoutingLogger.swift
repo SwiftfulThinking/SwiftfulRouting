@@ -14,7 +14,7 @@ public protocol RoutingLogger {
     func trackEvent(event: RoutingLogEvent)
 }
 
-struct SwiftfulRoutingLogger {
+public struct SwiftfulRoutingLogger {
     
     // RoutingLogger.enableLogging(logger: logger)
     @MainActor static public func set(logger newValue: RoutingLogger) {
