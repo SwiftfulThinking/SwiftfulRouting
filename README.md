@@ -971,7 +971,7 @@ router.activeModules
 
 </details>
 
-## Contribute 🤓
+## Contribute
 
 <details>
 <summary> Details (Click to expand) </summary>
@@ -985,8 +985,12 @@ Community contributions are encouraged! Please ensure that your code adheres to 
 
 Upcoming features:
 
-- [x] Support multiple Modals per screen
-- [ ] Add `showModule` support, for navigating between parent-level RouterView's
-- [ ] Support VisionOS
+- [ ] Internalize tabbar support
+- [ ] Add Module queue
+- [ ] Add Module tests
+- [ ] Add Modal queue
+- [ ] Add remove(count:) to all queues
+- [ ] Add support for showing in-app web browser
+- [ ] Add supprot for opening other apps (email, etc.)
 
 </details>
