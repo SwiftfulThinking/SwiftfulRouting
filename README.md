@@ -3,27 +3,26 @@
 
 # SwiftfulRouting 🤙
 
-Programmatic navigation for SwiftUI applications.
+### Programmatic navigation for SwiftUI applications.
+- ✅ Segues
+- ✅ Alerts
+- ✅ Modals
+- ✅ Transitions
+- ✅ Modules
 
-✅ Segues
-✅ Alerts
-✅ Modals
-✅ Transitions
-✅ Modules
+### How to use this package:
 
-How to use this package:
-
-1️⃣ Read the docs below
-2️⃣ Watch [YouTube Tutorial](https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6)
-3️⃣ Practice with [Sample Project](https://github.com/SwiftfulThinking/SwiftfulRoutingExample)
-4️⃣ Test the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject)
+- 1️⃣ Read the docs below
+- 2️⃣ Watch [YouTube Tutorial](https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6)
+- 3️⃣ Practice with [Sample Project](https://github.com/SwiftfulThinking/SwiftfulRoutingExample)
+- 4️⃣ Test the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject)
 
 
-Versioning:
+### Versioning:
 
-➡️ iOS 17+ use version 6.0 or above
-➡️ iOS 14+ use version 5.3.6
-➡️ iOS 13+ use version 2.0.2
+- ➡️ iOS 17+ use version 6.0 or above
+- ➡️ iOS 14+ use version 5.3.6
+- ➡️ iOS 13+ use version 2.0.2
 
 ## Quick Start (TLDR)
 
@@ -94,7 +93,7 @@ router.dismissModule...
 As you segue to a new screen, the framework adds a set view modifiers to the root of the destination View that will support all potential navigation routes. This allows declarative code to behave as programmatic code, since the view modifiers are connected in advance. Screen destinations are erased to generic types, allowing the developer to determine the destination at the time of execution. 
 
 
-Version 6.0 adds many new features to the framework by implementing an internal `RouterViewModel` across the screen heirarchy that allows and screen's `router` to perform actions that affect the entire heirarchy. The technical solution was to introduce `[AnyDestinationStack]` which is a single array that holds bindings for all active segues in the heirarchy. 
+Version 6.0 adds many new features to the framework by implementing an internal RouterViewModel across the screen heirarchy that allows and screen's router to perform actions that affect the entire heirarchy. The solution introduces [AnyDestinationStack] which is a single array that holds bindings for all active segues in the heirarchy. 
 
 ```
 // Example of what an [AnyDestinationStack] might look like:
@@ -336,6 +335,7 @@ router.showSafari {
      URL(string: "https://www.apple.com")
 }
 ```
+</details>
 
 
 ## Dismiss Screens
@@ -409,6 +409,7 @@ Dismiss all screens in the screen heirarchy.
 ```swift
 router.dismissLastEnvironment()
 ```
+</details>
 
 ## Screen Queue
 
