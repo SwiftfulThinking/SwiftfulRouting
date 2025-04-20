@@ -126,8 +126,8 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Dismiss all screens in front of (but not including) screen at id.
-    @MainActor public func dismissScreens(upToScreenId: String, animates: Bool = true) {
-        object.dismissScreens(upToScreenId: upToScreenId, animates: animates)
+    @MainActor public func dismissScreens(upToId: String, animates: Bool = true) {
+        object.dismissScreens(upToId: upToId, animates: animates)
     }
     
     /// Dismiss a specific number of screens.
@@ -284,7 +284,7 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Display a simple alert with title and "OK" button.
-    @MainActor public func showSimpleAlert(text: String, action: (() -> Void)? = nil) {
+    @MainActor public func showBasicAlert(text: String, action: (() -> Void)? = nil) {
         showAlert(.alert, title: text) {
             Button("OK") {
                 action?()
@@ -398,8 +398,8 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Dismiss all modals in front of, but not including, modal id on this screen.
-    @MainActor public func dismissModals(upToModalId: String) {
-        object.dismissModals(upToModalId: upToModalId)
+    @MainActor public func dismissModals(upToId: String) {
+        object.dismissModals(upToId: upToId)
     }
     
     /// Dismiss specific number modals on this screen.

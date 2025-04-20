@@ -318,6 +318,15 @@ let screen = AnyDestination(
 )
 ```
 
+Additional convenience methods:
+
+```swift
+router.showSafari {
+     URL(string: "https://www.apple.com")
+}
+```
+
+
 ## Dismiss Screens
 
 <details>
@@ -443,13 +452,13 @@ router.showNextScreenOrDismissPushStack()
 </details>
 
 
-## Alerts
+## Show Alerts
 
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
 
-Router supports native SwiftUI alerts.
+Router supports all native SwiftUI alerts.
 
 ```swift
 // Alert
@@ -476,13 +485,26 @@ router.showAlert(.confirmationDialog, title: "Title goes here", subtitle: "Subti
 }
 ```
 
-Dismiss an alert.
+Alert methods also accept `AnyAlert` as a convenience.
+
+```swift
+let alert = AnyAlert(
+    style: .alert,
+    location: .currentScreen,
+    title: "Title",
+    subtitle: nil
+)
+router.showAlert(alert: alert)
+```
+
+Dismiss the alert.
 
 ```swift
 router.dismissAlert()
+router.dismissAllAlerts()
 ```
 
-Additional convenience methods:
+Additional convenience methods.
 
 ```swift
 router.showBasicAlert(text: "Error")
@@ -490,51 +512,372 @@ router.showBasicAlert(text: "Error")
 
 </details>
 
-## Modals
+## Show Modals
 
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
 
-Router also supports any modal transition, which displays above the current content. Customize transition, animation, background color/blur, etc. See sample project for example implementations.
+Modals appear on top of the current screen. Router supports an **infinite** number of **simultaneous** modals.
 
 ```swift
-router.showModal(transition: .move(edge: .top), animation: .easeInOut, alignment: .top, backgroundColor: nil, useDeviceBounds: true) {
-     Text("Sample")
-          .onTapGesture {
-               router.dismissModal()
-          }
+router.showModal {
+    MyModal()
+        .frame(width: 300, height: 300)
 }
 ```
 
-You can display multiple modals simultaneously. Modals have an optional ID field, which can later be used to dismiss the modal.  
+Fully customize modal's display.
 
 ```swift
-router.showModal(id: "top1") {
-     Text("Sample")
+router.showModal(
+    id: "modal_1", // Id for modal
+    transition: .move(edge: .bottom), // AnyTransition
+    animation: .smooth, // transition animation
+    alignment: .center, // Alignment within screen
+    backgroundColor: Color.black.opacity(0.1), // Color behind modal
+    backgroundEffect: BackgroundEffect(effect: UIBlurEffect(style: .systemMaterialDark), intensity: 0.1), // Blur effect behind modal
+    dismissOnBackgroundTap: true, // Add dismiss tap gesture on background layer
+    ignoreSafeArea: true, // Modal will safe area
+    onDismiss: {
+        // Do something when modal is dismissed
+    },
+    destination: {
+        MyModal()
+    }
+)
+```
+
+Modal methods also accept `AnyModal` as a convenience.
+
+```
+let modal = AnyModal {
+    MyModal()
 }
 
-// Dismiss top-most modal
+router.showModal(modal: modal)
+```
+
+Trigger multiple modals at the same time.
+
+```swift
+router.showModals(modals: [modal1, modal2])
+```
+
+Dismiss the last modal displayed.
+
+```swift
 router.dismissModal()
-
-// Dismiss modal by ID
-router.dismissModal(id: "top1")
-
-// Dismiss all modals
-router.dismissAllModals()
-
 ```
 
+Dismiss modal by id.
+
+```swift
+router.dismissModal(id: "modal_1")
+```
+
+Dismiss modals above, but not including, id.
+
+```swift
+router.dismissModals(upToModalId: "modal_1")
+```
+
+Dismiss specific number of modals.
+
+```swift
+router.dismissModals(count: 2)
+```
+
+Dismiss all modals.
+
+```swift
+router.dismissAllModals()
+```
 
 Additional convenience methods:
 
 ```swift
 router.showBasicModal {
-     Text("Sample")
-          .onTapGesture {
-               router.dismissModal()
-          }
+     Rectangle()
+        .frame(width: 200, height: 200)
 }
+```
+
+```swift
+router.showBottomModal {
+     Rectangle()
+        .frame(width: 200, height: 200)
+}
+```
+
+</details>
+
+## Show Transitions
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Transitions change the current screen WITHOUT performing a full segue.
+
+Transitions are NOT segues!
+
+Transitions are similar to using an "if-else" statement to switch between views.
+
+```swift
+router.showTransition { router in
+    MyView()
+}
+```
+
+**Important:** When showing a new screen via `showScreen` there is a parameter `transitionBehavior`. This will determine the UI behavior of any `showTransition` on the resulting screen.
+
+Set `transitionBehavior` to `.keepPrevious` to keep previous screens in memory. This will transition new screens ON TOP of each other.
+
+Set `transitionBehavior` to `.removePrevious` to remove previous screens from memory. This will transition a new screen on, while transitioning the old screen off.
+
+```swift
+router.showScreen(transitionBehavior: .removePrevious) { _ in
+    MyView()
+}
+```
+
+Transition methods also accept `AnyTransitionDestination` as a convenience.
+
+```swift
+let screen = AnyTransitionDestination { _ in
+    MyView()
+}
+
+router.showTransition(transition: screen)
+```
+
+Add multiple transitions on the screen and display the last one on top.
+
+```swift
+router.showTransitions(transitions: [screen1, screen2, screen3])
+```
+
+Fully customize transition's display.
+
+```swift
+let transition = AnyTransitionDestination(
+    id: "transition_1", // Id for the screen
+    transition: .trailing, // Transition edge
+    allowsSwipeBack: true, // Add a swipe back gesture to the screen's edge
+    onDismiss: {
+        // Do something when transition dismisses
+    },
+    destination: { router in
+        MyView()
+    }
+)
+```
+
+Dismiss the last transition displayed.
+
+```swift
+router.dismissTransition()
+```
+
+Dismiss transition by id.
+
+```swift
+router.dismissTransition(id: "transition_1")
+```
+
+Dismiss transitions above, but not including, id.
+
+```swift
+router.dismissTransitions(upToId: "transition_1")
+```
+
+Dismiss specific number of transitions.
+
+```swift
+router.dismissTransitions(count: 2)
+```
+
+Dismiss all transitions.
+
+```swift
+router.dismissAllTransitions()
+```
+
+Additional convenience methods:
+
+```swift
+// Dismiss transition (if there is one) otherwise dismiss screen.
+router.dismissTransitionOrDismissScreen()
+```
+
+</details>
+
+## Transition Queue
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Add transitions to a queue to trigger them later!
+
+```swift
+router.addTransitionToQueue(transition: screen1)
+router.addTransitionsToQueue(transitions: [screen1, screen2, screen3])
+```
+
+Trigger transition to the first in queue, if available.
+
+```swift
+// Show next transition if available
+router.showNextTransition()
+
+// show next transition, otherwise, throw error
+do {
+    try router.tryShowNextTransition()
+} catch {
+    // Do something else
+}
+```
+
+Remove transitinos from the queue.
+
+```swift
+router.removeTransitionFromQueue(id: "x")
+router.removeTransitionsFromQueue(ids: ["x", "y"])
+router.removeAllTransitionsFromQueue()
+```
+
+For example, an onboarding flow might have a variable number of screens depending on the user's responses. As the user progresses, add screens to the queue and then the logic within each screen is "try to go to next screen (if available) otherwise dismiss onboarding"
+
+Additional convenience methods:
+
+```swift
+// Trigger next transition or trigger next screen or dismiss screen.
+router.showNextTransitionOrNextScreenOrDismissScreen()
+```
+
+</details>
+
+## Show Modules
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Modules swap the ENTIRE view heirarchy and replace the existing `RouterView` with a new one.
+
+```swift
+router.showModule { router in
+    MyView()
+}
+```
+
+**Important:** Module support is NOT automatically included within `RouterView`. You must enable it by setting `addModuleSupport` to `true`. This is done on purpose, in case there are multiple `RouterView` in the same heirarchy.
+
+```swift
+router.showScreen(addModuleSupport: true) { _ in
+    MyView()
+}
+```
+
+Module methods also accept `AnyTransitionDestination` as a convenience.
+
+```swift
+let screen = AnyTransitionDestination { _ in
+    MyView()
+}
+
+router.showModule(module: screen)
+```
+
+The user's last module is saved in UserDefaults and can be used to restore the app's state across sessions.
+
+```swift
+@State private var lastModuleId = UserDefaults.lastModuleId
+
+var body: some Scene {
+    WindowGroup {
+        if lastModuleId == "onboarding" {
+            RouterView(id: "onboarding", addModuleSupport: true) { router in
+                OnboardingView()
+            }
+        } else {
+            RouterView(id: "home", addModuleSupport: true) { router in
+                HomeView()
+            }
+        }
+    }
+}
+```
+
+Add multiple modules to the heirarchy and display the last one.
+
+```swift
+router.showModules(modules: [module1, module2, module3])
+```
+
+Fully customize module's display.
+
+```swift
+let module = AnyTransitionDestination(
+    id: "module_1", // Id for the screen
+    transition: .trailing, // Transition edge
+    allowsSwipeBack: true, // Add a swipe back gesture to the screen's edge
+    onDismiss: {
+        // Do something when transition dismisses
+    },
+    destination: { router in
+        MyView()
+    }
+)
+```
+
+**Note:** You can dismiss modules, although it is easier to use `showModule` to display the previous module again. 
+
+Dismiss the last module displayed.
+
+```swift
+router.dismissModule()
+```
+
+Dismiss module by id.
+
+```swift
+router.dismissModule(id: "module_1")
+```
+
+Dismiss modules above, but not including, id.
+
+```swift
+router.dismissModules(upToId: "module_1")
+```
+
+Dismiss specific number of modules.
+
+```swift
+router.dismissModules(count: 2)
+```
+
+Dismiss all modules.
+
+```swift
+router.dismissAllModules()
+```
+
+</details>
+
+## Logging, analytics & debugging
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Built-in logging that can be used for debugging and analytics.
+
+```swift
+// Set log level
+        enableLogging(level: .analytic, printParameters: true)
 ```
 
 </details>
@@ -558,11 +901,3 @@ Upcoming features:
 - [ ] Support VisionOS
 
 </details>
-
-
-Additional convenience methods:
-```swift
-router.showSafari {
-     URL(string: "https://www.apple.com")
-}
-```

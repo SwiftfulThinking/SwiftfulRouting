@@ -19,7 +19,7 @@ protocol Router: Sendable {
     @MainActor func showScreens(destinations: [AnyDestination])
     @MainActor func dismissScreen(animates: Bool)
     @MainActor func dismissScreen(id: String, animates: Bool)
-    @MainActor func dismissScreens(upToScreenId: String, animates: Bool)
+    @MainActor func dismissScreens(upToId: String, animates: Bool)
     @MainActor func dismissScreens(count: Int, animates: Bool)
     @MainActor func dismissPushStack(animates: Bool)
     @MainActor func dismissEnvironment(animates: Bool)
@@ -40,7 +40,7 @@ protocol Router: Sendable {
     @MainActor func showModal(modal: AnyModal)
     @MainActor func dismissModal()
     @MainActor func dismissModal(id: String)
-    @MainActor func dismissModals(upToModalId: String)
+    @MainActor func dismissModals(upToId: String)
     @MainActor func dismissModals(count: Int)
     @MainActor func dismissAllModals()
     

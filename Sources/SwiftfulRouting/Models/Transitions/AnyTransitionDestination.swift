@@ -8,10 +8,10 @@ import SwiftUI
 import SwiftfulRecursiveUI
 
 public struct AnyTransitionDestination: Identifiable, Equatable {
-    public private(set) var id: String = UUID().uuidString
-    public private(set) var transition: TransitionOption = .trailing
-    public private(set) var allowsSwipeBack: Bool = true
-    public private(set) var onDismiss: (() -> Void)? = nil
+    public private(set) var id: String
+    public private(set) var transition: TransitionOption
+    public private(set) var allowsSwipeBack: Bool
+    public private(set) var onDismiss: (() -> Void)?
     public private(set) var destination: (AnyRouter) -> any View
     
     /// Transition current screen.
@@ -22,7 +22,7 @@ public struct AnyTransitionDestination: Identifiable, Equatable {
     ///   - onDismiss: Closure that triggers when transition is dismissed.
     ///   - destination: Destination screen.
     public init(
-        id: String,
+        id: String = UUID().uuidString,
         transition: TransitionOption = .trailing,
         allowsSwipeBack: Bool = false,
         onDismiss: (() -> Void)? = nil,

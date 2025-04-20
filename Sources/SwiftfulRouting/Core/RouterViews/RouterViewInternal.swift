@@ -170,8 +170,8 @@ struct RouterViewInternal<Content: View>: View, Router {
         viewModel.dismissScreen(routeId: id, animates: animates)
     }
     
-    func dismissScreens(upToScreenId: String, animates: Bool) {
-        viewModel.dismissScreens(to: upToScreenId, animates: animates)
+    func dismissScreens(upToId: String, animates: Bool) {
+        viewModel.dismissScreens(to: upToId, animates: animates)
     }
     
     func dismissScreens(count: Int, animates: Bool) {
@@ -242,8 +242,8 @@ struct RouterViewInternal<Content: View>: View, Router {
         viewModel.dismissModal(routerId: routerId, modalId: id)
     }
     
-    func dismissModals(upToModalId: String) {
-        viewModel.dismissModals(routerId: routerId, to: upToModalId)
+    func dismissModals(upToId: String) {
+        viewModel.dismissModals(routerId: routerId, to: upToId)
     }
     
     func dismissModals(count: Int) {

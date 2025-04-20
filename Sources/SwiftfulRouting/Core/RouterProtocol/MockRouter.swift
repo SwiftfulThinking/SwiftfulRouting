@@ -57,7 +57,7 @@ struct MockRouter: Router {
         printError()
     }
     
-    func dismissScreens(upToScreenId: String, animates: Bool) {
+    func dismissScreens(upToId: String, animates: Bool) {
         printError()
     }
     
@@ -129,7 +129,7 @@ struct MockRouter: Router {
         printError()
     }
     
-    func dismissModals(upToModalId: String) {
+    func dismissModals(upToId: String) {
         printError()
     }
     
