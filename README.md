@@ -1,7 +1,8 @@
 ### 🚀 Learn how to build and use this package: https://www.swiftful-thinking.com/offers/REyNLwwH
 
 
-# SwiftfulRouting 🤙
+# SwiftfulRouting  🤙
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSwiftfulThinking%2FSwiftfulRouting%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/SwiftfulThinking/SwiftfulRouting) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSwiftfulThinking%2FSwiftfulRouting%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/SwiftfulThinking/SwiftfulRouting)
 
 ### Programmatic navigation for SwiftUI applications.
 - ✅ Segues
