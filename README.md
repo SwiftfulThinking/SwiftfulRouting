@@ -225,7 +225,7 @@ RouterView(addNavigationView: false) { router in
 Router supports all native SwiftUI segues.
 
 ```swift
-// NavigationLink
+// Navigation destination
 router.showScreen(.push) { _ in
      Text("View2")
 }
@@ -241,107 +241,82 @@ router.showScreen(.fullScreenCover) { _ in
 }
 ```
 
-Segue methods also accept `AnyRoute` as a convenience, which make it easy to pass the `Route` around your code.
+Segue methods also accept `AnyDestination` as a convenience.
 
 ```swift
-let route = AnyRoute(.push, destination: { router in
-     Text("Hello, world!")
+let screen = AnyDestination(segue: .push, destination: { router in
+    Text("Hello, world!")
 })
-                        
-router.showScreen(route)
+                                    
+router.showScreen(screen)
 ```
 
-All segues have an onDismiss method.
+Segue to multiple screens at once. This will immediately trigger each screen in order, ending with the last screen displayed.
 
 ```swift
+let screen1 = AnyDestination(segue: .push, destination: { router in
+    Text("Hello, world!")
+})
+let screen2 = AnyDestination(segue: .sheet, destination: { router in
+    Text("Another screen!")
+})
+let screen3 = AnyDestination(segue: .push, destination: { router in
+    Text("Third screen!")
+})
+                                    
+router.showScreens(destinations: [screen1, screen2, screen3])
+```
 
+Use `.sheetConfig()` or `.fullScreenCoverConfig()` to for resizable sheets and backgrounds in new Environments.
+
+```swift
+let config = ResizableSheetConfig(
+    detents: [.medium, .large],
+    dragIndicator: .visible
+)
+
+router.showScreen(.sheetConfig(config: config)) { _ in
+    Text("Screen2")
+}
+```
+
+```swift
+let config = FullScreenCoverConfig(
+    background: .clear
+)
+            
+router.showScreen(.fullScreenCoverConfig(config: config)) { _ in
+    Text("Screen2")
+}
+```
+
+All segues have an `onDismiss` method.
+
+```swift
 router.showScreen(.push, onDismiss: {
      // dismiss action
 }, destination: { _ in
      Text("Hello, world!")
 })
-                
-let route = AnyRoute(.push, onDismiss: {
-     // dismiss action
-}, destination: { _ in
-     Text("Hello, world!")
-})
-                
-router.showScreen(route)
 ```
 
-iOS 16+ uses NavigationStack, which supports pushing multiple screens at once.
+Fully customize each segue!
 
 ```swift
-let route1 = PushRoute(destination: { router in
-     Text("View1")
-})
-let route2 = PushRoute(destination: { router in
-     Text("View2")
-})
-let route3 = PushRoute(destination: { router in
-     Text("View3")
-})
-                        
-router.pushScreenStack(destinations: [route1, route2, route3])
+let screen = AnyDestination(
+    id: "profile_screen", // id of screen (used for analytics)
+    segue: .fullScreenCover, // segue option
+    location: .insert, // where to add screen within the view heirarchy
+    animates: true, // animate the segue
+    transitionBehavior: .keepPrevious, // transition behavior (only relevant for showTransition methods)
+    onDismiss: {
+        // Do something when screen dismisses
+    },
+    destination: { _ in
+        Text("ProfileView")
+    }
+)
 ```
-
-iOS 16+ also supports resizable sheets.
-
-```swift
-router.showResizableSheet(sheetDetents: [.medium, .large], selection: nil, showDragIndicator: true) { _ in
-     Text("Hello, world!)
-}
-```
-
-Additional convenience methods:
-```swift
-router.showSafari {
-     URL(string: "https://www.apple.com")
-}
-```
-
-</details>
-
-## Enter Screen Flows
-
-<details>
-<summary> Details (Click to expand) </summary>
-<br>
-
-Screen "flows" are new way to support dynamic routing in your application. When you enter a "screen flow", you add an array of `Routes` to the heirarchy. The application will immediately segue to the first screen, and then set the remaining screens into a queue.
-
-```swift
-router.enterScreenFlow([
-     AnyRoute(.fullScreenCover, destination: screen1),
-     AnyRoute(.push, destination: screen2),
-     AnyRoute(.push, destination: screen3),
-     AnyRoute(.push, destination: screen4),
-])
-```
-
-This allows the developer to set multiple future segues at once, without requiring screen-specific code in each child view. Each child view's routing logic is simple as "try to go to next screen".
-
-```swift
-do {
-     try router.showNextScreen()
-} catch {
-     // There is no next screen set in the flow
-     // Dismiss the flow (see below dismiss methods) or do something else
-}
-```
-
-Benefits of using a "flow":
-
-- **Simiplified Logic:** In most applications, the routing logic is tightly coupled to the View (ie. when you create a screen, you declare in code exactly what the next screen must be). Now, you can build a screen without having to worry about routing at all. Simply support "go to next screen" or "dismiss flow" (see dismissal code below).
-
-- **AB Tests:** Each user can see a unique flow of screens in your app, and you don't have to write 'if-else' logic within every child view.
-
-- **High-Level Control**: You can control the entire flow from one method, which will be closer to the business logic of your app, rather than within the View itself.
-
-- **Flows on Flows**: Flows are fully dynamic, meaning you can enter flows from within flows and can dismiss screens within flows (back-forward-back) without corrupting the flow.
-
-</details>
 
 ## Dismiss Screens
 
@@ -349,68 +324,124 @@ Benefits of using a "flow":
 <summary> Details (Click to expand) </summary>
 <br>
 
-Dismiss one screen. You can also dismiss a screen using native SwiftUI code, including swipe-back gestures or `presentationMode`. 
+Dismiss one screen.
 
 ```swift
 router.dismissScreen()
 ```
 
-Dismiss all screens pushed onto the stack. This dismisses every "push" (NavigationLink) on the screen's Navigation Stack. This does not dismiss `sheet` or `fullScreenCover`.
+You can also use the native SwiftUI method. 
 
 ```swift
-router.dismissScreenStack()
+@Environment(\.dismiss) var dismiss
 ```
 
-Dismiss screen environment. This dismisses the screen's root environment (if there is one to dismiss), which is the closest 'sheet' or `fullScreenCover` below the call-site.
+Dismiss screen at id.
+
+```swift
+router.dismissScreen(id: "x")
+```
+
+Dismiss screens back to, but not including, id.
+
+```swift
+router.dismissScreen(upToScreenId: "x")
+```
+
+Dismiss a specific number of screens.
+
+```swift
+router.dismissScreens(count: 2)
+```
+
+Dismiss all .push segues on the NavigationStack of the current screen.
+
+```swift
+router.dismissPushStack()
+```
+
+Dismiss screen environment (ie. the closest .sheet or .fullScreenCover to this screen).
 
 ```swift
 router.dismissEnvironment()
 ```
 
-For example, if you entered the following screen flow and you called `dismissEnvironment` from any of the child views, it would dismiss the `fullScreenCover`, which in-turn dismisses every view displayed on that Environment. 
+Dismiss the last screen in the screen heirarchy.
 
 ```swift
-router.enterScreenFlow([
-     AnyRoute(.fullScreenCover, destination: screen1),
-     AnyRoute(.push, destination: screen2),
-     AnyRoute(.push, destination: screen3),
-     AnyRoute(.push, destination: screen4),
-])
+router.dismissLastScreen()
 ```
 
-Logic for dismissing a "Flow" can generally look like:
+Dismiss the last push stack in the screen heirarchy.
 
 ```swift
+router.dismissLastPushStack()
+```
+
+Dismiss the last environment in the screen heirarchy.
+
+```swift
+router.dismissLastEnvironment()
+```
+
+Dismiss all screens in the screen heirarchy.
+
+```swift
+router.dismissLastEnvironment()
+```
+
+## Screen Queue
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Add screens to a queue to navigate to them later!
+
+```swift
+router.addScreenToQueue(destination: screen1)
+router.addScreensToQueue(destinations: [screen1, screen2, screen3])
+```
+
+Trigger segue to the first screen in queue, if available.
+
+```swift
+// Show next screen if available
+router.showNextScreen()
+
+// show next screen, otherwise, throw error
 do {
-     try router.showNextScreen()
+    try router.tryShowNextScreen()
 } catch {
-     router.dismissEnvironment()
+    // Do something else
 }
 ```
 
-Or convenience method:
+Remove screens from the queue.
 
 ```swift
+router.removeScreenFromQueue(id: "x")
+router.removeScreensFromQueue(ids: ["x", "y"])
+router.removeAllScreensFromQueue()
+```
+
+For example, an onboarding flow might have a variable number of screens depending on the user's responses. As the user progresses, add screens to the queue and then the logic within each screen is "try to go to next screen (if available) otherwise dismiss onboarding"
+
+Additional convenience methods:
+
+```swift
+// Segue to a the next screen in the queue (if available) otherwise dismiss the screen.
+router.showNextScreenOrDismissScreen()
+
+// Segue to a the next screen in the queue (if available) otherwise dismiss environment.
 router.showNextScreenOrDismissEnvironment()
-```
 
-Copy and paste this code into your project to enable swipe back gestures. This is not included in the SwiftUI framework by default and therefore is not automatically included herein. 
-
-
-```swift
-extension UINavigationController: UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-    
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
-    }
-}
+// Segue to a the next screen in the queue (if available) otherwise dismiss push stack.
+router.showNextScreenOrDismissPushStack()
 ```
 
 </details>
+
 
 ## Alerts
 
@@ -527,3 +558,11 @@ Upcoming features:
 - [ ] Support VisionOS
 
 </details>
+
+
+Additional convenience methods:
+```swift
+router.showSafari {
+     URL(string: "https://www.apple.com")
+}
+```
