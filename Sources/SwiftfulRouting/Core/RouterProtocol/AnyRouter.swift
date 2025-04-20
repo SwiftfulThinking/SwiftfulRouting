@@ -223,7 +223,7 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Segue to a the first screen in this RouterView's screen queue, if available, otherwise dismiss the environment.
-    @MainActor public func showNextScreenOrDismissEnvironment(animateDismiss: Bool = true) throws {
+    @MainActor public func showNextScreenOrDismissEnvironment(animateDismiss: Bool = true) {
         do {
             try tryShowNextScreen()
         } catch {
@@ -232,7 +232,7 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Segue to a the first screen in this RouterView's screen queue, if available, otherwise dismiss the .push stack.
-    @MainActor public func showNextScreenOrDismissPushStack(animateDismiss: Bool = true) throws {
+    @MainActor public func showNextScreenOrDismissPushStack(animateDismiss: Bool = true) {
         do {
             try tryShowNextScreen()
         } catch {
@@ -528,7 +528,7 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Show the first transition in this RouterView's transition queue, otherwise show next screen, otherwise dismiss screen.
-    @MainActor public func showNextTransitionOrNextScreenOrDismissScreen() throws {
+    @MainActor public func showNextTransitionOrNextScreenOrDismissScreen() {
         do {
             try tryShowNextTransition()
         } catch {
