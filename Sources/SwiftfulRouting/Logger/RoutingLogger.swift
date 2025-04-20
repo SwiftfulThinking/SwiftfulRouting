@@ -9,23 +9,20 @@ import SwiftUI
 
 @MainActor var logger: (any RoutingLogger) = MockRoutingLogger(logLevel: .warning, printParameters: false)
 
-
-
-
 @MainActor
 public protocol RoutingLogger {
     func trackEvent(event: RoutingLogEvent)
 }
 
-extension RoutingLogger {
+struct SwiftfulRoutingLogger {
     
     // RoutingLogger.enableLogging(logger: logger)
-    @MainActor static public func enableLogging(logger newValue: RoutingLogger) {
+    @MainActor static public func set(logger newValue: RoutingLogger) {
         logger = newValue
     }
 
     // RoutingLogger.enableLogging(level: .info)
-    @MainActor static public func enableLogging(level newValue: RoutingLogType, printParameters: Bool = false) {
+    @MainActor static public func set(level newValue: RoutingLogType, printParameters: Bool = false) {
         logger = MockRoutingLogger(logLevel: newValue, printParameters: printParameters)
     }
     
