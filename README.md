@@ -797,6 +797,18 @@ router.showScreen(addModuleSupport: true) { _ in
 }
 ```
 
+Depending on how deep your view heirarchy is, you may want to dismiss screens before switching modules for better UX.
+
+```swift
+Task {
+  router.dismissAllScreens()
+  try? await Task.sleep(for: .seconds(1))
+  router.showModule { router in
+    MyView()
+  }
+}
+```
+
 Module methods also accept `AnyTransitionDestination` as a convenience.
 
 ```swift
