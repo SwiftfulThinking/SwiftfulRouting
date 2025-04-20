@@ -14,15 +14,15 @@ public protocol RoutingLogger {
     func trackEvent(event: RoutingLogEvent)
 }
 
-public struct SwiftfulRoutingLogger {
+public enum SwiftfulRoutingLogger {
     
     // RoutingLogger.enableLogging(logger: logger)
-    @MainActor static public func set(logger newValue: RoutingLogger) {
+    @MainActor static public func enableLogging(logger newValue: RoutingLogger) {
         logger = newValue
     }
 
     // RoutingLogger.enableLogging(level: .info)
-    @MainActor static public func set(level newValue: RoutingLogType, printParameters: Bool = false) {
+    @MainActor static public func enableLogging(level newValue: RoutingLogType, printParameters: Bool = false) {
         logger = MockRoutingLogger(logLevel: newValue, printParameters: printParameters)
     }
     
