@@ -501,6 +501,18 @@ router.showAlert(.confirmationDialog, title: "Title goes here", subtitle: "Subti
 }
 ```
 
+Buttons closure supports all the same features as the native SwiftUI closure, such as TextFields.
+
+```swift
+let alert = AnyAlert(style: .alert, title: "Title goes here", subtitle: "Subtitle goes here", buttons: {
+  TextField("Enter your name", text: $textfieldText)
+                
+  Button("SUBMIT", action: {
+
+  })
+})
+```
+
 Alert methods also accept `AnyAlert` as a convenience.
 
 ```swift
