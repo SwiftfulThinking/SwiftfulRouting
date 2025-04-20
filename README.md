@@ -971,6 +971,175 @@ router.activeModules
 
 </details>
 
+## Tabbar & App Structure
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Even without SwiftfulRouting, SwiftUI developers must decide between using 1 NavigationStack for the entire application or individual NavigationStacks for each tab. 
+
+If you use only 1 `NavigationStack`, it will be a parent to the `TabView` and therefore the tabbar will also push off screen after a segue.
+
+1 NavigationStack without SwiftfulRouting:
+
+```swift
+NavigationStack {
+    TabView {
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+                    
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                    
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```   
+
+1 NavigationStack with SwiftfulRouting:
+
+```swift
+RouterView { _ in
+    TabView {
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+                    
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                    
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```   
+
+Individual NavigationStacks without SwiftfulRouting:
+ 
+```swift
+TabView {
+    NavigationStack {
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+    }
+      
+    NavigationStack {
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+    }
+    
+    NavigationStack {
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```  
+
+Individual NavigationStacks with SwiftfulRouting:
+ 
+```swift
+TabView {
+    RouterView { _ in
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+    }
+      
+    RouterView { _ in
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+    }
+    
+    RouterView { _ in
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```
+
+Regardless of your choice, you may want to add a parent `RouterView` to `addModuleSupport` that has `addNavigationStack` set to `false`.
+
+```swift
+struct AppRootView: View {
+    
+    var body: some View {
+        RouterView(addNavigationStack: false, addModuleSupport: true) { _ in
+            AppTabbarView()
+        }
+    }
+}
+
+struct AppTabbarView: View {
+    
+    var body: some View {
+        TabView {
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen1")
+            })
+            .tabItem { Label("Home", systemImage: "house.fill") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen2")
+            })
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen3")
+            })
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+        }
+    }
+}
+```
+
+Therefore, a full app implementation can look like:
+
+```swift
+struct AppRootView: View {
+    
+    @State private var lastModuleId = UserDefaults.lastModuleId
+
+    @ViewBuilder
+    var body: some View {
+        if lastModuleId == "onboarding" {
+            RouterView(id: "onboarding", addModuleSupport: true) { router in
+                OnboardingView()
+            }
+        } else {
+            RouterView(id: "tabbar", addNavigationStack: false, addModuleSupport: true) { _ in
+                AppTabbarView()
+            }
+        }
+    }
+}
+
+struct AppTabbarView: View {
+    
+    var body: some View {
+        TabView {
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen1")
+            })
+            .tabItem { Label("Home", systemImage: "house.fill") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen2")
+            })
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen3")
+            })
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+        }
+    }
+}
+```
+
+Reference the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject) for an full implementation!
+
+</details>
+
 ## Contribute
 
 <details>
