@@ -16,20 +16,31 @@ public enum EnvironmentBackgroundOption {
 extension View {
     
     @ViewBuilder
-    func applyEnvironmentBackground(option: EnvironmentBackgroundOption) -> some View {
-        switch option {
-        case .automatic:
-            self
-        case .clear:
-            self
-                .presentationBackground(.clear)
-                .background(RemoveSheetShadow())
-        case .custom(let value):
-            self
-                .presentationBackground(AnyShapeStyle(value))
+    func applyEnvironmentBackgroundIfAvailable(option: EnvironmentBackgroundOption) -> some View {
+        if #available(iOS 16.4, *) {
+            switch option {
+            case .automatic:
+                self
+            case .clear:
+                self
+                    .presentationBackground(.clear)
+                    .background(RemoveSheetShadow())
+            case .custom(let value):
+                self
+                    .presentationBackground(AnyShapeStyle(value))
+            }
+        } else {
+            switch option {
+            case .automatic:
+                self
+            case .clear:
+                self
+                    .background(RemoveSheetShadow())
+            case .custom(let value):
+                self
+            }
         }
     }
-
 }
 
 fileprivate struct RemoveSheetShadow: UIViewRepresentable {

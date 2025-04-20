@@ -29,24 +29,54 @@ extension View {
                 .presentationDragIndicator(config.dragIndicator)
             
                 // Add background color if needed
-                .applyEnvironmentBackground(option: config.background)
+                .applyEnvironmentBackgroundIfAvailable(option: config.background)
             
                 // Value for background corner radius
                 .ifLetCondition(config.cornerRadius, transform: { content, value in
                     content
-                        .presentationCornerRadius(value)
+                        .presentationCornerRadiusIfAvailable(value)
                 })
             
                 // Background interaction
-                .presentationBackgroundInteraction(config.backgroundInteraction)
+                .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
             
                 // Content interaction
-                .presentationContentInteraction(config.contentInteraction)
+                .presentationContentInteractionIfAvailable(config.contentInteraction)
         case .fullScreenCoverConfig(config: let config):
             self
                 // Add background color if needed
-                .applyEnvironmentBackground(option: config.background)
+                .applyEnvironmentBackgroundIfAvailable(option: config.background)
         }
     }
         
+}
+
+extension View {
+    
+    @ViewBuilder
+    func presentationCornerRadiusIfAvailable(_ value: CGFloat) -> some View {
+        if #available(iOS 16.4, *) {
+            self.presentationCornerRadius(value)
+        } else {
+            self
+        }
+    }
+    
+    @ViewBuilder
+    func presentationBackgroundInteractionIfAvailable(_ interaction: PresentationBackgroundInteractionBackSupport) -> some View {
+        if #available(iOS 16.4, *) {
+            self.presentationBackgroundInteraction(interaction.backgroundInteraction)
+        } else {
+            self
+        }
+    }
+    
+    @ViewBuilder
+    func presentationContentInteractionIfAvailable(_ interaction: PresentationContentInteractionBackSupport) -> some View {
+        if #available(iOS 16.4, *) {
+            self.presentationContentInteraction(interaction.contentInteraction)
+        } else {
+            self
+        }
+    }
 }

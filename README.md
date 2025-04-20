@@ -19,6 +19,12 @@ How to use this package:
 4️⃣ Test the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject)
 
 
+Versioning:
+
+➡️ iOS 17+ use version 6.0 or above
+➡️ iOS 14+ use version 5.3.6
+➡️ iOS 13+ use version 2.0.2
+
 ## Quick Start (TLDR)
 
 <details>
