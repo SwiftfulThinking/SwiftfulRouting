@@ -32,8 +32,8 @@
 
 Use a `RouterView` to replace `NavigationStack` in your SwiftUI code.
 
+Before SwiftfulRouting:
 ```swift
-// Before SwiftfulRouting
 NavigationStack {
   MyView()
     .navigationDestination()
@@ -41,8 +41,10 @@ NavigationStack {
     .fullScreenCover()
     .alert()
 }
+```
 
-// With SwiftfulRouting
+With SwiftfulRouting:
+```swift
 RouterView { _ in
   MyView()
 }
@@ -66,19 +68,21 @@ struct MyView: View {
 }
 ```
 
-All available methods in `router` are in `AnyRouter.swift`. Examples:
+All available methods in `router` are in [AnyRouter.swift](https://github.com/SwiftfulThinking/SwiftfulRouting/blob/development/Sources/SwiftfulRouting/Core/RouterProtocol/AnyRouter.swift). 
+
+Examples:
 
 ```swift
-router.showScreen...
-router.showAlert...
-router.showModal...
-router.showTransition...
-router.showModule...
-router.dismissScreen...
-router.dismissAlert...
-router.dismissModal...
-router.dismissTransition...
-router.dismissModule...
+router.showScreen()
+router.showAlert()
+router.showModal()
+router.showTransition()
+router.showModule()
+router.dismissScreen()
+router.dismissAlert()
+router.dismissModal()
+router.dismissTransition()
+router.dismissModule()
 ```
 
 </details>
@@ -879,7 +883,7 @@ router.dismissAllModules()
 
 </details>
 
-## Logging, analytics & debugging
+## Logging, Analytics & Debugging
 
 <details>
 <summary> Details (Click to expand) </summary>
@@ -1138,6 +1142,16 @@ struct AppTabbarView: View {
 ```
 
 Reference the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject) for an full implementation!
+
+</details>
+
+## Testing
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Full suite of UI tests are included in the [Sample Project](https://github.com/SwiftfulThinking/SwiftfulRoutingExample).
 
 </details>
 
