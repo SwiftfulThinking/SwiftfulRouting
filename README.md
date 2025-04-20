@@ -11,8 +11,13 @@ Programmatic navigation for SwiftUI applications.
 ✅ Transitions
 ✅ Modules
 
-- Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
-- YouTube Tutorial: https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6
+How to use this package:
+
+1️⃣ Read the docs below
+2️⃣ Watch [YouTube Tutorial](https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6)
+3️⃣ Practice with [Sample Project](https://github.com/SwiftfulThinking/SwiftfulRoutingExample)
+4️⃣ Test the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject)
+
 
 ## Quick Start (TLDR)
 
@@ -876,8 +881,86 @@ router.dismissAllModules()
 Built-in logging that can be used for debugging and analytics.
 
 ```swift
-// Set log level
-        enableLogging(level: .analytic, printParameters: true)
+// Set log level using internal logger:
+
+SwiftfulRoutingLogger.enableLogging(level: .analytic, printParameters: true)
+```
+
+Add your own implementation to handle unique events in your app.
+```swift
+struct MyLogger: RoutingLogger {
+    
+    func trackEvent(event: any RoutingLogEvent) {
+        let name = event.eventName
+        let params = event.parameters
+        
+        switch event.type {
+        case .info:
+            break
+        case .analytic:
+            break
+        case .warning:
+            break
+        case .severe:
+            break
+        }
+    }
+}
+
+SwiftfulRoutingLogger.enableLogging(logger: MyLogger())
+```        
+
+Or use [SwiftfulLogging](https://github.com/SwiftfulThinking/SwiftfulLogging) directly.
+
+```swift
+let logManager = LogManager(services: [
+    ConsoleService(printParameters: true),
+    FirebaseCrashlyticsService(),
+    MixpanelService()
+])
+
+SwiftfulRoutingLogger.enableLogging(logger: logManager)
+```
+
+Additional values to look into the underlying view heirarchy. 
+
+```swift
+
+// Active screen stacks in the heirarchy
+router.activeScreens
+
+// Active screen queue
+router.activeScreenQueue
+
+// Has at least 1 screen in queue
+router.hasScreenInQueue
+
+// Active alert
+router.activeAlert
+
+// Has alert displayed
+router.hasActiveAlert
+
+// Active modals on screen
+router.activeModals
+
+// Has at least 1 modal displayed
+router.hasActiveModal
+
+// Active transitions on screen
+router.activeTransitions
+
+// Has at least 1 active transtion
+router.hasActiveTransition
+
+// Active transition queue
+router.activeTransitionQueue
+
+// Has at least 1 transition in queue
+router.hasTransitionInQueue
+
+// Active modules
+router.activeModules
 ```
 
 </details>

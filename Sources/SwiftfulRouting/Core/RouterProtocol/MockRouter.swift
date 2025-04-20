@@ -44,6 +44,9 @@ struct MockRouter: Router {
         []
     }
 
+    var activeModules: [AnyTransitionDestination] {
+        []
+    }
     
     func showScreens(destinations: [AnyDestination]) {
         printError()

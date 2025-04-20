@@ -76,6 +76,11 @@ public struct AnyRouter: Sendable, Router {
         !object.activeTransitionQueue.isEmpty
     }
     
+    /// Active transition heirarchy on this screen.
+    @MainActor public var activeModules: [AnyTransitionDestination] {
+        object.activeModules
+    }
+    
     /// Segue to a new screen.
     /// - Parameters:
     ///   - segue: Push (NavigationLink), Sheet, or FullScreenCover

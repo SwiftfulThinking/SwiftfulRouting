@@ -33,17 +33,20 @@ public struct RouterView<Content: View>: View {
     let id: String
     let addNavigationStack: Bool
     let addModuleSupport: Bool
+    let transitionBehavior: TransitionMemoryBehavior
     @ViewBuilder var content: (AnyRouter) -> Content
     
     public init(
         id: String? = nil,
         addNavigationStack: Bool = true,
         addModuleSupport: Bool = false,
+        transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
         content: @escaping (AnyRouter) -> Content
     ) {
         self.id = id ?? RouterViewModel.rootId
         self.addNavigationStack = addNavigationStack
         self.addModuleSupport = addModuleSupport
+        self.transitionBehavior = transitionBehavior
         self.content = content
     }
 
@@ -51,7 +54,7 @@ public struct RouterView<Content: View>: View {
         Group {
             if addModuleSupport {
                 ModuleSupportView(
-                    rootRouterId: id,
+                    rootRouterInfo: (id, transitionBehavior),
                     addNavigationStack: addNavigationStack,
                     content: content
                 )
@@ -59,7 +62,7 @@ public struct RouterView<Content: View>: View {
                 RouterViewModelWrapper {
                     RouterViewInternal(
                         routerId: RouterViewModel.rootId,
-                        rootRouterId: id,
+                        rootRouterInfo: (id, transitionBehavior),
                         addNavigationStack: addNavigationStack,
                         content: content
                     )

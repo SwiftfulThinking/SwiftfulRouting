@@ -42,7 +42,7 @@ public struct AnyDestination: Identifiable, Hashable {
         self.destination = AnyView(
             RouterViewInternal(
                 routerId: id,
-                rootRouterId: nil,
+                rootRouterInfo: nil,
                 addNavigationStack: segue != .push,
                 content: destination
             )

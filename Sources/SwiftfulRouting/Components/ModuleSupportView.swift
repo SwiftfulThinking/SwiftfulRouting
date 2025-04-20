@@ -12,7 +12,7 @@ struct ModuleSupportView<Content:View>: View {
     
     @StateObject private var viewModel = ModuleViewModel()
 
-    var rootRouterId: String
+    var rootRouterInfo: (id: String, transitionBehavior: TransitionMemoryBehavior)?
     let addNavigationStack: Bool
     
     @ViewBuilder var content: (AnyRouter) -> Content
@@ -29,7 +29,7 @@ struct ModuleSupportView<Content:View>: View {
                         RouterViewModelWrapper {
                             RouterViewInternal(
                                 routerId: RouterViewModel.rootId,
-                                rootRouterId: rootRouterId,
+                                rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
                                 content: content
                             )
@@ -38,7 +38,7 @@ struct ModuleSupportView<Content:View>: View {
                         RouterViewModelWrapper {
                             RouterViewInternal(
                                 routerId: RouterViewModel.rootId,
-                                rootRouterId: rootRouterId,
+                                rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
                                 content: { router in
                                     AnyView(data.destination(router))

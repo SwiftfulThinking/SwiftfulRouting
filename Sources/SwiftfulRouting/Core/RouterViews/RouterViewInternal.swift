@@ -14,7 +14,7 @@ struct RouterViewInternal<Content: View>: View, Router {
     @EnvironmentObject var viewModel: RouterViewModel
     @EnvironmentObject var moduleViewModel: ModuleViewModel
     var routerId: String
-    var rootRouterId: String?
+    var rootRouterInfo: (id: String, transitionBehavior: TransitionMemoryBehavior)?
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
@@ -79,8 +79,15 @@ struct RouterViewInternal<Content: View>: View, Router {
         .ifSatisfiesCondition(routerId == RouterViewModel.rootId, transform: { content in
             content
                 .onFirstAppear {
-                    let view = AnyDestination(id: routerId, segue: .fullScreenCover, location: .insert, onDismiss: nil, destination: { _ in self })
-                    viewModel.insertRootView(rootRouterId: rootRouterId, view: view)
+                    let view = AnyDestination(
+                        id: routerId,
+                        segue: .fullScreenCover,
+                        location: .insert,
+                        animates: false,
+                        transitionBehavior: rootRouterInfo?.transitionBehavior ?? .keepPrevious,
+                        onDismiss: nil,
+                        destination: { _ in self })
+                    viewModel.insertRootView(rootRouterId: rootRouterInfo?.id, view: view)
                 }
         })
         
@@ -148,6 +155,10 @@ struct RouterViewInternal<Content: View>: View, Router {
     
     var activeTransitions: [AnyTransitionDestination] {
         viewModel.allTransitions[routerId] ?? []
+    }
+    
+    var activeModules: [AnyTransitionDestination] {
+        moduleViewModel.modules
     }
     
     var activeTransitionQueue: [AnyTransitionDestination] {

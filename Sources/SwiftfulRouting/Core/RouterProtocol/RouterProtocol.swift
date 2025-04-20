@@ -15,6 +15,7 @@ protocol Router: Sendable {
     @MainActor var activeModals: [AnyModal] { get }
     @MainActor var activeTransitions: [AnyTransitionDestination] { get }
     @MainActor var activeTransitionQueue: [AnyTransitionDestination] { get }
+    @MainActor var activeModules: [AnyTransitionDestination] { get }
     
     @MainActor func showScreens(destinations: [AnyDestination])
     @MainActor func dismissScreen(animates: Bool)
