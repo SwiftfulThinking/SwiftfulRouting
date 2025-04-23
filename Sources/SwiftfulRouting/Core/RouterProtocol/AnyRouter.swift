@@ -331,6 +331,7 @@ public struct AnyRouter: Sendable, Router {
         backgroundEffect: BackgroundEffect? = nil,
         dismissOnBackgroundTap: Bool = true,
         ignoreSafeArea: Bool = true,
+        location: ModalLocation = .currentRouter,
         onDismiss: (() -> Void)? = nil,
         @ViewBuilder destination: @escaping () -> T
     ) where T : View {
@@ -343,6 +344,7 @@ public struct AnyRouter: Sendable, Router {
                 backgroundEffect: backgroundEffect,
                 dismissOnBackgroundTap: dismissOnBackgroundTap,
                 ignoreSafeArea: ignoreSafeArea,
+                location: location,
                 destination: destination,
                 onDismiss: onDismiss
             )
