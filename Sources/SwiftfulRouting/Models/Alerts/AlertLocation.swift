@@ -8,5 +8,5 @@ import Foundation
 import SwiftUI
 
 public enum AlertLocation: String {
-    case currentScreen, topScreen
+    case currentRouter, topRouter
 }

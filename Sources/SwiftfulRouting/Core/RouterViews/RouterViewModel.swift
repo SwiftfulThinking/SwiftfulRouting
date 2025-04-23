@@ -758,7 +758,7 @@ extension RouterViewModel {
         var routerId = routerId
         
         // If location is .topScreen, present alert on the last screen displayed
-        if alert.location == .topScreen {
+        if alert.location == .topRouter {
             if let lastScreen = activeScreenStacks.allScreens.last {
                 routerId = lastScreen.id
             }
@@ -806,6 +806,21 @@ extension RouterViewModel {
     
     // Show modal on routerId
     func showModal(routerId: String, modal: AnyModal) {
+        var routerId = routerId
+        
+        switch modal.location {
+        case .currentRouter:
+            break
+        case .topRouter:
+            if let lastScreen = activeScreenStacks.allScreens.last {
+                routerId = lastScreen.id
+            }
+        case .bottomRouter:
+            if let firstScreen = activeScreenStacks.allScreens.first {
+                routerId = firstScreen.id
+            }
+        }
+        
         // Every routerId needs an array if it doesn't have one already
         if allModals[routerId] == nil {
             allModals[routerId] = []

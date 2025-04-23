@@ -16,6 +16,7 @@ public struct AnyModal: Identifiable, Equatable {
     public private(set) var backgroundEffect: BackgroundEffect?
     public private(set) var dismissOnBackgroundTap: Bool
     public private(set) var ignoreSafeArea: Bool
+    public private(set) var location: ModalLocation
     public private(set) var destination: AnyView
     public private(set) var onDismiss: (() -> Void)?
     public private(set) var isRemoved: Bool = false
@@ -41,6 +42,7 @@ public struct AnyModal: Identifiable, Equatable {
         backgroundEffect: BackgroundEffect? = nil,
         dismissOnBackgroundTap: Bool = true,
         ignoreSafeArea: Bool = true,
+        location: ModalLocation = .currentRouter,
         destination: @escaping () -> T,
         onDismiss: (() -> Void)? = nil
     ) {
@@ -52,6 +54,7 @@ public struct AnyModal: Identifiable, Equatable {
         self.backgroundEffect = backgroundEffect
         self.dismissOnBackgroundTap = dismissOnBackgroundTap
         self.ignoreSafeArea = ignoreSafeArea
+        self.location = location
         self.destination = AnyView(
             destination()
         )

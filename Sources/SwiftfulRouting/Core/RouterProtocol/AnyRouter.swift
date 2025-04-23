@@ -253,7 +253,7 @@ public struct AnyRouter: Sendable, Router {
     ///   - buttons: Buttons within alert (hint: use Group with multiple Button inside).
     @MainActor public func showAlert<T:View>(
         _ style: AlertStyle = .alert,
-        location: AlertLocation = .topScreen,
+        location: AlertLocation = .topRouter,
         title: String,
         subtitle: String? = nil,
         @ViewBuilder buttons: @escaping () -> T
@@ -270,7 +270,7 @@ public struct AnyRouter: Sendable, Router {
     ///   - subtitle: Subtitle of alert (optional)
     @MainActor public func showAlert(
         _ style: AlertStyle = .alert,
-        location: AlertLocation = .topScreen,
+        location: AlertLocation = .topRouter,
         title: String,
         subtitle: String? = nil
     ) {

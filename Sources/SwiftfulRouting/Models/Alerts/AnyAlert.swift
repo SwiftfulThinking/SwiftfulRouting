@@ -24,7 +24,7 @@ public struct AnyAlert: Identifiable {
     ///   - buttons: Buttons within alert (hint: use Group with multiple Button inside).
     public init<T:View>(
         style: AlertStyle = .alert,
-        location: AlertLocation = .topScreen,
+        location: AlertLocation = .topRouter,
         title: String,
         subtitle: String? = nil,
         @ViewBuilder buttons: () -> T
@@ -44,7 +44,7 @@ public struct AnyAlert: Identifiable {
     ///   - subtitle: Subtitle of alert (optional)
     public init(
         style: AlertStyle = .alert,
-        location: AlertLocation = .topScreen,
+        location: AlertLocation = .topRouter,
         title: String,
         subtitle: String? = nil
     ) {
