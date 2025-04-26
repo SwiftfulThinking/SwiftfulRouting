@@ -2,29 +2,122 @@
 
 
 # SwiftfulRouting  🤙
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSwiftfulThinking%2FSwiftfulRouting%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/SwiftfulThinking/SwiftfulRouting) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSwiftfulThinking%2FSwiftfulRouting%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/SwiftfulThinking/SwiftfulRouting)
 
-SwiftfulRouting is a native, declarative framework that enables programmatic navigation in SwiftUI applications. 
+### Programmatic navigation for SwiftUI applications.
+- ✅ Segues
+- ✅ Alerts
+- ✅ Modals
+- ✅ Transitions
+- ✅ Modules
 
-- Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
-- YouTube Tutorial: https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6
+### How to use this package:
+
+- 1️⃣ Read the docs below
+- 2️⃣ Watch [YouTube Tutorial](https://www.youtube.com/watch?v=zKfhv-Yds4g&list=PLwvDm4VfkdphPRGbtiY-X3IZsUXFi6595&index=6)
+- 3️⃣ Practice with [Sample Project](https://github.com/SwiftfulThinking/SwiftfulRoutingExample)
+- 4️⃣ Test the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject)
+
+
+### Versioning:
+
+- ➡️ iOS 17+ use version 6.0 or above
+- ➡️ iOS 14+ use version 5.3.6
+- ➡️ iOS 13+ use version 2.0.2
+
+## Quick Start (TLDR)
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Use a `RouterView` to replace `NavigationStack` in your SwiftUI code.
+
+Before SwiftfulRouting:
+```swift
+NavigationStack {
+  MyView()
+    .navigationDestination()
+    .sheet()
+    .fullScreenCover()
+    .alert()
+}
+```
+
+With SwiftfulRouting:
+```swift
+RouterView { _ in
+  MyView()
+}
+```
+
+Use a `router` to perform actions.
+
+```swift
+struct MyView: View {
+    
+    @Environment(\.router) var router
+    
+    var body: some View {
+        Text("Hello, world!")
+            .onTapGesture {
+                router.showScreen { _ in 
+                    AnotherView()
+                }
+            }
+    }
+}
+```
+
+All available methods in `router` are in [AnyRouter.swift](https://github.com/SwiftfulThinking/SwiftfulRouting/blob/development/Sources/SwiftfulRouting/Core/RouterProtocol/AnyRouter.swift). 
+
+Examples:
+
+```swift
+router.showScreen()
+router.showAlert()
+router.showModal()
+router.showTransition()
+router.showModule()
+router.dismissScreen()
+router.dismissAlert()
+router.dismissModal()
+router.dismissTransition()
+router.dismissModule()
+```
+
+</details>
+
 
 ## How It Works
 
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
-Routers based on programatic code do not declare the view heirarchy in advance, but rather at the time of execution. However, SwiftUI is declarative, and so we must declare the view heirarchy in advance. The solution herein is to convert SwiftUI's declarative code to behave as programmatic code by connecting view modifiers to support the routing in advance.
-<br>
-<br>
-As you segue to a new screen, the framework adds a set view modifiers to the root of the destination View that will support all potential navigation routes. The modifiers are based on generic and/or type-erased destinations, which maintains a declarative view heirarchy while allowing the developer to still determine the destination at the time of execution. 
-<br>
-<br>
 
-- The ViewModifiers are in `RouterView.swift -> body`.
-- Accessible routing methods are in `AnyRouter.swift`. 
-- Refer to the sample project for example implementations, UI Tests and sample MVC, MVVM and VIPER design patterns.
+As you segue to a new screen, the framework adds a set view modifiers to the root of the destination View that will support all potential navigation routes. This allows declarative code to behave as programmatic code, since the view modifiers are connected in advance. Screen destinations are erased to generic types, allowing the developer to determine the destination at the time of execution. 
 
-Sample project: https://github.com/SwiftfulThinking/SwiftfulRoutingExample
+
+Version 6.0 adds many new features to the framework by implementing an internal RouterViewModel across the screen heirarchy that allows and screen's router to perform actions that affect the entire heirarchy. The solution introduces [AnyDestinationStack] which is a single array that holds bindings for all active segues in the heirarchy. 
+
+```
+// Example of what an [AnyDestinationStack] might look like:
+
+ [
+    [.fullScreenCover]
+    [.push, .push, .push, .push]
+    [.sheet]
+    []
+ ]
+```
+
+In addition to adding a `router` to the Environment, every segue immedaitely returns a `router` in the View's closure. This allows the developer to have access to the screen's routing methods before the screen is created. Leave fully decouples routing logic from the View layer and is perfect for more complex app architectures, such as MVVM or VIPER.
+
+```swift
+RouterView { router in
+  MyView(router: router)
+}
+```
 
 </details>
 
@@ -39,21 +132,29 @@ Add the package to your Xcode project.
 https://github.com/SwiftfulThinking/SwiftfulRouting.git
 ```
 
-Import the package
+Import the package.
 
 ```swift
 import SwiftfulRouting
 ```
 
-Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a Navigation heirarchy and add modifiers to support all potential segues.
+Add a `RouterView` at the top of your view heirarchy. A `RouterView` will embed your view into a NavigationStack and add modifiers to support all potential segues. This would **replace** an existing `NavigationStack` in your code.
+
+Use a `RouterView` to replace `NavigationStack` in your SwiftUI code.
 
 ```swift
-struct ContentView: View {
-    var body: some View {
-        RouterView { _ in
-            MyView()
-        }
-    }
+// Before SwiftfulRouting
+NavigationStack {
+  MyView()
+    .navigationDestination()
+    .sheet()
+    .fullScreenCover()
+    .alert()
+}
+
+// With SwiftfulRouting
+RouterView { _ in
+  MyView()
 }
 ```
 
@@ -73,25 +174,37 @@ var body: some View {
 }
 ```
 
-Instead of relying on the `Environment`, you may also pass the `Router` directly into the child views. This allows the `Router` to be fully decoupled from the View (for more complex app architectures).
+Instead of relying on the `Environment`, you can also pass the `router` directly into the child views.
 
 ```swift
 RouterView { router in
-     ContentView(router: router)
-          .onTapGesture {
-               router.showScreen(.push) { router2 in
-                    Text("View2")
-                         .onTapGesture {
-                              router2.showScreen(.push) { router3 in
-                                   Text("View3")
-                              }
-                         }
+    MyView(router: router)
+}
+```
+
+You can also use the returned `router` directly. A new `router` is created and added to the view heirarchy after each segue and are therefore unique to each screen. In the below example, the tap gesture on "View3" could call `dismissScreen()` from `router2` or `router3`, which would have different behaviors. This is done on purpose and is further explained in the docs below!
+
+```swift
+RouterView { router1 in
+    Text("View 1")
+        .onTapGesture {
+            router1.showScreen(.push) { router2 in
+                Text("View 2")
+                    .onTapGesture {
+                        router2.showScreen(.push) { router3 in
+                            Text("View3")
+                                .onTapGesture {
+                                    router3.dismissScreen() // Dismiss View3
+                                    router2.dismissScreen() // Dismiss View2 and View 3
+                                }
+                        }
+                    }
                }
           }
 }
 ```
 
-A new Router is created and added to the view heirarchy after each Segue. Refer to `AnyRouter.swift` to see all accessible methods.
+Refer to [AnyRouter.swift](https://github.com/SwiftfulThinking/SwiftfulRouting/blob/main/Sources/SwiftfulRouting/Core/AnyRouter.swift) to see all accessible methods.
 
 </details>
 
@@ -101,14 +214,15 @@ A new Router is created and added to the view heirarchy after each Segue. Refer 
 <summary> Details (Click to expand) </summary>
 <br>
     
-In order to enter the framework's view heirarchy, you must wrap your content in a RouterView. By default, your view will be wrapped in with navigation stack (iOS 16+ uses a NavigationStack, iOS 15 and below uses NavigationView). 
-- If your view is already within a navigation heirarchy, set `addNavigationView` to `FALSE`. 
-- If your view is already within a NavigationStack, use `screens` to bind to the existing stack path.
-- The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
+In order to enter the framework's view heirarchy, you must wrap your content in a `RouterView`, which will add a `NavigationStack` by default.
+
+Most apps should replace their existing `NavigationStack` with a `RouterView`, however, if you cannot remove it, you can add a `RouterView` but initialize it without a `NavigationStack`.
+
+The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
 
 ```swift
-RouterView(addNavigationView: false, screens: $existingStack) { router in
-   MyView(router: router)
+RouterView(addNavigationView: false) { router in
+   MyView()
         .navigationBarHidden(true)
         .toolbar {
         }
@@ -126,7 +240,7 @@ RouterView(addNavigationView: false, screens: $existingStack) { router in
 Router supports all native SwiftUI segues.
 
 ```swift
-// NavigationLink
+// Navigation destination
 router.showScreen(.push) { _ in
      Text("View2")
 }
@@ -142,107 +256,92 @@ router.showScreen(.fullScreenCover) { _ in
 }
 ```
 
-Segue methods also accept `AnyRoute` as a convenience, which make it easy to pass the `Route` around your code.
+Segue methods also accept `AnyDestination` as a convenience.
 
 ```swift
-let route = AnyRoute(.push, destination: { router in
-     Text("Hello, world!")
+let screen = AnyDestination(segue: .push, destination: { router in
+    Text("Hello, world!")
 })
-                        
-router.showScreen(route)
+                                    
+router.showScreen(screen)
 ```
 
-All segues have an onDismiss method.
+Segue to multiple screens at once. This will immediately trigger each screen in order, ending with the last screen displayed.
 
 ```swift
+let screen1 = AnyDestination(segue: .push, destination: { router in
+    Text("Hello, world!")
+})
+let screen2 = AnyDestination(segue: .sheet, destination: { router in
+    Text("Another screen!")
+})
+let screen3 = AnyDestination(segue: .push, destination: { router in
+    Text("Third screen!")
+})
+                                    
+router.showScreens(destinations: [screen1, screen2, screen3])
+```
 
+Use `.sheetConfig()` or `.fullScreenCoverConfig()` to for resizable sheets and backgrounds in new Environments.
+
+```swift
+let config = ResizableSheetConfig(
+    detents: [.medium, .large],
+    dragIndicator: .visible
+)
+
+router.showScreen(.sheetConfig(config: config)) { _ in
+    Text("Screen2")
+}
+```
+
+```swift
+let config = FullScreenCoverConfig(
+    background: .clear
+)
+            
+router.showScreen(.fullScreenCoverConfig(config: config)) { _ in
+    Text("Screen2")
+}
+```
+
+All segues have an `onDismiss` method.
+
+```swift
 router.showScreen(.push, onDismiss: {
      // dismiss action
 }, destination: { _ in
      Text("Hello, world!")
 })
-                
-let route = AnyRoute(.push, onDismiss: {
-     // dismiss action
-}, destination: { _ in
-     Text("Hello, world!")
-})
-                
-router.showScreen(route)
 ```
 
-iOS 16+ uses NavigationStack, which supports pushing multiple screens at once.
+Fully customize each segue!
 
 ```swift
-let route1 = PushRoute(destination: { router in
-     Text("View1")
-})
-let route2 = PushRoute(destination: { router in
-     Text("View2")
-})
-let route3 = PushRoute(destination: { router in
-     Text("View3")
-})
-                        
-router.pushScreenStack(destinations: [route1, route2, route3])
-```
-
-iOS 16+ also supports resizable sheets.
-
-```swift
-router.showResizableSheet(sheetDetents: [.medium, .large], selection: nil, showDragIndicator: true) { _ in
-     Text("Hello, world!)
-}
+let screen = AnyDestination(
+    id: "profile_screen", // id of screen (used for analytics)
+    segue: .fullScreenCover, // segue option
+    location: .insert, // where to add screen within the view heirarchy
+    animates: true, // animate the segue
+    transitionBehavior: .keepPrevious, // transition behavior (only relevant for showTransition methods)
+    onDismiss: {
+        // Do something when screen dismisses
+    },
+    destination: { _ in
+        Text("ProfileView")
+    }
+)
 ```
 
 Additional convenience methods:
+
 ```swift
 router.showSafari {
      URL(string: "https://www.apple.com")
 }
 ```
-
 </details>
 
-## Enter Screen Flows
-
-<details>
-<summary> Details (Click to expand) </summary>
-<br>
-
-Screen "flows" are new way to support dynamic routing in your application. When you enter a "screen flow", you add an array of `Routes` to the heirarchy. The application will immediately segue to the first screen, and then set the remaining screens into a queue.
-
-```swift
-router.enterScreenFlow([
-     AnyRoute(.fullScreenCover, destination: screen1),
-     AnyRoute(.push, destination: screen2),
-     AnyRoute(.push, destination: screen3),
-     AnyRoute(.push, destination: screen4),
-])
-```
-
-This allows the developer to set multiple future segues at once, without requiring screen-specific code in each child view. Each child view's routing logic is simple as "try to go to next screen".
-
-```swift
-do {
-     try router.showNextScreen()
-} catch {
-     // There is no next screen set in the flow
-     // Dismiss the flow (see below dismiss methods) or do something else
-}
-```
-
-Benefits of using a "flow":
-
-- **Simiplified Logic:** In most applications, the routing logic is tightly coupled to the View (ie. when you create a screen, you declare in code exactly what the next screen must be). Now, you can build a screen without having to worry about routing at all. Simply support "go to next screen" or "dismiss flow" (see dismissal code below).
-
-- **AB Tests:** Each user can see a unique flow of screens in your app, and you don't have to write 'if-else' logic within every child view.
-
-- **High-Level Control**: You can control the entire flow from one method, which will be closer to the business logic of your app, rather than within the View itself.
-
-- **Flows on Flows**: Flows are fully dynamic, meaning you can enter flows from within flows and can dismiss screens within flows (back-forward-back) without corrupting the flow.
-
-</details>
 
 ## Dismiss Screens
 
@@ -250,76 +349,133 @@ Benefits of using a "flow":
 <summary> Details (Click to expand) </summary>
 <br>
 
-Dismiss one screen. You can also dismiss a screen using native SwiftUI code, including swipe-back gestures or `presentationMode`. 
+Dismiss one screen.
 
 ```swift
 router.dismissScreen()
 ```
 
-Dismiss all screens pushed onto the stack. This dismisses every "push" (NavigationLink) on the screen's Navigation Stack. This does not dismiss `sheet` or `fullScreenCover`.
+You can also use the native SwiftUI method. 
 
 ```swift
-router.dismissScreenStack()
+@Environment(\.dismiss) var dismiss
 ```
 
-Dismiss screen environment. This dismisses the screen's root environment (if there is one to dismiss), which is the closest 'sheet' or `fullScreenCover` below the call-site.
+Dismiss screen at id.
+
+```swift
+router.dismissScreen(id: "x")
+```
+
+Dismiss screens back to, but not including, id.
+
+```swift
+router.dismissScreen(upToScreenId: "x")
+```
+
+Dismiss a specific number of screens.
+
+```swift
+router.dismissScreens(count: 2)
+```
+
+Dismiss all .push segues on the NavigationStack of the current screen.
+
+```swift
+router.dismissPushStack()
+```
+
+Dismiss screen environment (ie. the closest .sheet or .fullScreenCover to this screen).
 
 ```swift
 router.dismissEnvironment()
 ```
 
-For example, if you entered the following screen flow and you called `dismissEnvironment` from any of the child views, it would dismiss the `fullScreenCover`, which in-turn dismisses every view displayed on that Environment. 
+Dismiss the last screen in the screen heirarchy.
 
 ```swift
-router.enterScreenFlow([
-     AnyRoute(.fullScreenCover, destination: screen1),
-     AnyRoute(.push, destination: screen2),
-     AnyRoute(.push, destination: screen3),
-     AnyRoute(.push, destination: screen4),
-])
+router.dismissLastScreen()
 ```
 
-Logic for dismissing a "Flow" can generally look like:
+Dismiss the last push stack in the screen heirarchy.
 
 ```swift
-do {
-     try router.showNextScreen()
-} catch {
-     router.dismissEnvironment()
-}
+router.dismissLastPushStack()
 ```
 
-Or convenience method:
+Dismiss the last environment in the screen heirarchy.
 
 ```swift
-router.showNextScreenOrDismissEnvironment()
+router.dismissLastEnvironment()
 ```
 
-Copy and paste this code into your project to enable swipe back gestures. This is not included in the SwiftUI framework by default and therefore is not automatically included herein. 
-
+Dismiss all screens in the screen heirarchy.
 
 ```swift
-extension UINavigationController: UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-    
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
-    }
-}
+router.dismissLastEnvironment()
 ```
-
 </details>
 
-## Alerts
+## Screen Queue
 
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
 
-Router supports native SwiftUI alerts.
+Add screens to a queue to navigate to them later!
+
+```swift
+router.addScreenToQueue(destination: screen1)
+router.addScreensToQueue(destinations: [screen1, screen2, screen3])
+```
+
+Trigger segue to the first screen in queue, if available.
+
+```swift
+// Show next screen if available
+router.showNextScreen()
+
+// show next screen, otherwise, throw error
+do {
+    try router.tryShowNextScreen()
+} catch {
+    // Do something else
+}
+```
+
+Remove screens from the queue.
+
+```swift
+router.removeScreenFromQueue(id: "x")
+router.removeScreensFromQueue(ids: ["x", "y"])
+router.removeAllScreensFromQueue()
+```
+
+For example, an onboarding flow might have a variable number of screens depending on the user's responses. As the user progresses, add screens to the queue and then the logic within each screen is "try to go to next screen (if available) otherwise dismiss onboarding"
+
+Additional convenience methods:
+
+```swift
+// Segue to a the next screen in the queue (if available) otherwise dismiss the screen.
+router.showNextScreenOrDismissScreen()
+
+// Segue to a the next screen in the queue (if available) otherwise dismiss environment.
+router.showNextScreenOrDismissEnvironment()
+
+// Segue to a the next screen in the queue (if available) otherwise dismiss push stack.
+router.showNextScreenOrDismissPushStack()
+```
+
+</details>
+
+
+## Show Alerts
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Router supports all native SwiftUI alerts.
 
 ```swift
 // Alert
@@ -346,13 +502,38 @@ router.showAlert(.confirmationDialog, title: "Title goes here", subtitle: "Subti
 }
 ```
 
-Dismiss an alert.
+Buttons closure supports all the same features as the native SwiftUI closure, such as TextFields.
+
+```swift
+let alert = AnyAlert(style: .alert, title: "Title goes here", subtitle: "Subtitle goes here", buttons: {
+  TextField("Enter your name", text: $textfieldText)
+                
+  Button("SUBMIT", action: {
+
+  })
+})
+```
+
+Alert methods also accept `AnyAlert` as a convenience.
+
+```swift
+let alert = AnyAlert(
+    style: .alert,
+    location: .currentScreen,
+    title: "Title",
+    subtitle: nil
+)
+router.showAlert(alert: alert)
+```
+
+Dismiss the alert.
 
 ```swift
 router.dismissAlert()
+router.dismissAllAlerts()
 ```
 
-Additional convenience methods:
+Additional convenience methods.
 
 ```swift
 router.showBasicAlert(text: "Error")
@@ -360,56 +541,646 @@ router.showBasicAlert(text: "Error")
 
 </details>
 
-## Modals
+## Show Modals
 
 <details>
 <summary> Details (Click to expand) </summary>
 <br>
 
-Router also supports any modal transition, which displays above the current content. Customize transition, animation, background color/blur, etc. See sample project for example implementations.
+Modals appear on top of the current screen. Router supports an **infinite** number of **simultaneous** modals.
 
 ```swift
-router.showModal(transition: .move(edge: .top), animation: .easeInOut, alignment: .top, backgroundColor: nil, useDeviceBounds: true) {
-     Text("Sample")
-          .onTapGesture {
-               router.dismissModal()
-          }
+router.showModal {
+    MyModal()
+        .frame(width: 300, height: 300)
 }
 ```
 
-You can display multiple modals simultaneously. Modals have an optional ID field, which can later be used to dismiss the modal.  
+Fully customize modal's display.
 
 ```swift
-router.showModal(id: "top1") {
-     Text("Sample")
+router.showModal(
+    id: "modal_1", // Id for modal
+    transition: .move(edge: .bottom), // AnyTransition
+    animation: .smooth, // transition animation
+    alignment: .center, // Alignment within screen
+    backgroundColor: Color.black.opacity(0.1), // Color behind modal
+    backgroundEffect: BackgroundEffect(effect: UIBlurEffect(style: .systemMaterialDark), intensity: 0.1), // Blur effect behind modal
+    dismissOnBackgroundTap: true, // Add dismiss tap gesture on background layer
+    ignoreSafeArea: true, // Modal will safe area
+    onDismiss: {
+        // Do something when modal is dismissed
+    },
+    destination: {
+        MyModal()
+    }
+)
+```
+
+Modal methods also accept `AnyModal` as a convenience.
+
+```
+let modal = AnyModal {
+    MyModal()
 }
 
-// Dismiss top-most modal
+router.showModal(modal: modal)
+```
+
+Trigger multiple modals at the same time.
+
+```swift
+router.showModals(modals: [modal1, modal2])
+```
+
+Dismiss the last modal displayed.
+
+```swift
 router.dismissModal()
-
-// Dismiss modal by ID
-router.dismissModal(id: "top1")
-
-// Dismiss all modals
-router.dismissAllModals()
-
 ```
 
+Dismiss modal by id.
+
+```swift
+router.dismissModal(id: "modal_1")
+```
+
+Dismiss modals above, but not including, id.
+
+```swift
+router.dismissModals(upToModalId: "modal_1")
+```
+
+Dismiss specific number of modals.
+
+```swift
+router.dismissModals(count: 2)
+```
+
+Dismiss all modals.
+
+```swift
+router.dismissAllModals()
+```
 
 Additional convenience methods:
 
 ```swift
 router.showBasicModal {
-     Text("Sample")
-          .onTapGesture {
-               router.dismissModal()
-          }
+     Rectangle()
+        .frame(width: 200, height: 200)
+}
+```
+
+```swift
+router.showBottomModal {
+     Rectangle()
+        .frame(width: 200, height: 200)
 }
 ```
 
 </details>
 
-## Contribute 🤓
+## Show Transitions
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Transitions change the current screen WITHOUT performing a full segue.
+
+Transitions are NOT segues!
+
+Transitions are similar to using an "if-else" statement to switch between views.
+
+```swift
+router.showTransition { router in
+    MyView()
+}
+```
+
+**Important:** When showing a new screen via `showScreen` there is a parameter `transitionBehavior`. This will determine the UI behavior of any `showTransition` on the resulting screen.
+
+Set `transitionBehavior` to `.keepPrevious` to keep previous screens in memory. This will transition new screens ON TOP of each other.
+
+Set `transitionBehavior` to `.removePrevious` to remove previous screens from memory. This will transition a new screen on, while transitioning the old screen off.
+
+```swift
+router.showScreen(transitionBehavior: .removePrevious) { _ in
+    MyView()
+}
+```
+
+Transition methods also accept `AnyTransitionDestination` as a convenience.
+
+```swift
+let screen = AnyTransitionDestination { _ in
+    MyView()
+}
+
+router.showTransition(transition: screen)
+```
+
+Add multiple transitions on the screen and display the last one on top.
+
+```swift
+router.showTransitions(transitions: [screen1, screen2, screen3])
+```
+
+Fully customize transition's display.
+
+```swift
+let transition = AnyTransitionDestination(
+    id: "transition_1", // Id for the screen
+    transition: .trailing, // Transition edge
+    allowsSwipeBack: true, // Add a swipe back gesture to the screen's edge
+    onDismiss: {
+        // Do something when transition dismisses
+    },
+    destination: { router in
+        MyView()
+    }
+)
+```
+
+Dismiss the last transition displayed.
+
+```swift
+router.dismissTransition()
+```
+
+Dismiss transition by id.
+
+```swift
+router.dismissTransition(id: "transition_1")
+```
+
+Dismiss transitions above, but not including, id.
+
+```swift
+router.dismissTransitions(upToId: "transition_1")
+```
+
+Dismiss specific number of transitions.
+
+```swift
+router.dismissTransitions(count: 2)
+```
+
+Dismiss all transitions.
+
+```swift
+router.dismissAllTransitions()
+```
+
+Additional convenience methods:
+
+```swift
+// Dismiss transition (if there is one) otherwise dismiss screen.
+router.dismissTransitionOrDismissScreen()
+```
+
+</details>
+
+## Transition Queue
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Add transitions to a queue to trigger them later!
+
+```swift
+router.addTransitionToQueue(transition: screen1)
+router.addTransitionsToQueue(transitions: [screen1, screen2, screen3])
+```
+
+Trigger transition to the first in queue, if available.
+
+```swift
+// Show next transition if available
+router.showNextTransition()
+
+// show next transition, otherwise, throw error
+do {
+    try router.tryShowNextTransition()
+} catch {
+    // Do something else
+}
+```
+
+Remove transitinos from the queue.
+
+```swift
+router.removeTransitionFromQueue(id: "x")
+router.removeTransitionsFromQueue(ids: ["x", "y"])
+router.removeAllTransitionsFromQueue()
+```
+
+For example, an onboarding flow might have a variable number of screens depending on the user's responses. As the user progresses, add screens to the queue and then the logic within each screen is "try to go to next screen (if available) otherwise dismiss onboarding"
+
+Additional convenience methods:
+
+```swift
+// Trigger next transition or trigger next screen or dismiss screen.
+router.showNextTransitionOrNextScreenOrDismissScreen()
+```
+
+</details>
+
+## Show Modules
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Modules swap the ENTIRE view heirarchy and replace the existing `RouterView` with a new one.
+
+```swift
+router.showModule { router in
+    MyView()
+}
+```
+
+**Important:** Module support is NOT automatically included within `RouterView`. You must enable it by setting `addModuleSupport` to `true`. This is done on purpose, in case there are multiple `RouterView` in the same heirarchy.
+
+```swift
+router.showScreen(addModuleSupport: true) { _ in
+    MyView()
+}
+```
+
+Depending on how deep your view heirarchy is, you may want to dismiss screens before switching modules for better UX.
+
+```swift
+Task {
+  router.dismissAllScreens()
+  try? await Task.sleep(for: .seconds(1))
+  router.showModule { router in
+    MyView()
+  }
+}
+```
+
+Module methods also accept `AnyTransitionDestination` as a convenience.
+
+```swift
+let screen = AnyTransitionDestination { _ in
+    MyView()
+}
+
+router.showModule(module: screen)
+```
+
+The user's last module is saved in UserDefaults and can be used to restore the app's state across sessions.
+
+```swift
+@State private var lastModuleId = UserDefaults.lastModuleId
+
+var body: some Scene {
+    WindowGroup {
+        if lastModuleId == "onboarding" {
+            RouterView(id: "onboarding", addModuleSupport: true) { router in
+                OnboardingView()
+            }
+        } else {
+            RouterView(id: "home", addModuleSupport: true) { router in
+                HomeView()
+            }
+        }
+    }
+}
+```
+
+Add multiple modules to the heirarchy and display the last one.
+
+```swift
+router.showModules(modules: [module1, module2, module3])
+```
+
+Fully customize module's display.
+
+```swift
+let module = AnyTransitionDestination(
+    id: "module_1", // Id for the screen
+    transition: .trailing, // Transition edge
+    allowsSwipeBack: true, // Add a swipe back gesture to the screen's edge
+    onDismiss: {
+        // Do something when transition dismisses
+    },
+    destination: { router in
+        MyView()
+    }
+)
+```
+
+**Note:** You can dismiss modules, although it is easier to use `showModule` to display the previous module again. 
+
+Dismiss the last module displayed.
+
+```swift
+router.dismissModule()
+```
+
+Dismiss module by id.
+
+```swift
+router.dismissModule(id: "module_1")
+```
+
+Dismiss modules above, but not including, id.
+
+```swift
+router.dismissModules(upToId: "module_1")
+```
+
+Dismiss specific number of modules.
+
+```swift
+router.dismissModules(count: 2)
+```
+
+Dismiss all modules.
+
+```swift
+router.dismissAllModules()
+```
+
+</details>
+
+## Logging, Analytics & Debugging
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Built-in logging that can be used for debugging and analytics.
+
+```swift
+// Set log level using internal logger:
+
+SwiftfulRoutingLogger.enableLogging(level: .analytic, printParameters: true)
+```
+
+Add your own implementation to handle unique events in your app.
+```swift
+struct MyLogger: RoutingLogger {
+    
+    func trackEvent(event: any RoutingLogEvent) {
+        let name = event.eventName
+        let params = event.parameters
+        
+        switch event.type {
+        case .info:
+            break
+        case .analytic:
+            break
+        case .warning:
+            break
+        case .severe:
+            break
+        }
+    }
+}
+
+SwiftfulRoutingLogger.enableLogging(logger: MyLogger())
+```        
+
+Or use [SwiftfulLogging](https://github.com/SwiftfulThinking/SwiftfulLogging) directly.
+
+```swift
+let logManager = LogManager(services: [
+    ConsoleService(printParameters: true),
+    FirebaseCrashlyticsService(),
+    MixpanelService()
+])
+
+SwiftfulRoutingLogger.enableLogging(logger: logManager)
+```
+
+Additional values to look into the underlying view heirarchy. 
+
+```swift
+
+// Active screen stacks in the heirarchy
+router.activeScreens
+
+// Active screen queue
+router.activeScreenQueue
+
+// Has at least 1 screen in queue
+router.hasScreenInQueue
+
+// Active alert
+router.activeAlert
+
+// Has alert displayed
+router.hasActiveAlert
+
+// Active modals on screen
+router.activeModals
+
+// Has at least 1 modal displayed
+router.hasActiveModal
+
+// Active transitions on screen
+router.activeTransitions
+
+// Has at least 1 active transtion
+router.hasActiveTransition
+
+// Active transition queue
+router.activeTransitionQueue
+
+// Has at least 1 transition in queue
+router.hasTransitionInQueue
+
+// Active modules
+router.activeModules
+```
+
+</details>
+
+## Tabbar & App Structure
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Even without SwiftfulRouting, SwiftUI developers must decide between using 1 NavigationStack for the entire application or individual NavigationStacks for each tab. 
+
+If you use only 1 `NavigationStack`, it will be a parent to the `TabView` and therefore the tabbar will also push off screen after a segue.
+
+1 NavigationStack without SwiftfulRouting:
+
+```swift
+NavigationStack {
+    TabView {
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+                    
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                    
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```   
+
+1 NavigationStack with SwiftfulRouting:
+
+```swift
+RouterView { _ in
+    TabView {
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+                    
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                    
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```   
+
+Individual NavigationStacks without SwiftfulRouting:
+ 
+```swift
+TabView {
+    NavigationStack {
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+    }
+      
+    NavigationStack {
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+    }
+    
+    NavigationStack {
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```  
+
+Individual NavigationStacks with SwiftfulRouting:
+ 
+```swift
+TabView {
+    RouterView { _ in
+        Text("Screen1")
+            .tabItem { Label("Home", systemImage: "house.fill") }
+    }
+      
+    RouterView { _ in
+        Text("Screen2")
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+    }
+    
+    RouterView { _ in
+        Text("Screen3")
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+    }
+}
+```
+
+Regardless of your choice, you may want to add a parent `RouterView` to `addModuleSupport` that has `addNavigationStack` set to `false`.
+
+```swift
+struct AppRootView: View {
+    
+    var body: some View {
+        RouterView(addNavigationStack: false, addModuleSupport: true) { _ in
+            AppTabbarView()
+        }
+    }
+}
+
+struct AppTabbarView: View {
+    
+    var body: some View {
+        TabView {
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen1")
+            })
+            .tabItem { Label("Home", systemImage: "house.fill") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen2")
+            })
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen3")
+            })
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+        }
+    }
+}
+```
+
+Therefore, a full app implementation can look like:
+
+```swift
+struct AppRootView: View {
+    
+    @State private var lastModuleId = UserDefaults.lastModuleId
+
+    @ViewBuilder
+    var body: some View {
+        if lastModuleId == "onboarding" {
+            RouterView(id: "onboarding", addModuleSupport: true) { router in
+                OnboardingView()
+            }
+        } else {
+            RouterView(id: "tabbar", addNavigationStack: false, addModuleSupport: true) { _ in
+                AppTabbarView()
+            }
+        }
+    }
+}
+
+struct AppTabbarView: View {
+    
+    var body: some View {
+        TabView {
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen1")
+            })
+            .tabItem { Label("Home", systemImage: "house.fill") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen2")
+            })
+            .tabItem { Label("Search", systemImage: "magnifyingglass") }
+            
+            RouterView(addNavigationStack: true, addModuleSupport: false, content: { _ in
+                Text("Screen3")
+            })
+            .tabItem { Label("Profile", systemImage: "person.fill") }
+        }
+    }
+}
+```
+
+Reference the [Starter Project](https://github.com/SwiftfulThinking/SwiftfulStarterProject) for an full implementation!
+
+</details>
+
+## Testing
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Full suite of UI tests are included in the [Sample Project](https://github.com/SwiftfulThinking/SwiftfulRoutingExample).
+
+</details>
+
+## Contribute
 
 <details>
 <summary> Details (Click to expand) </summary>
@@ -423,8 +1194,12 @@ Community contributions are encouraged! Please ensure that your code adheres to 
 
 Upcoming features:
 
-- [x] Support multiple Modals per screen
-- [ ] Add `showModule` support, for navigating between parent-level RouterView's
-- [ ] Support VisionOS
+- [ ] Internalize tabbar support
+- [ ] Add Module queue
+- [ ] Add Module tests
+- [ ] Add Modal queue
+- [ ] Add remove(count:) to all queues
+- [ ] Add support for showing in-app web browser
+- [ ] Add supprot for opening other apps (email, etc.)
 
 </details>
