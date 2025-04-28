@@ -12,6 +12,7 @@ import SwiftUI
 @MainActor
 public protocol RoutingLogger {
     func trackEvent(event: RoutingLogEvent)
+    func trackScreenView(event: RoutingLogEvent)
 }
 
 public enum SwiftfulRoutingLogger {
@@ -52,6 +53,9 @@ struct MockRoutingLogger: RoutingLogger {
         #endif
     }
     
+    func trackScreenView(event: any RoutingLogEvent) {
+        trackEvent(event: event)
+    }
 }
 
 @MainActor

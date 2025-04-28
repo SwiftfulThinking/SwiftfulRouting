@@ -45,7 +45,7 @@ final class RouterViewModel: ObservableObject {
     func insertRootView(rootRouterId: String?, view: AnyDestination) {
         activeScreenStacks.insert(AnyDestinationStack(segue: .fullScreenCover, screens: [view]), at: 0)
         rootRouterIdFromDeveloper = rootRouterId
-        logger.trackEvent(event: Event.screenShow(screen: view, rootRouterId: rootRouterIdFromDeveloper))
+        logger.trackScreenView(event: Event.screenShow(screen: view, rootRouterId: rootRouterIdFromDeveloper))
     }
     
 }
@@ -388,7 +388,7 @@ extension RouterViewModel {
             }
         }
         
-        logger.trackEvent(event: Event.screenShow(screen: destination, rootRouterId: rootRouterIdFromDeveloper))
+        logger.trackScreenView(event: Event.screenShow(screen: destination, rootRouterId: rootRouterIdFromDeveloper))
     }
     
     // Utility functino to trigger action with or without SwiftUI animation
@@ -585,7 +585,7 @@ extension RouterViewModel {
                 }
                 
                 if let newScreenShowing = activeScreenStacks.allScreens.last {
-                    logger.trackEvent(event: Event.screenShow(screen: newScreenShowing, rootRouterId: rootRouterIdFromDeveloper))
+                    logger.trackScreenView(event: Event.screenShow(screen: newScreenShowing, rootRouterId: rootRouterIdFromDeveloper))
                 }
 
                 // Stop loop
