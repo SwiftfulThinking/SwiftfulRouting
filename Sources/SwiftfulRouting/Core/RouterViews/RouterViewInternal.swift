@@ -7,19 +7,6 @@
 import SwiftUI
 
 @MainActor
-final class StablePath: ObservableObject, Equatable {
-    @Published var destinations: [AnyDestination]
-
-    init(destinations: [AnyDestination]) {
-        self.destinations = destinations
-    }
-
-    static func == (lhs: StablePath, rhs: StablePath) -> Bool {
-        lhs === rhs
-    }
-}
-
-@MainActor
 struct RouterViewInternal<Content: View>: View, Router {
     
     @Environment(\.openURL) var openURL
@@ -31,12 +18,12 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
-    @StateObject private var stableScreenStack = StablePath(destinations: [])
+    @StateObject private var stableScreenStack = StableAnyDestinationArray(destinations: [])
 
     private var currentRouter: AnyRouter {
         AnyRouter(id: routerId, object: self)
     }
-    
+        
     var body: some View {
         // Wrap starting content for Transition support
         TransitionSupportView(
@@ -60,52 +47,10 @@ struct RouterViewInternal<Content: View>: View, Router {
                     }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
-                        
-                        let activeStack = viewModel.activeScreenStacks
-                        let index = activeStack.firstIndex { subStack in
-                            return subStack.screens.contains(where: { $0.id == routerId })
-                        }
-                        guard let index, activeStack.indices.contains(index + 1) else {
-                            return
-                        }
-
-                        if screenStack.count < activeStack[index + 1].screens.count {
-                            if let lastScreen = screenStack.last {
-                                viewModel.dismissScreens(to: lastScreen.id, animates: true)
-                                print("DISMISS TO LAST SCREEN ID")
-                            } else {
-                                viewModel.dismissPushStack(routeId: routerId, animates: true)
-                                print("DISMISS PUSH STACK")
-                            }
-                        }
+                        handleStableScreenStackDidChange(screenStack: screenStack)
                     })
                     .onChange(of: viewModel.activeScreenStacks) { newStack in
-                        
-                        let index = newStack.firstIndex { subStack in
-                            return subStack.screens.contains(where: { $0.id == routerId })
-                        }
-                        guard let index, newStack.indices.contains(index + 1) else {
-                            if !stableScreenStack.destinations.isEmpty {
-                                stableScreenStack.destinations = []
-                                print("SET STACK TO ZERO")
-                            }
-                            return
-                        }
-                        
-                        let activeStack = newStack[index + 1].screens
-                        if stableScreenStack.destinations != activeStack {
-                            stableScreenStack.destinations = activeStack
-                            print("SET STACK TOOO: \(activeStack.count)")
-                        }
-//                        let index = newStack.firstIndex { $0.screens.contains { $0.id == routerId } }
-//                        if let index, newStack.indices.contains(index + 1) {
-//                            let newScreens = newStack[index + 1].screens
-//                            if stablePath.destinations != newScreens {
-//                                stablePath.destinations = newScreens
-//                            }
-//                        } else {
-//                            stablePath.destinations = []
-//                        }
+                        handleActiveScreenStackDidChange(newStack: newStack)
                     }
             }
         })
@@ -195,6 +140,37 @@ struct RouterViewInternal<Content: View>: View, Router {
         }
         
         return viewModel.activeScreenStacks[index].screens.first(where: { $0.id == routerId })
+    }
+    
+    private func handleStableScreenStackDidChange(screenStack: [AnyDestination]) {
+        let activeStack = viewModel.activeScreenStacks
+        let index = activeStack.firstIndex { subStack in
+            return subStack.screens.contains(where: { $0.id == routerId })
+        }
+        guard let index, activeStack.indices.contains(index + 1) else {
+            return
+        }
+
+        if screenStack.count < activeStack[index + 1].screens.count {
+            if let lastScreen = screenStack.last {
+                viewModel.dismissScreens(to: lastScreen.id, animates: true)
+            } else {
+                viewModel.dismissPushStack(routeId: routerId, animates: true)
+            }
+        }
+    }
+    
+    private func handleActiveScreenStackDidChange(newStack: [AnyDestinationStack]) {
+        let index = newStack.firstIndex { subStack in
+            return subStack.screens.contains(where: { $0.id == routerId })
+        }
+        guard let index, newStack.indices.contains(index + 1) else {
+            stableScreenStack.setNewValueIfNeeded(newValue: [])
+            return
+        }
+        
+        let activeStack = newStack[index + 1].screens
+        stableScreenStack.setNewValueIfNeeded(newValue: activeStack)
     }
             
     var activeScreens: [AnyDestinationStack] {

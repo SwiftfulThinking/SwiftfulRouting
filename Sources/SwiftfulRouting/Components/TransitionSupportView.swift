@@ -28,7 +28,6 @@ struct TransitionSupportView<Content:View>: View {
                 return Group {
                     if data == transitions.first {
                         content(router)
-//                            .id(routerId)
                     } else {
                         if allowsSwipeBack {
                             SwipeBackSupportContainer(

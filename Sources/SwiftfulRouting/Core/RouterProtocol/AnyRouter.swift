@@ -611,12 +611,14 @@ public struct AnyRouter: Sendable, Router {
 
 }
 
+// Used to stabilize View updates (Issue #92)
 extension AnyRouter: Identifiable, Hashable, Equatable {
+
     public static func == (lhs: AnyRouter, rhs: AnyRouter) -> Bool {
-        lhs.id == rhs.id // or compare the underlying object identity
+        lhs.id == rhs.id
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id) // or use ObjectIdentifier
+        hasher.combine(id)
     }
 }
