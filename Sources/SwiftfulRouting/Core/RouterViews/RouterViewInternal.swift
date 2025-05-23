@@ -18,6 +18,8 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
+    @State private var stableScreenStack: [AnyDestination] = []
+
     private var currentRouter: AnyRouter {
         AnyRouter(object: self)
     }
@@ -36,16 +38,34 @@ struct RouterViewInternal<Content: View>: View, Router {
         )
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
-            NavigationStack(path: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, onDidDismiss: { lastRouteRemaining in
-                if let lastRouteRemaining {
-                    viewModel.dismissScreens(to: lastRouteRemaining.id, animates: true)
-                } else {
-                    viewModel.dismissPushStack(routeId: routerId, animates: true)
-                }
-            })) {
+            NavigationStack(path: $stableScreenStack) {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
+                    }
+                    .onChange(of: viewModel.activeScreenStacks) { newStack in
+                        
+                        let index = newStack.firstIndex { subStack in
+                            return subStack.screens.contains(where: { $0.id == routerId })
+                        }
+                        guard let index, newStack.indices.contains(index + 1) else {
+                            stableScreenStack = []
+                            return
+                        }
+                        
+                        let activeStack = newStack[index + 1].screens
+                        stableScreenStack = activeStack
+
+                        
+//                        let index = newStack.firstIndex { $0.screens.contains { $0.id == routerId } }
+//                        if let index, newStack.indices.contains(index + 1) {
+//                            let newScreens = newStack[index + 1].screens
+//                            if stablePath.destinations != newScreens {
+//                                stablePath.destinations = newScreens
+//                            }
+//                        } else {
+//                            stablePath.destinations = []
+//                        }
                     }
             }
         })
