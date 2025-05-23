@@ -43,6 +43,27 @@ struct RouterViewInternal<Content: View>: View, Router {
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
                     }
+                    .onChange(of: stableScreenStack, perform: { screenStack in
+                        // User manually swiped back on screen
+                        
+                        let activeStack = viewModel.activeScreenStacks
+                        let index = activeStack.firstIndex { subStack in
+                            return subStack.screens.contains(where: { $0.id == routerId })
+                        }
+                        guard let index, activeStack.indices.contains(index + 1) else {
+                            return
+                        }
+
+                        if screenStack.count < activeStack[index + 1].screens.count {
+                            if let lastScreen = screenStack.last {
+                                viewModel.dismissScreens(to: lastScreen.id, animates: true)
+                                print("DISMISS TO LAST SCREEN ID")
+                            } else {
+                                viewModel.dismissPushStack(routeId: routerId, animates: true)
+                                print("DISMISS PUSH STACK")
+                            }
+                        }
+                    })
                     .onChange(of: viewModel.activeScreenStacks) { newStack in
                         
                         let index = newStack.firstIndex { subStack in
@@ -50,13 +71,13 @@ struct RouterViewInternal<Content: View>: View, Router {
                         }
                         guard let index, newStack.indices.contains(index + 1) else {
                             stableScreenStack = []
+                            print("SET STACK TO ZERO")
                             return
                         }
                         
                         let activeStack = newStack[index + 1].screens
                         stableScreenStack = activeStack
-
-                        
+                        print("SET STACK TOOO: \(activeStack.count)")
 //                        let index = newStack.firstIndex { $0.screens.contains { $0.id == routerId } }
 //                        if let index, newStack.indices.contains(index + 1) {
 //                            let newScreens = newStack[index + 1].screens
