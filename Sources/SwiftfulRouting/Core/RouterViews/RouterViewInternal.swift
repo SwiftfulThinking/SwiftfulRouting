@@ -55,6 +55,7 @@ struct RouterViewInternal<Content: View>: View, Router {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
+                            .id(value.id)
                     }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
