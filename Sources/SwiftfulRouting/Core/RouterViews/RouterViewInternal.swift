@@ -49,6 +49,7 @@ struct RouterViewInternal<Content: View>: View, Router {
                 dismissTransition()
             }
         )
+        .id(routerId)
         
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
