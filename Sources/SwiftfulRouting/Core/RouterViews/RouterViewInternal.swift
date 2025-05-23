@@ -40,7 +40,6 @@ struct RouterViewInternal<Content: View>: View, Router {
     var body: some View {
         // Wrap starting content for Transition support
         TransitionSupportView(
-            routerId: routerId,
             behavior: parentDestination?.transitionBehavior ?? .keepPrevious,
             router: currentRouter,
             transitions: viewModel.allTransitions[routerId] ?? [],

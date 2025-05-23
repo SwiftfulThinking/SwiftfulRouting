@@ -10,7 +10,6 @@ import SwiftfulRecursiveUI
 
 struct TransitionSupportView<Content:View>: View {
     
-    var routerId: String
     var behavior: TransitionMemoryBehavior = .keepPrevious
     let router: AnyRouter
     let transitions: [AnyTransitionDestination]
@@ -29,7 +28,7 @@ struct TransitionSupportView<Content:View>: View {
                 return Group {
                     if data == transitions.first {
                         content(router)
-                            .id(routerId)
+//                            .id(routerId)
                     } else {
                         if allowsSwipeBack {
                             SwipeBackSupportContainer(
