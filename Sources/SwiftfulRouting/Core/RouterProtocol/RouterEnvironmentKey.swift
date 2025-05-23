@@ -7,7 +7,7 @@
 import SwiftUI
 
 public struct RouterEnvironmentKey: EnvironmentKey {
-    public static let defaultValue: AnyRouter = AnyRouter(object: MockRouter())
+    public static let defaultValue: AnyRouter = AnyRouter(id: "mock", object: MockRouter())
 }
 
 public extension EnvironmentValues {

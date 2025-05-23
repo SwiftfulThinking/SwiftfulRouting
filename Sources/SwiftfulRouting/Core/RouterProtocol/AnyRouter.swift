@@ -9,9 +9,11 @@ import SwiftUI
 
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Sendable, Router {
+    public let id: String
     private let object: any Router
 
-    init(object: any Router) {
+    init(id: String, object: any Router) {
+        self.id = id
         self.object = object
     }
     
@@ -607,4 +609,14 @@ public struct AnyRouter: Sendable, Router {
         object.showSafari(url)
     }
 
+}
+
+extension AnyRouter: Identifiable, Hashable, Equatable {
+    public static func == (lhs: AnyRouter, rhs: AnyRouter) -> Bool {
+        lhs.id == rhs.id // or compare the underlying object identity
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id) // or use ObjectIdentifier
+    }
 }

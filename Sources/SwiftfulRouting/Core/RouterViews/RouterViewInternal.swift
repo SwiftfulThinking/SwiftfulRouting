@@ -34,7 +34,7 @@ struct RouterViewInternal<Content: View>: View, Router {
     @StateObject private var stableScreenStack = StablePath(destinations: [])
 
     private var currentRouter: AnyRouter {
-        AnyRouter(object: self)
+        AnyRouter(id: routerId, object: self)
     }
     
     var body: some View {
