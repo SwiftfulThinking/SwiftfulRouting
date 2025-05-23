@@ -7,6 +7,19 @@
 import SwiftUI
 
 @MainActor
+final class StablePath: ObservableObject, Equatable {
+    @Published var destinations: [AnyDestination]
+
+    init(destinations: [AnyDestination]) {
+        self.destinations = destinations
+    }
+
+    static func == (lhs: StablePath, rhs: StablePath) -> Bool {
+        lhs === rhs
+    }
+}
+
+@MainActor
 struct RouterViewInternal<Content: View>: View, Router {
     
     @Environment(\.openURL) var openURL
@@ -18,7 +31,7 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
-    @State private var stableScreenStack: [AnyDestination] = []
+    @StateObject private var stableScreenStack = StablePath(destinations: [])
 
     private var currentRouter: AnyRouter {
         AnyRouter(object: self)
@@ -38,12 +51,12 @@ struct RouterViewInternal<Content: View>: View, Router {
         )
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
-            NavigationStack(path: $stableScreenStack) {
+            NavigationStack(path: $stableScreenStack.destinations) {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
                     }
-                    .onChange(of: stableScreenStack, perform: { screenStack in
+                    .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
                         
                         let activeStack = viewModel.activeScreenStacks
@@ -70,14 +83,16 @@ struct RouterViewInternal<Content: View>: View, Router {
                             return subStack.screens.contains(where: { $0.id == routerId })
                         }
                         guard let index, newStack.indices.contains(index + 1) else {
-                            stableScreenStack = []
-                            print("SET STACK TO ZERO")
+                            if !stableScreenStack.destinations.isEmpty {
+                                stableScreenStack.destinations = []
+                                print("SET STACK TO ZERO")
+                            }
                             return
                         }
                         
                         let activeStack = newStack[index + 1].screens
-                        if stableScreenStack != activeStack {
-                            stableScreenStack = activeStack
+                        if stableScreenStack.destinations != activeStack {
+                            stableScreenStack.destinations = activeStack
                             print("SET STACK TOOO: \(activeStack.count)")
                         }
 //                        let index = newStack.firstIndex { $0.screens.contains { $0.id == routerId } }
