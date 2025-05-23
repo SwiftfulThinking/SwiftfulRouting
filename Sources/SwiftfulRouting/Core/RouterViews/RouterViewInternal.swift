@@ -18,10 +18,12 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
+    @StateObject private var stableScreenStack = StableAnyDestinationArray(destinations: [])
+
     private var currentRouter: AnyRouter {
-        AnyRouter(object: self)
+        AnyRouter(id: routerId, object: self)
     }
-    
+        
     var body: some View {
         // Wrap starting content for Transition support
         TransitionSupportView(
@@ -34,18 +36,21 @@ struct RouterViewInternal<Content: View>: View, Router {
                 dismissTransition()
             }
         )
+        .id(routerId)
+        
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
-            NavigationStack(path: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, onDidDismiss: { lastRouteRemaining in
-                if let lastRouteRemaining {
-                    viewModel.dismissScreens(to: lastRouteRemaining.id, animates: true)
-                } else {
-                    viewModel.dismissPushStack(routeId: routerId, animates: true)
-                }
-            })) {
+            NavigationStack(path: $stableScreenStack.destinations) {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
+                    }
+                    .onChange(of: stableScreenStack.destinations, perform: { screenStack in
+                        // User manually swiped back on screen
+                        handleStableScreenStackDidChange(screenStack: screenStack)
+                    })
+                    .onChange(of: viewModel.activeScreenStacks) { newStack in
+                        handleActiveScreenStackDidChange(newStack: newStack)
                     }
             }
         })
@@ -135,6 +140,37 @@ struct RouterViewInternal<Content: View>: View, Router {
         }
         
         return viewModel.activeScreenStacks[index].screens.first(where: { $0.id == routerId })
+    }
+    
+    private func handleStableScreenStackDidChange(screenStack: [AnyDestination]) {
+        let activeStack = viewModel.activeScreenStacks
+        let index = activeStack.firstIndex { subStack in
+            return subStack.screens.contains(where: { $0.id == routerId })
+        }
+        guard let index, activeStack.indices.contains(index + 1) else {
+            return
+        }
+
+        if screenStack.count < activeStack[index + 1].screens.count {
+            if let lastScreen = screenStack.last {
+                viewModel.dismissScreens(to: lastScreen.id, animates: true)
+            } else {
+                viewModel.dismissPushStack(routeId: routerId, animates: true)
+            }
+        }
+    }
+    
+    private func handleActiveScreenStackDidChange(newStack: [AnyDestinationStack]) {
+        let index = newStack.firstIndex { subStack in
+            return subStack.screens.contains(where: { $0.id == routerId })
+        }
+        guard let index, newStack.indices.contains(index + 1) else {
+            stableScreenStack.setNewValueIfNeeded(newValue: [])
+            return
+        }
+        
+        let activeStack = newStack[index + 1].screens
+        stableScreenStack.setNewValueIfNeeded(newValue: activeStack)
     }
             
     var activeScreens: [AnyDestinationStack] {

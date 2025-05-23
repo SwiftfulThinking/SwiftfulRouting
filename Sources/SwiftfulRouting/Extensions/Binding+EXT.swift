@@ -8,34 +8,34 @@
 import Foundation
 import SwiftUI
 
-@MainActor
-extension Binding where Value == [AnyDestination] {
-    
-    init(stack: [AnyDestinationStack], routerId: String, onDidDismiss: @escaping (_ lastRouteRemaining: AnyDestination?) -> Void) {
-        self.init {
-            let index = stack.firstIndex { subStack in
-                return subStack.screens.contains(where: { $0.id == routerId })
-            }
-            guard let index, stack.indices.contains(index + 1) else {
-                return []
-            }
-            return stack[index + 1].screens
-        } set: { newValue in
-            // User manually swiped back on screen
-            
-            let index = stack.firstIndex { subStack in
-                return subStack.screens.contains(where: { $0.id == routerId })
-            }
-            guard let index, stack.indices.contains(index + 1) else {
-                return
-            }
-            
-            if newValue.count < stack[index + 1].screens.count {
-                onDidDismiss(newValue.last)
-            }
-        }
-    }
-}
+//@MainActor
+//extension Binding where Value == [AnyDestination] {
+//    
+//    init(stack: [AnyDestinationStack], routerId: String, onDidDismiss: @escaping (_ lastRouteRemaining: AnyDestination?) -> Void) {
+//        self.init {
+//            let index = stack.firstIndex { subStack in
+//                return subStack.screens.contains(where: { $0.id == routerId })
+//            }
+//            guard let index, stack.indices.contains(index + 1) else {
+//                return []
+//            }
+//            return stack[index + 1].screens
+//        } set: { newValue in
+//            // User manually swiped back on screen
+//            
+//            let index = stack.firstIndex { subStack in
+//                return subStack.screens.contains(where: { $0.id == routerId })
+//            }
+//            guard let index, stack.indices.contains(index + 1) else {
+//                return
+//            }
+//            
+//            if newValue.count < stack[index + 1].screens.count {
+//                onDidDismiss(newValue.last)
+//            }
+//        }
+//    }
+//}
 
 @MainActor
 extension Binding where Value == AnyDestination? {
