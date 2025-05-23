@@ -76,8 +76,10 @@ struct RouterViewInternal<Content: View>: View, Router {
                         }
                         
                         let activeStack = newStack[index + 1].screens
-                        stableScreenStack = activeStack
-                        print("SET STACK TOOO: \(activeStack.count)")
+                        if stableScreenStack != activeStack {
+                            stableScreenStack = activeStack
+                            print("SET STACK TOOO: \(activeStack.count)")
+                        }
 //                        let index = newStack.firstIndex { $0.screens.contains { $0.id == routerId } }
 //                        if let index, newStack.indices.contains(index + 1) {
 //                            let newScreens = newStack[index + 1].screens
