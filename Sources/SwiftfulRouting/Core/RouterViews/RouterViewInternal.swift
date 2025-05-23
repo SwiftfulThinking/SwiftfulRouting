@@ -49,13 +49,15 @@ struct RouterViewInternal<Content: View>: View, Router {
                 dismissTransition()
             }
         )
+        // Stabilizes view
+        .id(routerId)
+        
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
             NavigationStack(path: $stableScreenStack.destinations) {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
-                            .id(value.id)
                     }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
