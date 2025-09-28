@@ -804,8 +804,16 @@ router.showModule { router in
 
 **Important:** Module support is NOT automatically included within `RouterView`. You must enable it by setting `addModuleSupport` to `true`. This is done on purpose, in case there are multiple `RouterView` in the same heirarchy.
 
+**🚨 Note:** When `addModuleSupport` is `true`, an `id` parameter is REQUIRED for proper analytics tracking. The framework will trigger an assertion failure in debug builds if no ID is provided.
+
 ```swift
-router.showScreen(addModuleSupport: true) { _ in
+// ✅ Correct - ID provided when addModuleSupport is true
+RouterView(id: "home", addModuleSupport: true) { _ in
+    MyView()
+}
+
+// ❌ Will trigger assertion in debug builds
+RouterView(addModuleSupport: true) { _ in
     MyView()
 }
 ```
@@ -839,13 +847,13 @@ The user's last module is saved in UserDefaults and can be used to restore the a
 
 var body: some Scene {
     WindowGroup {
-        if lastModuleId == "onboarding" {
-            RouterView(id: "onboarding", addModuleSupport: true) { router in
-                OnboardingView()
-            }
-        } else {
+        if lastModuleId == "home" {
             RouterView(id: "home", addModuleSupport: true) { router in
                 HomeView()
+            }
+        } else {
+            RouterView(id: "onboarding", addModuleSupport: true) { router in
+                OnboardingView()
             }
         }
     }
@@ -1131,13 +1139,13 @@ struct AppRootView: View {
 
     @ViewBuilder
     var body: some View {
-        if lastModuleId == "onboarding" {
-            RouterView(id: "onboarding", addModuleSupport: true) { router in
-                OnboardingView()
-            }
-        } else {
+        if lastModuleId == "tabbar" {
             RouterView(id: "tabbar", addNavigationStack: false, addModuleSupport: true) { _ in
                 AppTabbarView()
+            }
+        } else {
+            RouterView(id: "onboarding", addModuleSupport: true) { router in
+                OnboardingView()
             }
         }
     }
