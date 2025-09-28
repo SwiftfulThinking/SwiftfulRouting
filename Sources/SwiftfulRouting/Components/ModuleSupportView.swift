@@ -65,7 +65,7 @@ struct ModuleSupportView<Content:View>: View {
         .environmentObject(viewModel)
         
         #if DEBUG
-        .onChange(of: viewModel.modules ?? []) { newValue in
+        .onChange(of: viewModel.modules) { newValue in
             viewModel.printModuleStack(modules: newValue)
         }
         #endif

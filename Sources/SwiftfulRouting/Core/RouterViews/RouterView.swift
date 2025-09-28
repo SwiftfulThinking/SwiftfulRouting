@@ -43,6 +43,17 @@ public struct RouterView<Content: View>: View {
         transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
         content: @escaping (AnyRouter) -> Content
     ) {
+        
+        // Validate that ID is provided when module support is enabled
+        if addModuleSupport && id == nil {
+            let string = "🚨 RouterView: parameter ID is required when addModuleSupport is TRUE."
+            assertionFailure(string)
+            
+            #if DEBUG
+            print(string)
+            #endif
+        }
+        
         self.id = id ?? RouterViewModel.rootId
         self.addNavigationStack = addNavigationStack
         self.addModuleSupport = addModuleSupport

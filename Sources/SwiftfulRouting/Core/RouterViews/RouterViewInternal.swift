@@ -21,7 +21,7 @@ struct RouterViewInternal<Content: View>: View, Router {
     @StateObject private var stableScreenStack = StableAnyDestinationArray(destinations: [])
 
     private var currentRouter: AnyRouter {
-        AnyRouter(id: routerId, object: self)
+        AnyRouter(id: routerId, rootRouterId: rootRouterInfo?.id ?? "", object: self)
     }
         
     var body: some View {
