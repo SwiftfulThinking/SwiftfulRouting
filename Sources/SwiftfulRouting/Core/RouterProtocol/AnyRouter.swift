@@ -10,10 +10,12 @@ import SwiftUI
 /// Type-erased Router with convenience methods.
 public struct AnyRouter: Sendable, Router {
     public let id: String
+    public let rootRouterId: String
     private let object: any Router
 
-    init(id: String, object: any Router) {
+    init(id: String, rootRouterId: String, object: any Router) {
         self.id = id
+        self.rootRouterId = rootRouterId
         self.object = object
     }
     
@@ -615,7 +617,7 @@ public struct AnyRouter: Sendable, Router {
 extension AnyRouter: Identifiable, Hashable, Equatable {
 
     public static func == (lhs: AnyRouter, rhs: AnyRouter) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.rootRouterId == rhs.rootRouterId
     }
 
     public func hash(into hasher: inout Hasher) {
