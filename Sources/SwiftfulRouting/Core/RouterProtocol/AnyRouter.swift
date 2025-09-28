@@ -621,6 +621,6 @@ extension AnyRouter: Identifiable, Hashable, Equatable {
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(id + rootRouterId)
     }
 }
