@@ -607,7 +607,7 @@ public struct AnyRouter: Sendable, Router {
     }
 
     /// Open URL in Safari app. To open url in in-app browser, use showSheet with a WebView.
-    func showSafari(_ url: @escaping () -> URL) {
+    @MainActor public func showSafari(_ url: @escaping () -> URL) {
         object.showSafari(url)
     }
 
