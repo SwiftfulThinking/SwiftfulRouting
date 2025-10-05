@@ -57,11 +57,11 @@ struct RouterViewInternal<Content: View>: View, Router {
                     }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
-                        print("onChange(of: stableScreenStack.destinations - \(screenStack.count)")
+                        print("\(routerId) onChange(of: stableScreenStack.destinations - \(screenStack.count)")
                         handleStableScreenStackDidChange(screenStack: screenStack)
                     })
                     .onChange(of: viewModel.activeScreenStacks) { newStack in
-                        print("onChange(of: viewModel.activeScreenStacks - \(newStack.count)")
+                        print("\(routerId) onChange(of: viewModel.activeScreenStacks - \(newStack.count)")
                         handleActiveScreenStackDidChange(newStack: newStack)
                     }
                 
