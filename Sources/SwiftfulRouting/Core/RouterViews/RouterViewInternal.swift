@@ -55,7 +55,8 @@ struct RouterViewInternal<Content: View>: View, Router {
         
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
-            NavigationStack(path: stableNavigationPath) {
+            let _ = print("NavigationStack for \(routerId) - path count: \(stableNavigationPath.wrappedValue.count)")
+            return NavigationStack(path: stableNavigationPath) {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
