@@ -18,20 +18,10 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
-    @StateObject private var stableScreenStack: StableAnyDestinationArray
+    @StateObject private var stableScreenStack = StableAnyDestinationArray(destinations: [])
 
     private var currentRouter: AnyRouter {
         AnyRouter(id: routerId, rootRouterId: rootRouterInfo?.id ?? "", object: self)
-    }
-
-    init(routerId: String, rootRouterInfo: (id: String, transitionBehavior: TransitionMemoryBehavior)?, addNavigationStack: Bool, content: @escaping (AnyRouter) -> Content) {
-        self.routerId = routerId
-        self.rootRouterInfo = rootRouterInfo
-        self.addNavigationStack = addNavigationStack
-        self.content = content
-
-        // Initialize with empty array - will be synced in onAppear
-        _stableScreenStack = StateObject(wrappedValue: StableAnyDestinationArray(destinations: []))
     }
         
     var body: some View {
@@ -46,7 +36,7 @@ struct RouterViewInternal<Content: View>: View, Router {
                 dismissTransition()
             }
         )
-        .id(routerId)
+//        .id(routerId)
         
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
@@ -55,10 +45,10 @@ struct RouterViewInternal<Content: View>: View, Router {
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
                     }
-                    .onAppear {
-                        // Sync on appear to handle view recreation (e.g., after backgrounding)
-                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
-                    }
+//                    .onAppear {
+//                        // Sync on appear to handle view recreation (e.g., after backgrounding)
+//                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
+//                    }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
                         print("onChange(of: stableScreenStack.destinations - \(screenStack.count)")
