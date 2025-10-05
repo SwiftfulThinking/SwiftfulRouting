@@ -39,9 +39,10 @@ import SwiftUI
 
 @MainActor
 extension Binding where Value == AnyDestination? {
-    
-    init(stack: [AnyDestinationStack], routerId: String, segue: SegueOption, onDidDismiss: @escaping () -> Void) {
+
+    init(viewModel: RouterViewModel, routerId: String, segue: SegueOption, onDidDismiss: @escaping () -> Void) {
         self.init {
+            let stack = viewModel.activeScreenStacks
             let routerStackIndex = stack.firstIndex { subStack in
                 return subStack.screens.contains(where: { $0.id == routerId })
             }
@@ -75,6 +76,43 @@ extension Binding where Value == AnyDestination? {
         } set: { newValue in
             // User manually swiped down on environment
             print("BINDING SET (\(routerId), \(segue.stringValue)): \(newValue?.id ?? "nil")")
+            if newValue == nil {
+                onDidDismiss()
+            }
+        }
+    }
+
+    // Legacy initializer for compatibility
+    init(stack: [AnyDestinationStack], routerId: String, segue: SegueOption, onDidDismiss: @escaping () -> Void) {
+        self.init {
+            let routerStackIndex = stack.firstIndex { subStack in
+                return subStack.screens.contains(where: { $0.id == routerId })
+            }
+
+            guard let routerStackIndex else {
+                return nil
+            }
+
+            let routerStack = stack[routerStackIndex]
+
+            if routerStack.segue == .push, routerStack.screens.last?.id != routerId {
+                return nil
+            }
+
+            var nextSheetStack: AnyDestinationStack?
+            if routerStack.segue == .push, stack.indices.contains(routerStackIndex + 1) {
+                nextSheetStack = stack[routerStackIndex + 1]
+            } else if stack.indices.contains(routerStackIndex + 2) {
+                nextSheetStack = stack[routerStackIndex + 2]
+            }
+
+            if let nextSegue = nextSheetStack?.segue, nextSegue == segue, let screen = nextSheetStack?.screens.first {
+                return screen
+            }
+
+            return nil
+        } set: { newValue in
+            // User manually swiped down on environment
             if newValue == nil {
                 onDidDismiss()
             }
