@@ -44,10 +44,10 @@ struct RouterViewInternal<Content: View>: View, Router {
         )
         .id(routerId)
         .onFirstAppear {
-            print("FIRST APPEAR ROUTER: \(routerId)")
+            print("FIRST APPEAR ROUTER: \(routerId) - stablePath: \(viewModel.stableNavigationPaths[routerId]?.count ?? 0)")
         }
         .onAppear {
-            print("APPEAR ROUTER: \(routerId)")
+            print("APPEAR ROUTER: \(routerId) - stablePath: \(viewModel.stableNavigationPaths[routerId]?.count ?? 0)")
         }
         .onChange(of: routerId, perform: { newValue in
             print("CHANGE ROUTER: \(newValue)")
