@@ -18,7 +18,13 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
-    @StateObject private var stableScreenStack = StableAnyDestinationArray(destinations: [])
+    // Computed binding to viewModel's stable path (survives view recreation)
+    private var stableNavigationPath: Binding<[AnyDestination]> {
+        Binding(
+            get: { viewModel.stableNavigationPaths[routerId] ?? [] },
+            set: { viewModel.stableNavigationPaths[routerId] = $0 }
+        )
+    }
 
     private var currentRouter: AnyRouter {
         AnyRouter(id: routerId, rootRouterId: rootRouterInfo?.id ?? "", object: self)
@@ -49,18 +55,14 @@ struct RouterViewInternal<Content: View>: View, Router {
         
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
-            NavigationStack(path: $stableScreenStack.destinations) {
+            NavigationStack(path: stableNavigationPath) {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
                     }
-//                    .onAppear {
-//                        // Sync on appear to handle view recreation (e.g., after backgrounding)
-//                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
-//                    }
-                    .onChange(of: stableScreenStack.destinations, perform: { screenStack in
+                    .onChange(of: stableNavigationPath.wrappedValue, perform: { screenStack in
                         // User manually swiped back on screen
-                        print("\(routerId) onChange(of: stableScreenStack.destinations - \(screenStack.count)")
+                        print("\(routerId) onChange(of: stableNavigationPath - \(screenStack.count)")
                         handleStableScreenStackDidChange(screenStack: screenStack)
                     })
                     .onChange(of: viewModel.activeScreenStacks) { newStack in
@@ -169,13 +171,17 @@ struct RouterViewInternal<Content: View>: View, Router {
         }
         guard let index, newStack.indices.contains(index + 1) else {
             print("handleActiveScreenStackDidChange - []")
-            stableScreenStack.setNewValueIfNeeded(newValue: [])
+            if viewModel.stableNavigationPaths[routerId] != [] {
+                viewModel.stableNavigationPaths[routerId] = []
+            }
             return
         }
-        
+
         let activeStack = newStack[index + 1].screens
         print("handleActiveScreenStackDidChange - \(activeStack.count)")
-        stableScreenStack.setNewValueIfNeeded(newValue: activeStack)
+        if viewModel.stableNavigationPaths[routerId] != activeStack {
+            viewModel.stableNavigationPaths[routerId] = activeStack
+        }
     }
             
     var activeScreens: [AnyDestinationStack] {
