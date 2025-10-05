@@ -8,7 +8,7 @@ import SwiftUI
 
 @MainActor
 struct RouterViewInternal<Content: View>: View, Router {
-    
+
     @Environment(\.openURL) var openURL
 
     @EnvironmentObject var viewModel: RouterViewModel
@@ -18,10 +18,20 @@ struct RouterViewInternal<Content: View>: View, Router {
     var addNavigationStack: Bool = false
     var content: (AnyRouter) -> Content
 
-    @StateObject private var stableScreenStack = StableAnyDestinationArray(destinations: [])
+    @StateObject private var stableScreenStack: StableAnyDestinationArray
 
     private var currentRouter: AnyRouter {
         AnyRouter(id: routerId, rootRouterId: rootRouterInfo?.id ?? "", object: self)
+    }
+
+    init(routerId: String, rootRouterInfo: (id: String, transitionBehavior: TransitionMemoryBehavior)?, addNavigationStack: Bool, content: @escaping (AnyRouter) -> Content) {
+        self.routerId = routerId
+        self.rootRouterInfo = rootRouterInfo
+        self.addNavigationStack = addNavigationStack
+        self.content = content
+
+        // Initialize with empty array - will be synced in onAppear
+        _stableScreenStack = StateObject(wrappedValue: StableAnyDestinationArray(destinations: []))
     }
         
     var body: some View {
@@ -44,6 +54,10 @@ struct RouterViewInternal<Content: View>: View, Router {
                 content
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
+                    }
+                    .onAppear {
+                        // Sync on appear to handle view recreation (e.g., after backgrounding)
+                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
                     }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
