@@ -37,6 +37,9 @@ struct RouterViewInternal<Content: View>: View, Router {
             }
         )
         .id(routerId)
+        .onFirstAppear {
+            print("FIRST APPEAR ROUTER: \(routerId)")
+        }
         .onAppear {
             print("APPEAR ROUTER: \(routerId)")
         }
