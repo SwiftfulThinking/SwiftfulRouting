@@ -47,9 +47,11 @@ struct RouterViewInternal<Content: View>: View, Router {
                     }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
+                        print("onChange(of: stableScreenStack.destinations - \(screenStack.count)")
                         handleStableScreenStackDidChange(screenStack: screenStack)
                     })
                     .onChange(of: viewModel.activeScreenStacks) { newStack in
+                        print("onChange(of: viewModel.activeScreenStacks - \(newStack.count)")
                         handleActiveScreenStackDidChange(newStack: newStack)
                     }
                 
@@ -153,11 +155,13 @@ struct RouterViewInternal<Content: View>: View, Router {
             return subStack.screens.contains(where: { $0.id == routerId })
         }
         guard let index, newStack.indices.contains(index + 1) else {
+            print("handleActiveScreenStackDidChange - []")
             stableScreenStack.setNewValueIfNeeded(newValue: [])
             return
         }
         
         let activeStack = newStack[index + 1].screens
+        print("handleActiveScreenStackDidChange - \(activeStack.count)")
         stableScreenStack.setNewValueIfNeeded(newValue: activeStack)
     }
             
