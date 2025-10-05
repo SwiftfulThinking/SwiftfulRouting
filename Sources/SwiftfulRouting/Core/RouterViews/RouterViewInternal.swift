@@ -40,8 +40,8 @@ struct RouterViewInternal<Content: View>: View, Router {
         .onAppear {
             print("APPEAR ROUTER: \(routerId)")
         }
-        .onChange(of: routerId, { old, new in
-            print("CHANGE ROUTER: \(old) -> \(new)")
+        .onChange(of: routerId, perform: { newValue in
+            print("CHANGE ROUTER: \(newValue)")
         })
         
         // Add NavigationStack if needed
