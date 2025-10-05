@@ -51,10 +51,10 @@ struct RouterViewInternal<Content: View>: View, Router {
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
                     }
-                    .onAppear {
-                        // Sync on appear to handle view recreation (e.g., after backgrounding)
-                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
-                    }
+//                    .onAppear {
+//                        // Sync on appear to handle view recreation (e.g., after backgrounding)
+//                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
+//                    }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
                         print("\(routerId) onChange(of: stableScreenStack.destinations - \(screenStack.count)")
