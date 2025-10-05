@@ -36,7 +36,7 @@ struct RouterViewInternal<Content: View>: View, Router {
                 dismissTransition()
             }
         )
-//        .id(routerId)
+        .id(routerId)
         
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
@@ -45,10 +45,10 @@ struct RouterViewInternal<Content: View>: View, Router {
                     .navigationDestination(for: AnyDestination.self) { value in
                         value.destination
                     }
-//                    .onAppear {
-//                        // Sync on appear to handle view recreation (e.g., after backgrounding)
-//                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
-//                    }
+                    .onAppear {
+                        // Sync on appear to handle view recreation (e.g., after backgrounding)
+                        handleActiveScreenStackDidChange(newStack: viewModel.activeScreenStacks)
+                    }
                     .onChange(of: stableScreenStack.destinations, perform: { screenStack in
                         // User manually swiped back on screen
                         print("onChange(of: stableScreenStack.destinations - \(screenStack.count)")
