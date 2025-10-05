@@ -45,17 +45,19 @@ extension Binding where Value == AnyDestination? {
             let routerStackIndex = stack.firstIndex { subStack in
                 return subStack.screens.contains(where: { $0.id == routerId })
             }
-            
+
             guard let routerStackIndex else {
+                print("BINDING GET (\(routerId), \(segue.stringValue)): routerStackIndex not found -> nil")
                 return nil
             }
-            
+
             let routerStack = stack[routerStackIndex]
 
             if routerStack.segue == .push, routerStack.screens.last?.id != routerId {
+                print("BINDING GET (\(routerId), \(segue.stringValue)): not last in push stack -> nil")
                 return nil
             }
-            
+
             var nextSheetStack: AnyDestinationStack?
             if routerStack.segue == .push, stack.indices.contains(routerStackIndex + 1) {
                 nextSheetStack = stack[routerStackIndex + 1]
@@ -64,12 +66,15 @@ extension Binding where Value == AnyDestination? {
             }
 
             if let nextSegue = nextSheetStack?.segue, nextSegue == segue, let screen = nextSheetStack?.screens.first {
+                print("BINDING GET (\(routerId), \(segue.stringValue)): returning screen \(screen.id)")
                 return screen
             }
-            
+
+            print("BINDING GET (\(routerId), \(segue.stringValue)): no matching next stack -> nil")
             return nil
         } set: { newValue in
             // User manually swiped down on environment
+            print("BINDING SET (\(routerId), \(segue.stringValue)): \(newValue?.id ?? "nil")")
             if newValue == nil {
                 onDidDismiss()
             }
