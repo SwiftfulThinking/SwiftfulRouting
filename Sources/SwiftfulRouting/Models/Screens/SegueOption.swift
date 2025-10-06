@@ -54,6 +54,17 @@ public enum SegueOption: Equatable, CaseIterable, Hashable {
         }
     }
     
+    public var isResizeableSheet: Bool {
+        switch self {
+        case .push:
+            return false
+        case .fullScreenCoverConfig(let config):
+            return false
+        case .sheetConfig(let config):
+            return config.detents != [.large]
+        }
+    }
+    
     public var presentsNewEnvironment: Bool {
         switch self {
         case .push:

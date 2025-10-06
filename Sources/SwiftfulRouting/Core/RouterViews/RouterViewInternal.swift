@@ -55,19 +55,16 @@ struct RouterViewInternal<Content: View>: View, Router {
                 
                     // There's a weird behavior (bug?) where the presentationDetent is not calculated
                     // If the .sheet modifier is outside of the NavigationStack
-                    // Therefore, if we add NavigationStack, we add these as children of it
-                    .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
-                    .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
+                    // Therefore, this modifier only handles resizeableSheets
+                    // Note: when backgrounded, the OS will recreate this sheet (and children of this sheet)
+                    // This does not happen to the other sheet/fsc modifiers outside of NavigationStack
+                    // It is currently a tradeoff/limitation of SwiftUI between (presentationDetent bug #95) and (background OS bug #101)
+                    .resizeableSheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
             }
         })
-        
-        // If we don't add NavigationStack, add .sheet modifiers here instead
-        .ifSatisfiesCondition(!addNavigationStack, transform: { content in
-            content
-                .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
-                .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
-        })
-        
+        .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
+        .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
+
         // If this is the root router, add "root" stack to the array
         .ifSatisfiesCondition(routerId == RouterViewModel.rootId, transform: { content in
             content
@@ -370,11 +367,26 @@ struct RouterViewInternal<Content: View>: View, Router {
 
 extension View {
     
+    func resizeableSheetBackgroundModifier(viewModel: RouterViewModel, routerId: String) -> some View {
+        self
+            .background(
+                Text("")
+                    .sheet(item: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, segue: .sheet, isResizeableSheet: true, onDidDismiss: {
+                        // This triggers if the user swipes down to dismiss the screen
+                        // Now we must update activeScreenStacks to match that behavior
+                        viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
+                    }), onDismiss: nil) { destination in
+                        destination.destination
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                    }
+            )
+    }
+    
     func sheetBackgroundModifier(viewModel: RouterViewModel, routerId: String) -> some View {
         self
             .background(
                 Text("")
-                    .sheet(item: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, segue: .sheet, onDidDismiss: {
+                    .sheet(item: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, segue: .sheet, isResizeableSheet: false, onDidDismiss: {
                         // This triggers if the user swipes down to dismiss the screen
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
@@ -389,7 +401,7 @@ extension View {
         self
             .background(
                 Text("")
-                    .fullScreenCover(item: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, segue: .fullScreenCover, onDidDismiss: {
+                    .fullScreenCover(item: Binding(stack: viewModel.activeScreenStacks, routerId: routerId, segue: .fullScreenCover, isResizeableSheet: false, onDidDismiss: {
                         // This triggers if the user swipes down to dismiss the screen
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
