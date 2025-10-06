@@ -40,7 +40,7 @@ import SwiftUI
 @MainActor
 extension Binding where Value == AnyDestination? {
     
-    init(stack: [AnyDestinationStack], routerId: String, segue: SegueOption, onDidDismiss: @escaping () -> Void) {
+    init(stack: [AnyDestinationStack], routerId: String, segue: SegueOption, isResizeableSheet: Bool, onDidDismiss: @escaping () -> Void) {
         self.init {
             let routerStackIndex = stack.firstIndex { subStack in
                 return subStack.screens.contains(where: { $0.id == routerId })
@@ -64,7 +64,12 @@ extension Binding where Value == AnyDestination? {
             }
 
             if let nextSegue = nextSheetStack?.segue, nextSegue == segue, let screen = nextSheetStack?.screens.first {
-                return screen
+                if isResizeableSheet && nextSegue.isResizeableSheet {
+                    return screen
+                }
+                if !isResizeableSheet && !nextSegue.isResizeableSheet {
+                    return screen
+                }
             }
             
             return nil
