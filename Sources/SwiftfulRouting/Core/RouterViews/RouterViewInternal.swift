@@ -55,19 +55,16 @@ struct RouterViewInternal<Content: View>: View, Router {
                 
                     // There's a weird behavior (bug?) where the presentationDetent is not calculated
                     // If the .sheet modifier is outside of the NavigationStack
-                    // Therefore, if we add NavigationStack, we add these as children of it
+                    // Therefore, this modifier only handles resizeableSheets
+                    // Note: when backgrounded, the OS will recreate this sheet (and children of this sheet)
+                    // This does not happen to the other sheet/fsc modifiers outside of NavigationStack
+                    // It is currently a tradeoff/limitation of SwiftUI between (presentationDetent bug #95) and (background OS bug #101)
                     .resizeableSheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
-//                    .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
             }
         })
-        
-        // If we don't add NavigationStack, add .sheet modifiers here instead
-//        .ifSatisfiesCondition(!addNavigationStack, transform: { content in
-//            content
-                .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
-                .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
-//        })
-        
+        .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
+        .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
+
         // If this is the root router, add "root" stack to the array
         .ifSatisfiesCondition(routerId == RouterViewModel.rootId, transform: { content in
             content
