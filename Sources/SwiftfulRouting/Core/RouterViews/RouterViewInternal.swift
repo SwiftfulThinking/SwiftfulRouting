@@ -26,16 +26,17 @@ struct RouterViewInternal<Content: View>: View, Router {
         
     var body: some View {
         // Wrap starting content for Transition support
-        TransitionSupportView(
-            behavior: parentDestination?.transitionBehavior ?? .keepPrevious,
-            router: currentRouter,
-            transitions: viewModel.allTransitions[routerId] ?? [],
-            content: content,
-            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing,
-            onDidSwipeBack: {
-                dismissTransition()
-            }
-        )
+//        TransitionSupportView(
+//            behavior: parentDestination?.transitionBehavior ?? .keepPrevious,
+//            router: currentRouter,
+//            transitions: viewModel.allTransitions[routerId] ?? [],
+//            content: content,
+//            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing,
+//            onDidSwipeBack: {
+//                dismissTransition()
+//            }
+//        )
+        content(currentRouter)
         .id(routerId)
         
         // Add NavigationStack if needed
