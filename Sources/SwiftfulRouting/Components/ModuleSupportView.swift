@@ -28,24 +28,25 @@ struct ModuleSupportView<Content:View>: View {
                     if data == viewModel.modules.first {
                         RouterViewModelWrapper {
                             RouterViewInternal(
-                                routerId: data.id,  // Use module's unique ID
+                                routerId: RouterViewModel.rootId,
                                 rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
                                 content: content
                             )
                         }
+                        .id("module_\(data.id)")  // Force new NavigationStack per module
                     } else {
                         RouterViewModelWrapper {
                             RouterViewInternal(
-                                routerId: data.id,  // Use module's unique ID
+                                routerId: RouterViewModel.rootId,
                                 rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
                                 content: { router in
-                                    // Cast to AnyView to allow type erasure while maintaining view identity
                                     AnyView(data.destination(router))
                                 }
                             )
                         }
+                        .id("module_\(data.id)")  // Force new NavigationStack per module
                     }
                 }
                 .transition(
