@@ -34,12 +34,12 @@ struct TransitionSupportView<Content:View>: View {
                                 insertionTransition: data.transition,
                                 swipeThreshold: 30,
                                 content: {
-                                    AnyView(data.destination(router))
+                                    _TypeErasedTransitionContent(content: data.destination(router))
                                 },
                                 onDidSwipeBack: onDidSwipeBack
                             )
                         } else {
-                            AnyView(data.destination(router))
+                            _TypeErasedTransitionContent(content: data.destination(router))
                         }
                     }
                 }
@@ -63,5 +63,15 @@ struct TransitionSupportView<Content:View>: View {
 ////                    self.viewFrame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
 //                })
 //        })
+    }
+}
+
+/// Type erasure wrapper that preserves toolbar modifiers.
+/// This ensures toolbar is applied before type erasure happens.
+private struct _TypeErasedTransitionContent: View {
+    let content: any View
+
+    var body: some View {
+        AnyView(content)
     }
 }

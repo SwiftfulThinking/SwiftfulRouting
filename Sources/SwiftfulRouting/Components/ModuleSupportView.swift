@@ -41,6 +41,7 @@ struct ModuleSupportView<Content:View>: View {
                                 rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
                                 content: { router in
+                                    // Type erasure handled by TransitionSupportView's _TypeErasedTransitionContent
                                     AnyView(data.destination(router))
                                 }
                             )
