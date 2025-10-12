@@ -26,17 +26,8 @@ struct RouterViewInternal<Content: View>: View, Router {
         
     var body: some View {
         // Wrap starting content for Transition support
-        TransitionSupportView(
-            behavior: parentDestination?.transitionBehavior ?? .keepPrevious,
-            router: currentRouter,
-            transitions: viewModel.allTransitions[routerId] ?? [],
-            content: content,
-            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing,
-            onDidSwipeBack: {
-                dismissTransition()
-            }
-        )
-        .id(routerId)
+        content(currentRouter)
+            .id(routerId)
         
         // Add NavigationStack if needed
         .ifSatisfiesCondition(addNavigationStack, transform: { content in
@@ -59,11 +50,11 @@ struct RouterViewInternal<Content: View>: View, Router {
                     // Note: when backgrounded, the OS will recreate this sheet (and children of this sheet)
                     // This does not happen to the other sheet/fsc modifiers outside of NavigationStack
                     // It is currently a tradeoff/limitation of SwiftUI between (presentationDetent bug #95) and (background OS bug #101)
-                    .resizeableSheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
+//                    .resizeableSheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
             }
         })
-        .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
-        .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
+//        .sheetBackgroundModifier(viewModel: viewModel, routerId: routerId)
+//        .fullScreenCoverBackgroundModifer(viewModel: viewModel, routerId: routerId)
 
         // If this is the root router, add "root" stack to the array
         .ifSatisfiesCondition(routerId == RouterViewModel.rootId, transform: { content in
@@ -82,23 +73,23 @@ struct RouterViewInternal<Content: View>: View, Router {
         })
         
         // Add Alert modifier.
-        .modifier(AlertViewModifier(alert: Binding(get: {
-            viewModel.activeAlert[routerId]
-        }, set: { newValue in
-            if newValue == nil {
-                viewModel.dismissAlert(routerId: routerId)
-            }
-        })))
+//        .modifier(AlertViewModifier(alert: Binding(get: {
+//            viewModel.activeAlert[routerId]
+//        }, set: { newValue in
+//            if newValue == nil {
+//                viewModel.dismissAlert(routerId: routerId)
+//            }
+//        })))
         
         // Add Modals modifier.
-        .overlay(
-            ModalSupportView(
-                modals: viewModel.allModals[routerId] ?? [],
-                onDismissModal: { modal in
-                    viewModel.dismissModal(routerId: routerId, modalId: modal.id)
-                }
-            )
-        )
+//        .overlay(
+//            ModalSupportView(
+//                modals: viewModel.allModals[routerId] ?? [],
+//                onDismissModal: { modal in
+//                    viewModel.dismissModal(routerId: routerId, modalId: modal.id)
+//                }
+//            )
+//        )
         
         #if DEBUG
         // logging on every router
