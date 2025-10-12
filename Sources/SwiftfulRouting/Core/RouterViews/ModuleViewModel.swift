@@ -24,15 +24,15 @@ extension ModuleViewModel {
     
     func showModule(module: AnyTransitionDestination) {
         // Set the current transition before triggering the UI update
-        // This can change the existing screen's "removal" transition, based on the incomign screens transition
+        // This can change the existing screen's "removal" transition, based on the incoming screens transition
         self.currentTransition = module.transition
-        
+
         Task { @MainActor in
-            // The OS needs a slight delay to update the existing screen's transition
-            try? await Task.sleep(nanoseconds: 1_000_000)
-            
+            // Increased delay to allow NavigationStack to fully initialize with toolbar
+            // before the transition animation starts (fixes toolbar not appearing issue)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+
             // Trigger the UI update
-            // allTransitions[routerId] should never be nil since it's added in showScreen
             self.modules.append(module)
             self.setLastModuleId()
 
@@ -45,7 +45,8 @@ extension ModuleViewModel {
         self.currentTransition = lastModule.transition
 
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 1_000_000)
+            // Increased delay to allow NavigationStack to fully initialize with toolbar
+            try? await Task.sleep(nanoseconds: 100_000_000)
             self.modules.append(contentsOf: modules)
             self.setLastModuleId()
 
