@@ -28,9 +28,8 @@ extension ModuleViewModel {
         self.currentTransition = module.transition
 
         Task { @MainActor in
-            // Increased delay to allow NavigationStack to fully initialize with toolbar
-            // before the transition animation starts (fixes toolbar not appearing issue)
-            try? await Task.sleep(nanoseconds: 100_000_000)
+            // The OS needs a slight delay to update the existing screen's transition
+            try? await Task.sleep(nanoseconds: 1_000_000)
 
             // Trigger the UI update
             self.modules.append(module)
@@ -45,8 +44,7 @@ extension ModuleViewModel {
         self.currentTransition = lastModule.transition
 
         Task { @MainActor in
-            // Increased delay to allow NavigationStack to fully initialize with toolbar
-            try? await Task.sleep(nanoseconds: 100_000_000)
+            try? await Task.sleep(nanoseconds: 1_000_000)
             self.modules.append(contentsOf: modules)
             self.setLastModuleId()
 

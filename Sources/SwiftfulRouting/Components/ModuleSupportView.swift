@@ -28,7 +28,7 @@ struct ModuleSupportView<Content:View>: View {
                     if data == viewModel.modules.first {
                         RouterViewModelWrapper {
                             RouterViewInternal(
-                                routerId: RouterViewModel.rootId,
+                                routerId: data.id,  // Use module's unique ID
                                 rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
                                 content: content
@@ -36,11 +36,14 @@ struct ModuleSupportView<Content:View>: View {
                         }
                     } else {
                         RouterViewModelWrapper {
-                            ModuleDestinationWrapper(
-                                routerId: RouterViewModel.rootId,
+                            RouterViewInternal(
+                                routerId: data.id,  // Use module's unique ID
                                 rootRouterInfo: rootRouterInfo,
                                 addNavigationStack: addNavigationStack,
-                                destination: data.destination
+                                content: { router in
+                                    // Cast to AnyView to allow type erasure while maintaining view identity
+                                    AnyView(data.destination(router))
+                                }
                             )
                         }
                     }
@@ -67,38 +70,5 @@ struct ModuleSupportView<Content:View>: View {
             viewModel.printModuleStack(modules: newValue)
         }
         #endif
-    }
-}
-
-// Helper wrapper to properly handle toolbar modifiers in module destinations
-// By wrapping in a separate View struct, we ensure the NavigationStack and toolbar
-// have a stable view identity and can properly connect before the transition animation completes
-private struct ModuleDestinationWrapper: View {
-    let routerId: String
-    let rootRouterInfo: (id: String, transitionBehavior: TransitionMemoryBehavior)?
-    let addNavigationStack: Bool
-    let destination: (AnyRouter) -> any View
-
-    var body: some View {
-        RouterViewInternal(
-            routerId: routerId,
-            rootRouterInfo: rootRouterInfo,
-            addNavigationStack: addNavigationStack,
-            content: { router in
-                // Use a dedicated struct to perform type erasure
-                // This maintains the view hierarchy better than direct AnyView in the closure
-                ModuleDestinationContent(destination: destination(router))
-            }
-        )
-    }
-}
-
-// Dedicated struct for rendering module destination content
-// This provides a stable view identity that helps toolbar modifiers work correctly
-private struct ModuleDestinationContent: View {
-    let destination: any View
-
-    var body: some View {
-        AnyView(destination)
     }
 }
