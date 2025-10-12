@@ -43,7 +43,7 @@ struct ModuleSupportView<Content:View>: View {
                                 content: { router in
 //                                    AnyView(data.destination(router))
                                     AnyView(
-                                        Text("My new screen")
+                                        Text("My new screen:: \(addNavigationStack)")
                                             .toolbar {
                                                 Button("Test") {
                                                     
