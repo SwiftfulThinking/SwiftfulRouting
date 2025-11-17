@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftfulRecursiveUI
 
-struct AnyTransitionWithDestination: Identifiable, Equatable {
+struct AnyTransitionWithDestination: Identifiable, Equatable, Hashable {
     let id: String
     let transition: TransitionOption
     let destination: (AnyRouter) -> AnyDestination
@@ -19,7 +19,11 @@ struct AnyTransitionWithDestination: Identifiable, Equatable {
             AnyDestination(EmptyView())
         })
     }
-    
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
     static func == (lhs: AnyTransitionWithDestination, rhs: AnyTransitionWithDestination) -> Bool {
         lhs.id == rhs.id
     }
@@ -38,8 +42,10 @@ struct TransitionSupportView<Content:View>: View {
     let onDidSwipeBack: () -> Void
     
     var body: some View {
-        ZStack {
-            LazyZStack(allowSimultaneous: allowSimultaneous, selection: selection, items: transitions) { data in
+        let _ = print("[DEBUG] TransitionSupportView body - transitions.count: \(transitions.count), transitions.last?.id: \(transitions.last?.id ?? "nil"), allowSimultaneous: \(allowSimultaneous)")
+        return ZStack {
+            LazyZStack(allowSimultaneous: allowSimultaneous, selection: transitions.last, items: transitions) { data in
+                let _ = print("[DEBUG] LazyZStack rendering item: \(data.id), isFirst: \(data == transitions.first)")
                 if data == transitions.first {
                     content(router)
                         .transition(
@@ -73,7 +79,7 @@ struct TransitionSupportView<Content:View>: View {
                     .zIndex(Double(transitions.firstIndex(of: data) ?? 1) + 1)
                 }
             }
-            .animation(.easeInOut, value: selection.id)
+            .animation(.easeInOut, value: (transitions.last?.id ?? "") + currentTransition.rawValue)
         }
     }
 }
@@ -132,10 +138,8 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
         )
         
         self.currentTransition = transition
-        
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 1_000_000)
-            
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
             self.screens.append(new)
             self.selectedScreen = new
         }
