@@ -78,6 +78,7 @@ struct TransitionSupportView<Content:View>: View {
                 }
             }
             .animation(.easeInOut, value: (transitions.last?.id ?? "") + currentTransition.rawValue)
+            .id(transitions.map({ $0.id }))
         }
     }
 }
