@@ -175,11 +175,14 @@ struct RouterViewInternal<Content: View>: View, Router {
     }
     
     var activeTransitions: [AnyTransitionDestination] {
-        viewModel.allTransitions[routerId] ?? []
+        let transitions = viewModel.allTransitions[routerId] ?? []
+        // Filter out the .root placeholder transition
+        return transitions.filter { $0 != .root }
     }
     
     var activeModules: [AnyTransitionDestination] {
-        moduleViewModel.modules
+        // Filter out the .root placeholder module
+        moduleViewModel.modules.filter { $0 != .root }
     }
     
     var activeTransitionQueue: [AnyTransitionDestination] {
