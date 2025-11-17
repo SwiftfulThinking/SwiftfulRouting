@@ -54,27 +54,28 @@ struct TransitionSupportView<Content:View>: View {
                         )
                         .zIndex(1)
                 } else {
-                    Group {
-                        if allowsSwipeBack {
-                            SwipeBackSupportContainer(
-                                insertionTransition: data.transition,
-                                swipeThreshold: 30,
-                                content: {
-                                    data.destination(router).destination
-                                },
-                                onDidSwipeBack: onDidSwipeBack
-                            )
-                        } else {
-                            data.destination(router).destination
-                        }
-                    }
+                    Rectangle()
+//                    Group {
+//                        if allowsSwipeBack {
+//                            SwipeBackSupportContainer(
+//                                insertionTransition: data.transition,
+//                                swipeThreshold: 30,
+//                                content: {
+//                                    data.destination(router).destination
+//                                },
+//                                onDidSwipeBack: onDidSwipeBack
+//                            )
+//                        } else {
+//                            data.destination(router).destination
+//                        }
+//                    }
                     .transition(
                         .asymmetric(
                             insertion: currentTransition.insertion,
                             removal: .customRemoval(direction: currentTransition.reversed)
                         )
                     )
-                    .zIndex(Double(transitions.firstIndex(of: data) ?? 1) + 1)
+                    .zIndex(Double(99) + 1)
                 }
             }
             .animation(.easeInOut, value: (transitions.last?.id ?? "") + currentTransition.rawValue)
@@ -135,12 +136,16 @@ public struct TransitionSupportViewBuilder<Content: View>: View, TransitionSuppo
                 AnyDestination(destination(router))
             }
         )
-        
+
+        print("[TRANSITION_DEBUG] showTransition called - new.id: \(new.id), transition: \(transition), screens.count before: \(screens.count)")
+
         self.currentTransition = transition
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
+            print("[TRANSITION_DEBUG] showTransition appending screen")
             self.screens.append(new)
             self.selectedScreen = new
+            print("[TRANSITION_DEBUG] showTransition complete - screens.count: \(self.screens.count), screens.last?.id: \(self.screens.last?.id ?? "nil")")
         }
     }
     
