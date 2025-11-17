@@ -42,10 +42,8 @@ struct TransitionSupportView<Content:View>: View {
     let onDidSwipeBack: () -> Void
     
     var body: some View {
-        let _ = print("[DEBUG] TransitionSupportView body - transitions.count: \(transitions.count), transitions.last?.id: \(transitions.last?.id ?? "nil"), allowSimultaneous: \(allowSimultaneous)")
-        return ZStack {
+        ZStack {
             LazyZStack(allowSimultaneous: allowSimultaneous, selection: transitions.last, items: transitions) { data in
-                let _ = print("[DEBUG] LazyZStack rendering item: \(data.id), isFirst: \(data == transitions.first)")
                 if data == transitions.first {
                     content(router)
                         .transition(
