@@ -53,7 +53,7 @@ struct TransitionSupportView<Content:View>: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.rawValue)
+        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
 //        .ifSatisfiesCondition(viewFrame == .zero, transform: { content in
 //            content
 //                .readingFrame(onChange: { frame in

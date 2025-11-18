@@ -429,7 +429,7 @@ public struct AnyRouter: Sendable, Router {
     ///   - onDismiss: Closure that triggers when transition is dismissed.
     ///   - destination: Destination screen.
     @MainActor public func showTransition<T>(
-        _ transition: TransitionOption = .trailing,
+        _ transition: TransitionOption = .trailing(),
         id: String = UUID().uuidString,
         allowsSwipeBack: Bool = false,
         onDismiss: (() -> Void)? = nil,

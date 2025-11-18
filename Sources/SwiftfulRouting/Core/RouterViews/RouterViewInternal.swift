@@ -31,7 +31,7 @@ struct RouterViewInternal<Content: View>: View, Router {
             router: currentRouter,
             transitions: viewModel.allTransitions[routerId] ?? [],
             content: content,
-            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing,
+            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing(),
             onDidSwipeBack: {
                 dismissTransition()
             }
