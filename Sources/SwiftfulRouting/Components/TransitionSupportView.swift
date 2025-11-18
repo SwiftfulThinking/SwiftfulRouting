@@ -53,7 +53,11 @@ struct TransitionSupportView<Content:View>: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
+        .transactionAnimationIfAvailable(
+            value: (transitions.last?.id ?? "") + currentTransition.id,
+            transition: currentTransition
+        )
+//        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
 //        .ifSatisfiesCondition(viewFrame == .zero, transform: { content in
 //            content
 //                .readingFrame(onChange: { frame in
@@ -64,4 +68,20 @@ struct TransitionSupportView<Content:View>: View {
 //                })
 //        })
     }
+}
+
+extension View {
+    
+    @ViewBuilder
+    func transactionAnimationIfAvailable<T: Equatable>(value: T, transition: TransitionOption) -> some View {
+        if #available(iOS 17.0, *) {
+            self
+                .transaction(value: value) { transaction in
+                    transaction.animation = transition.animation
+                }
+        } else {
+            self.animation(transition.animation, value: value)
+        }
+    }
+    
 }

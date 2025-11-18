@@ -61,7 +61,10 @@ struct ModuleSupportView<Content:View>: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .animation(viewModel.currentTransition.animation, value: (viewModel.modules.last?.id ?? "") + viewModel.currentTransition.id)
+        .transactionAnimationIfAvailable(
+            value: (viewModel.modules.last?.id ?? "") + viewModel.currentTransition.id,
+            transition: viewModel.currentTransition
+        )
         .environmentObject(viewModel)
         
         #if DEBUG
