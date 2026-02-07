@@ -221,7 +221,7 @@ Most apps should replace their existing `NavigationStack` with a `RouterView`, h
 The framework uses the native SwiftUI navigation bar, so all related modifiers will still work.
 
 ```swift
-RouterView(addNavigationView: false) { router in
+RouterView(addNavigationStack: false) { router in
    MyView()
         .navigationBarHidden(true)
         .toolbar {
@@ -412,7 +412,7 @@ router.dismissLastEnvironment()
 Dismiss all screens in the screen heirarchy.
 
 ```swift
-router.dismissLastEnvironment()
+router.dismissAllScreens()
 ```
 </details>
 
@@ -769,7 +769,7 @@ do {
 }
 ```
 
-Remove transitinos from the queue.
+Remove transitions from the queue.
 
 ```swift
 router.removeTransitionFromQueue(id: "x")
@@ -1208,6 +1208,20 @@ Upcoming features:
 - [ ] Add Modal queue
 - [ ] Add remove(count:) to all queues
 - [ ] Add support for showing in-app web browser
-- [ ] Add supprot for opening other apps (email, etc.)
+- [ ] Add support for opening other apps (email, etc.)
 
 </details>
+
+## Claude Code
+
+This package includes a `.claude/swiftful-routing-rules.md` with usage guidelines, navigation patterns, and integration advice for projects using [Claude Code](https://claude.ai/claude-code).
+
+## Platform Support
+
+- **iOS 16.0+**
+- **macOS 12.0+**
+- **tvOS 14.0+**
+
+## License
+
+SwiftfulRouting is available under the MIT license.
