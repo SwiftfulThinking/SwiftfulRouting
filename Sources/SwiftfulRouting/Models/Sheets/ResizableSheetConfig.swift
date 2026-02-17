@@ -34,6 +34,8 @@ public struct ResizableSheetConfig {
         backgroundInteraction: PresentationBackgroundInteractionBackSupport = .automatic,
         contentInteraction: PresentationContentInteractionBackSupport = .automatic
     ) {
+        print("🟣 [ResizableSheetConfig] Init called - detents: \(detents), selection: \(selection?.wrappedValue.title ?? "nil")")
+
         self.detents = detents
         self.selection = selection
         self.dragIndicator = dragIndicator

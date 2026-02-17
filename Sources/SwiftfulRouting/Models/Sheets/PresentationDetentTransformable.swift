@@ -24,21 +24,25 @@ public enum PresentationDetentTransformable: Hashable {
         default:
             self = .unknown
         }
+        print("🟡 [PresentationDetentTransformable] Init from PresentationDetent -> \(self.title)")
     }
-    
+
     var asPresentationDetent: PresentationDetent {
+        let detent: PresentationDetent
         switch self {
         case .medium:
-            return .medium
+            detent = .medium
         case .large:
-            return .large
+            detent = .large
         case .height(let height):
-            return .height(height)
+            detent = .height(height)
         case .fraction(let fraction):
-            return .fraction(fraction)
+            detent = .fraction(fraction)
         case .unknown:
-            return .large
+            detent = .large
         }
+        print("🟡 [PresentationDetentTransformable] Converting \(self.title) to PresentationDetent")
+        return detent
     }
     
     public var title: String {
