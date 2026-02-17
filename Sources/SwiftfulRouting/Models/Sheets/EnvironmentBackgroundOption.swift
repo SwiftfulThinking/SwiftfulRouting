@@ -70,12 +70,18 @@ fileprivate struct RemoveSheetShadow: UIViewRepresentable {
             // Clear sheet background
             var current: UIView? = view
             while let parent = current?.superview {
-                print("🟣 [RemoveSheetShadow] Checking parent: \(String(describing: type(of: parent)))")
+                let viewType = String(describing: type(of: parent))
+                print("🟣 [RemoveSheetShadow] Checking parent: \(viewType)")
 
-                // Clear background of all parent views
-                if parent.backgroundColor != nil {
-                    print("🟣 [RemoveSheetShadow] Clearing background of \(String(describing: type(of: parent)))")
-                    parent.backgroundColor = .clear
+                // Always clear background (don't check if nil)
+                let oldColor = parent.backgroundColor
+                parent.backgroundColor = .clear
+                print("🟣 [RemoveSheetShadow] Set \(viewType).backgroundColor from \(String(describing: oldColor)) to .clear")
+
+                // Also clear layer background
+                if parent.layer.backgroundColor != nil {
+                    parent.layer.backgroundColor = UIColor.clear.cgColor
+                    print("🟣 [RemoveSheetShadow] Cleared layer.backgroundColor for \(viewType)")
                 }
 
                 current = parent
