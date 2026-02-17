@@ -376,9 +376,9 @@ extension View {
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
-                        let _ = print("🟠 [RouterViewInternal] Presenting destination with selection: \(destination.presentationDetentSelection?.wrappedValue.title ?? "nil")")
+                        let _ = print("🟠 [RouterViewInternal] Presenting destination")
                         return destination.destination
-                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
                     }
             )
     }
@@ -392,9 +392,9 @@ extension View {
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
-                        let _ = print("🟠 [RouterViewInternal] Presenting destination with selection: \(destination.presentationDetentSelection?.wrappedValue.title ?? "nil")")
+                        let _ = print("🟠 [RouterViewInternal] Presenting destination")
                         return destination.destination
-                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
                     }
             )
     }
@@ -408,9 +408,9 @@ extension View {
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
-                        let _ = print("🟠 [RouterViewInternal] Presenting destination with selection: \(destination.presentationDetentSelection?.wrappedValue.title ?? "nil")")
+                        let _ = print("🟠 [RouterViewInternal] Presenting destination")
                         return destination.destination
-                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
                     }
             )
     }

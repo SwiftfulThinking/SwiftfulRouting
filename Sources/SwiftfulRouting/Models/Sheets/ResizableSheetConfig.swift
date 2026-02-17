@@ -9,6 +9,7 @@ import SwiftUI
 
 public struct ResizableSheetConfig {
     var detents: Set<PresentationDetentTransformable>
+    var selection: Binding<PresentationDetentTransformable>?
     var dragIndicator: Visibility
     var background: EnvironmentBackgroundOption
     var cornerRadius: CGFloat?
@@ -18,24 +19,25 @@ public struct ResizableSheetConfig {
     /// Resizable sheet settings.
     /// - Parameters:
     ///   - detents: Array of sizes sheet can be.
+    ///   - selection: Programmatically set the selection. If nil, user can still swipe between sizes.
     ///   - dragIndicator: Show notch on top of sheet.
     ///   - background: Background of sheet. (supported on iOS 16.4 only!)
     ///   - cornerRadius: Corner radius of sheet. (supported on iOS 16.4 only!)
     ///   - backgroundInteraction: Background interaction of sheet (supported on iOS 16.4 only!)
     ///   - contentInteraction: Content interaction of sheet (supported on iOS 16.4 only!)
-    ///
-    /// Note: To programmatically control the sheet detent selection, use the `presentationDetentSelection` parameter on `router.showScreen()` instead.
     public init(
         detents: Set<PresentationDetentTransformable> = [.large],
+        selection: Binding<PresentationDetentTransformable>? = nil,
         dragIndicator: Visibility = .automatic,
         background: EnvironmentBackgroundOption = .automatic,
         cornerRadius: CGFloat? = nil,
         backgroundInteraction: PresentationBackgroundInteractionBackSupport = .automatic,
         contentInteraction: PresentationContentInteractionBackSupport = .automatic
     ) {
-        print("🟣 [ResizableSheetConfig] Init called - detents: \(detents)")
+        print("🟣 [ResizableSheetConfig] Init called - detents: \(detents), selection: \(selection?.wrappedValue.title ?? "nil")")
 
         self.detents = detents
+        self.selection = selection
         self.dragIndicator = dragIndicator
         self.background = background
         self.cornerRadius = cornerRadius

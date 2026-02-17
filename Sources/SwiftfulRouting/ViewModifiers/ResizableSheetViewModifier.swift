@@ -32,16 +32,15 @@ private struct ResizableSheetContentWrapper<Content: View>: View {
 
 extension View {
 
-    @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption, selection: Binding<PresentationDetentTransformable>?) -> some View {
+    @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption) -> some View {
         let _ = print("🔷 [ResizableSheetViewModifier] applyResizableSheetModifiersIfNeeded called")
         let _ = print("🔷 [ResizableSheetViewModifier]   - segue: \(segue.stringValue)")
-        let _ = print("🔷 [ResizableSheetViewModifier]   - selection binding is nil: \(selection == nil)")
 
         switch segue {
         case .push:
             self
         case .sheetConfig(config: let config):
-            if let selection = selection {
+            if let selection = config.selection {
                 let _ = print("🔷 [ResizableSheetViewModifier] Using ResizableSheetContentWrapper with @Binding")
                 let _ = print("🔷 [ResizableSheetViewModifier]   - Initial selection value: \(selection.wrappedValue.title)")
 

@@ -16,7 +16,6 @@ public struct AnyDestination: Identifiable, Hashable {
     public let destination: AnyView
     public let onDismiss: (() -> Void)?
     public let transitionBehavior: TransitionMemoryBehavior
-    public let presentationDetentSelection: Binding<PresentationDetentTransformable>?
     
     /// - Parameters:
     ///   - id: Identifier for the screen
@@ -24,7 +23,6 @@ public struct AnyDestination: Identifiable, Hashable {
     ///   - location: Where to insert the new screen in the heirarchy (default = .insert)
     ///   - animates: If the segue should animate or not (default = true)
     ///   - transitionBehavior: Determines the behavior of "transition" methods on the destination screen.
-    ///   - presentationDetentSelection: Optional binding to control sheet detent selection programmatically
     ///   - onDismiss: Trigger closure when screen gets dismissed (note: dismiss != disappear)
     ///   - destination: The destination screen.
     public init<T:View>(
@@ -33,23 +31,16 @@ public struct AnyDestination: Identifiable, Hashable {
         location: SegueLocation = .insert,
         animates: Bool = true,
         transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
-        presentationDetentSelection: Binding<PresentationDetentTransformable>? = nil,
         onDismiss: (() -> Void)? = nil,
         destination: @escaping (AnyRouter) -> T
     ) {
-        print("🔶 [AnyDestination] Init - segue: \(segue.stringValue), selection: \(presentationDetentSelection?.wrappedValue.title ?? "nil")")
+        print("🔶 [AnyDestination] Init - segue: \(segue.stringValue)")
 
         self.id = id
         self.segue = segue
         self.location = location
         self.animates = animates
         self.transitionBehavior = transitionBehavior
-        self.presentationDetentSelection = presentationDetentSelection
-
-        if let selection = presentationDetentSelection {
-            print("🔶 [AnyDestination] Stored selection binding, current value: \(selection.wrappedValue.title)")
-        }
-
         self.destination = AnyView(
             RouterViewInternal(
                 routerId: id,
