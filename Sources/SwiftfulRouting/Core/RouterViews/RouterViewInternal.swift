@@ -31,7 +31,7 @@ struct RouterViewInternal<Content: View>: View, Router {
             router: currentRouter,
             transitions: viewModel.allTransitions[routerId] ?? [],
             content: content,
-            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing,
+            currentTransition: viewModel.currentTransitions[routerId] ?? .trailing(),
             onDidSwipeBack: {
                 dismissTransition()
             }
@@ -175,11 +175,14 @@ struct RouterViewInternal<Content: View>: View, Router {
     }
     
     var activeTransitions: [AnyTransitionDestination] {
-        viewModel.allTransitions[routerId] ?? []
+        let transitions = viewModel.allTransitions[routerId] ?? []
+        // Filter out the .root placeholder transition
+        return transitions.filter { $0 != .root }
     }
     
     var activeModules: [AnyTransitionDestination] {
-        moduleViewModel.modules
+        // Filter out the .root placeholder module
+        moduleViewModel.modules.filter { $0 != .root }
     }
     
     var activeTransitionQueue: [AnyTransitionDestination] {
@@ -378,6 +381,7 @@ extension View {
                     }), onDismiss: nil) { destination in
                         destination.destination
                             .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                            .environmentObject(viewModel)
                     }
             )
     }
@@ -393,6 +397,7 @@ extension View {
                     }), onDismiss: nil) { destination in
                         destination.destination
                             .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                            .environmentObject(viewModel)
                     }
             )
     }
@@ -408,6 +413,7 @@ extension View {
                     }), onDismiss: nil) { destination in
                         destination.destination
                             .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                            .environmentObject(viewModel)
                     }
             )
     }

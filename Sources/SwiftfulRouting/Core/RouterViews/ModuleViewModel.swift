@@ -16,7 +16,7 @@ final class ModuleViewModel: ObservableObject {
     @Published private(set) var modules: [AnyTransitionDestination] = [.root]
     
     // The current TransitionOption for changing modules.
-    @Published private(set) var currentTransition: TransitionOption = .trailing
+    @Published private(set) var currentTransition: TransitionOption = .trailing()
 
 }
 

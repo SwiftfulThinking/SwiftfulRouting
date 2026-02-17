@@ -7,8 +7,31 @@
 import Foundation
 import SwiftUI
 
-public enum TransitionOption: String, CaseIterable {
-    case trailing, leading, top, bottom, identity
+public enum TransitionOption: CaseIterable, Equatable {
+    public static var allCases: [TransitionOption] {
+        [.trailing(), .leading(), .top(), .bottom(), .identity]
+    }
+    
+    case trailing(animation: Animation = .snappy)
+    case leading(animation: Animation = .snappy)
+    case top(animation: Animation = .snappy)
+    case bottom(animation: Animation = .snappy)
+    case identity
+    
+    var id: String {
+        switch self {
+        case .trailing:
+            return "trailing"
+        case .leading:
+            return "leading"
+        case .top:
+            return "top"
+        case .bottom:
+            return "bottom"
+        case .identity:
+            return "identity"
+        }
+    }
     
     var canSwipeBack: Bool {
         switch self {
@@ -21,10 +44,10 @@ public enum TransitionOption: String, CaseIterable {
     
     var animation: Animation? {
         switch self {
+        case .trailing(let animation), .leading(let animation), .top(let animation), .bottom(let animation):
+            return animation
         case .identity:
             return .none
-        default:
-            return .smooth
         }
     }
     
@@ -49,11 +72,16 @@ public enum TransitionOption: String, CaseIterable {
     
     var reversed: TransitionOption {
         switch self {
-        case .trailing: return .leading
-        case .leading: return .trailing
-        case .top: return .bottom
-        case .bottom: return .top
-        case .identity: return .identity
+        case .trailing(let animation):
+            return .leading(animation: animation)
+        case .leading(let animation):
+            return .trailing(animation: animation)
+        case .top(let animation):
+            return .bottom(animation: animation)
+        case .bottom(let animation):
+            return .top(animation: animation)
+        case .identity:
+            return .identity
         }
     }
     

@@ -8,7 +8,7 @@ import SwiftUI
 
 struct SwipeBackSupportContainer<Content:View>: View {
 
-    var insertionTransition: TransitionOption = .trailing
+    var insertionTransition: TransitionOption = .trailing()
     var swipeThreshold: CGFloat = 30
     @ViewBuilder var content: () -> Content
     var onDidSwipeBack: (() -> Void)? = nil
@@ -116,7 +116,7 @@ struct SwipeBackSupportContainer<Content:View>: View {
 }
 
 #Preview {
-    SwipeBackSupportContainer(insertionTransition: .trailing) {
+    SwipeBackSupportContainer(insertionTransition: .trailing()) {
         Rectangle()
             .fill(Color.blue)
     }

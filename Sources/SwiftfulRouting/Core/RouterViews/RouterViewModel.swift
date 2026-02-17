@@ -34,7 +34,7 @@ final class RouterViewModel: ObservableObject {
     
     // The current TransitionOption on each screen.
     // While a transition is rendered, its .transition may change based on the next/previous transition.
-    @Published private(set) var currentTransitions: [String: TransitionOption] = [RouterViewModel.rootId: .trailing]
+    @Published private(set) var currentTransitions: [String: TransitionOption] = [RouterViewModel.rootId: .trailing()]
     
     // Available transitions in queue, accessible via .showNextTransition()
     @Published private(set) var availableTransitionQueue: [String: [AnyTransitionDestination]] = [:]
