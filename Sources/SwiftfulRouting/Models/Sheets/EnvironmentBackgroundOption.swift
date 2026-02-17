@@ -20,29 +20,29 @@ extension View {
         if #available(iOS 16.4, *) {
             switch option {
             case .automatic:
-                print("🔵 [EnvironmentBackground] Using automatic background")
+                let _ = print("🔵 [EnvironmentBackground] Using automatic background")
                 self
             case .clear:
-                print("🔵 [EnvironmentBackground] Applying CLEAR background with RemoveSheetShadow")
+                let _ = print("🔵 [EnvironmentBackground] Applying CLEAR background with RemoveSheetShadow")
                 self
                     .presentationBackground(.clear)
                     .background(RemoveSheetShadow())
             case .custom(let value):
-                print("🔵 [EnvironmentBackground] Applying custom background")
+                let _ = print("🔵 [EnvironmentBackground] Applying custom background")
                 self
                     .presentationBackground(AnyShapeStyle(value))
             }
         } else {
             switch option {
             case .automatic:
-                print("🔵 [EnvironmentBackground] Using automatic background (iOS < 16.4)")
+                let _ = print("🔵 [EnvironmentBackground] Using automatic background (iOS < 16.4)")
                 self
             case .clear:
-                print("🔵 [EnvironmentBackground] Applying CLEAR background (iOS < 16.4)")
+                let _ = print("🔵 [EnvironmentBackground] Applying CLEAR background (iOS < 16.4)")
                 self
                     .background(RemoveSheetShadow())
             case .custom(let value):
-                print("🔵 [EnvironmentBackground] Applying custom background (iOS < 16.4)")
+                let _ = print("🔵 [EnvironmentBackground] Applying custom background (iOS < 16.4)")
                 self
             }
         }
