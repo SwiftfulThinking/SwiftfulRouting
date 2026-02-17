@@ -20,23 +20,29 @@ extension View {
         if #available(iOS 16.4, *) {
             switch option {
             case .automatic:
+                print("🔵 [EnvironmentBackground] Using automatic background")
                 self
             case .clear:
+                print("🔵 [EnvironmentBackground] Applying CLEAR background with RemoveSheetShadow")
                 self
                     .presentationBackground(.clear)
                     .background(RemoveSheetShadow())
             case .custom(let value):
+                print("🔵 [EnvironmentBackground] Applying custom background")
                 self
                     .presentationBackground(AnyShapeStyle(value))
             }
         } else {
             switch option {
             case .automatic:
+                print("🔵 [EnvironmentBackground] Using automatic background (iOS < 16.4)")
                 self
             case .clear:
+                print("🔵 [EnvironmentBackground] Applying CLEAR background (iOS < 16.4)")
                 self
                     .background(RemoveSheetShadow())
             case .custom(let value):
+                print("🔵 [EnvironmentBackground] Applying custom background (iOS < 16.4)")
                 self
             }
         }
@@ -45,20 +51,25 @@ extension View {
 
 fileprivate struct RemoveSheetShadow: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
+        print("🟣 [RemoveSheetShadow] makeUIView called")
         let view = UIView(frame: .zero)
         view.backgroundColor = .clear
-        
+
         DispatchQueue.main.async {
+            print("🟣 [RemoveSheetShadow] Searching for shadow view...")
             if let shadowView = view.dropShadowView {
+                print("🟣 [RemoveSheetShadow] ✅ Found shadow view! Clearing it.")
                 shadowView.layer.shadowColor = UIColor.clear.cgColor
+            } else {
+                print("🟣 [RemoveSheetShadow] ❌ Shadow view NOT found")
             }
         }
-        
+
         return view
     }
-    
+
     func updateUIView(_ uiView: UIView, context: Context) {
-        
+
     }
 }
 
