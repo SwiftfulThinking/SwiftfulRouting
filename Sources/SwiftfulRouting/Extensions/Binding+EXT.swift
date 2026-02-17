@@ -103,11 +103,13 @@ extension Binding where Value == Bool {
 extension Binding where Value == PresentationDetent {
 
     init(selection: Binding<PresentationDetentTransformable>) {
-        print("🟢 [Binding+EXT] Creating Binding<PresentationDetent> wrapper for initial value: \(selection.wrappedValue.title)")
+        let initialValue = selection.wrappedValue
+        print("🟢 [Binding+EXT] Creating Binding<PresentationDetent> wrapper")
+        print("🟢 [Binding+EXT]   - Current wrapped value at creation: \(initialValue.title)")
 
         self.init {
             let currentValue = selection.wrappedValue
-            print("🟢 [Binding+EXT] GETTER called - returning: \(currentValue.title)")
+            print("🟢 [Binding+EXT] GETTER called - current value from binding: \(currentValue.title)")
             return currentValue.asPresentationDetent
         } set: { newValue in
             let transformable = PresentationDetentTransformable(detent: newValue)

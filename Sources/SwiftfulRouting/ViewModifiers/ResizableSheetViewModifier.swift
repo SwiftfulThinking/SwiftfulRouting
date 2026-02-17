@@ -15,12 +15,15 @@ extension View {
         case .push:
             self
         case .sheetConfig(config: let config):
-            let _ = print("🔷 [ResizableSheetViewModifier] Sheet config - detents: \(config.detents), selection: \(config.selection?.wrappedValue.title ?? "nil")")
+            let currentSelectionValue = config.selection?.wrappedValue
+            let _ = print("🔷 [ResizableSheetViewModifier] Sheet config - detents: \(config.detents), selection: \(currentSelectionValue?.title ?? "nil")")
 
             self
                 // If a selection is passed in, bind to it
                 .ifLetCondition(config.selection) { content, value in
-                    let _ = print("🔷 [ResizableSheetViewModifier] Selection binding found, current value: \(value.wrappedValue.title)")
+                    let _ = print("🔷 [ResizableSheetViewModifier] Selection binding found")
+                    let _ = print("🔷 [ResizableSheetViewModifier]   - Reading value.wrappedValue: \(value.wrappedValue.title)")
+                    let _ = print("🔷 [ResizableSheetViewModifier]   - About to create Binding wrapper...")
                     return content
                         .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: value))
                 }
