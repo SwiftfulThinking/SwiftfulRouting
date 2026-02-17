@@ -18,6 +18,7 @@ extension View {
                 .ifLetCondition(config.selection) { content, value in
                     content
                         .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: value))
+                        .id(value.wrappedValue)
                 }
                 // Otherwise, don't pass in anything for the selection
                 .ifSatisfiesCondition(config.selection == nil) { content in
@@ -52,7 +53,7 @@ extension View {
 }
 
 extension View {
-    
+
     @ViewBuilder
     func presentationCornerRadiusIfAvailable(_ value: CGFloat) -> some View {
         if #available(iOS 16.4, *) {
