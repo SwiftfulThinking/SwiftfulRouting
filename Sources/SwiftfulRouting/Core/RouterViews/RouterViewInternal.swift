@@ -377,7 +377,7 @@ extension View {
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
                         destination.destination
-                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
                     }
             )
     }
@@ -392,7 +392,7 @@ extension View {
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
                         destination.destination
-                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
                     }
             )
     }
@@ -407,7 +407,7 @@ extension View {
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
                         destination.destination
-                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue)
+                            .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
                     }
             )
     }

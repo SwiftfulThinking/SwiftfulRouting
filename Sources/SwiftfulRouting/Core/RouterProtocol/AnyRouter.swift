@@ -93,6 +93,7 @@ public struct AnyRouter: Sendable, Router {
     ///   - onDismiss: Trigger closure when screen gets dismissed (note: dismiss != disappear)
     ///   - animates: If the segue should animate or not (default = true)
     ///   - transitionBehavior: Determines the behavior of "transition" methods on the destination screen.
+    ///   - presentationDetentSelection: Optional binding to control sheet detent selection programmatically
     ///   - destination: The destination screen.
     @MainActor public func showScreen<T>(
         _ segue: SegueOption = .push,
@@ -100,10 +101,11 @@ public struct AnyRouter: Sendable, Router {
         location: SegueLocation = .insert,
         animates: Bool = true,
         transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
+        presentationDetentSelection: Binding<PresentationDetentTransformable>? = nil,
         onDismiss: (() -> Void)? = nil,
         destination: @escaping (AnyRouter) -> T
     ) where T : View {
-        let destination = AnyDestination(id: id, segue: segue, location: location, animates: animates, transitionBehavior: transitionBehavior, onDismiss: onDismiss, destination: destination)
+        let destination = AnyDestination(id: id, segue: segue, location: location, animates: animates, transitionBehavior: transitionBehavior, presentationDetentSelection: presentationDetentSelection, onDismiss: onDismiss, destination: destination)
         object.showScreens(destinations: [destination])
     }
 

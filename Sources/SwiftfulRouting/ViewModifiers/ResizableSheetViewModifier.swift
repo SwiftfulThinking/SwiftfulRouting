@@ -8,19 +8,19 @@ import SwiftUI
 
 extension View {
         
-    @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption) -> some View {
+    @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption, selection: Binding<PresentationDetentTransformable>?) -> some View {
         let _ = print("🔷 [ResizableSheetViewModifier] applyResizableSheetModifiersIfNeeded called with segue: \(segue.stringValue)")
 
         switch segue {
         case .push:
             self
         case .sheetConfig(config: let config):
-            let currentSelectionValue = config.selection?.wrappedValue
+            let currentSelectionValue = selection?.wrappedValue
             let _ = print("🔷 [ResizableSheetViewModifier] Sheet config - detents: \(config.detents), selection: \(currentSelectionValue?.title ?? "nil")")
 
             self
                 // If a selection is passed in, bind to it
-                .ifLetCondition(config.selection) { content, value in
+                .ifLetCondition(selection) { content, value in
                     let _ = print("🔷 [ResizableSheetViewModifier] Selection binding found")
                     let _ = print("🔷 [ResizableSheetViewModifier]   - Reading value.wrappedValue: \(value.wrappedValue.title)")
                     let _ = print("🔷 [ResizableSheetViewModifier]   - About to create Binding wrapper...")
@@ -28,7 +28,7 @@ extension View {
                         .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: value))
                 }
                 // Otherwise, don't pass in anything for the selection
-                .ifSatisfiesCondition(config.selection == nil) { content in
+                .ifSatisfiesCondition(selection == nil) { content in
                     let _ = print("🔷 [ResizableSheetViewModifier] No selection binding")
                     return content
                         .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }))
