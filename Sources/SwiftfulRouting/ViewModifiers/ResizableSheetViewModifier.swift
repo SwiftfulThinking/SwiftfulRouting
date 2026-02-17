@@ -6,49 +6,52 @@
 //
 import SwiftUI
 
+/// Wrapper view that uses @Binding to maintain reactive connection to selection binding
+private struct ResizableSheetContentWrapper<Content: View>: View {
+    let content: Content
+    let config: ResizableSheetConfig
+    @Binding var selection: PresentationDetentTransformable
+
+    var body: some View {
+        content
+            .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: $selection))
+            .presentationDragIndicator(config.dragIndicator)
+            .applyEnvironmentBackgroundIfAvailable(option: config.background)
+            .ifLetCondition(config.cornerRadius, transform: { content, value in
+                content.presentationCornerRadiusIfAvailable(value)
+            })
+            .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
+            .presentationContentInteractionIfAvailable(config.contentInteraction)
+    }
+}
+
 extension View {
-        
+
     @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption) -> some View {
         switch segue {
         case .push:
             self
         case .sheetConfig(config: let config):
-            self
-                // If a selection is passed in, bind to it
-                .ifLetCondition(config.selection) { content, value in
-                    content
-                        .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: value))
-                }
-                // Otherwise, don't pass in anything for the selection
-                .ifSatisfiesCondition(config.selection == nil) { content in
-                    content
-                        .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }))
-                }
-            
-                // Value for showing drag indicator
-                .presentationDragIndicator(config.dragIndicator)
-            
-                // Add background color if needed
-                .applyEnvironmentBackgroundIfAvailable(option: config.background)
-            
-                // Value for background corner radius
-                .ifLetCondition(config.cornerRadius, transform: { content, value in
-                    content
-                        .presentationCornerRadiusIfAvailable(value)
-                })
-            
-                // Background interaction
-                .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
-            
-                // Content interaction
-                .presentationContentInteractionIfAvailable(config.contentInteraction)
+            if let selection = config.selection {
+                ResizableSheetContentWrapper(content: self, config: config, selection: selection)
+            } else {
+                self
+                    .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }))
+                    .presentationDragIndicator(config.dragIndicator)
+                    .applyEnvironmentBackgroundIfAvailable(option: config.background)
+                    .ifLetCondition(config.cornerRadius, transform: { content, value in
+                        content.presentationCornerRadiusIfAvailable(value)
+                    })
+                    .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
+                    .presentationContentInteractionIfAvailable(config.contentInteraction)
+            }
         case .fullScreenCoverConfig(config: let config):
             self
                 // Add background color if needed
                 .applyEnvironmentBackgroundIfAvailable(option: config.background)
         }
     }
-        
+
 }
 
 extension View {
