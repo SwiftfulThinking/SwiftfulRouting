@@ -16,12 +16,12 @@ private struct ResizableSheetContentWrapper<Content: View>: View {
         content
             .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: $selection))
             .presentationDragIndicator(config.dragIndicator)
-            .applyEnvironmentBackgroundIfAvailable(option: config.background)
             .ifLetCondition(config.cornerRadius, transform: { content, value in
                 content.presentationCornerRadiusIfAvailable(value)
             })
             .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
             .presentationContentInteractionIfAvailable(config.contentInteraction)
+            .applyEnvironmentBackgroundIfAvailable(option: config.background)
     }
 }
 
