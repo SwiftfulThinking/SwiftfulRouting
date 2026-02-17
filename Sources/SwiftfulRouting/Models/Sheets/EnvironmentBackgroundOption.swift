@@ -25,6 +25,7 @@ extension View {
             case .clear:
                 let _ = print("🔵 [EnvironmentBackground] Applying CLEAR background with RemoveSheetShadow")
                 self
+                    .background(.clear)
                     .presentationBackground(.clear)
                     .background(RemoveSheetShadow())
             case .custom(let value):
@@ -56,12 +57,31 @@ fileprivate struct RemoveSheetShadow: UIViewRepresentable {
         view.backgroundColor = .clear
 
         DispatchQueue.main.async {
-            print("🟣 [RemoveSheetShadow] Searching for shadow view...")
+            print("🟣 [RemoveSheetShadow] Searching for shadow view and sheet background...")
+
+            // Clear shadow
             if let shadowView = view.dropShadowView {
                 print("🟣 [RemoveSheetShadow] ✅ Found shadow view! Clearing it.")
                 shadowView.layer.shadowColor = UIColor.clear.cgColor
             } else {
                 print("🟣 [RemoveSheetShadow] ❌ Shadow view NOT found")
+            }
+
+            // Clear sheet background
+            var current: UIView? = view
+            while let parent = current?.superview {
+                print("🟣 [RemoveSheetShadow] Checking parent: \(String(describing: type(of: parent)))")
+
+                // Clear background of all parent views
+                if parent.backgroundColor != nil {
+                    print("🟣 [RemoveSheetShadow] Clearing background of \(String(describing: type(of: parent)))")
+                    parent.backgroundColor = .clear
+                }
+
+                current = parent
+
+                // Stop at a reasonable depth
+                if parent is UIWindow { break }
             }
         }
 
