@@ -38,12 +38,12 @@ extension View {
                 self
                     .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }))
                     .presentationDragIndicator(config.dragIndicator)
-                    .applyEnvironmentBackgroundIfAvailable(option: config.background)
                     .ifLetCondition(config.cornerRadius, transform: { content, value in
                         content.presentationCornerRadiusIfAvailable(value)
                     })
                     .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
                     .presentationContentInteractionIfAvailable(config.contentInteraction)
+                    .applyEnvironmentBackgroundIfAvailable(option: config.background)
             }
         case .fullScreenCoverConfig(config: let config):
             self
