@@ -37,12 +37,19 @@ public struct AnyDestination: Identifiable, Hashable {
         onDismiss: (() -> Void)? = nil,
         destination: @escaping (AnyRouter) -> T
     ) {
+        print("🔶 [AnyDestination] Init - segue: \(segue.stringValue), selection: \(presentationDetentSelection?.wrappedValue.title ?? "nil")")
+
         self.id = id
         self.segue = segue
         self.location = location
         self.animates = animates
         self.transitionBehavior = transitionBehavior
         self.presentationDetentSelection = presentationDetentSelection
+
+        if let selection = presentationDetentSelection {
+            print("🔶 [AnyDestination] Stored selection binding, current value: \(selection.wrappedValue.title)")
+        }
+
         self.destination = AnyView(
             RouterViewInternal(
                 routerId: id,

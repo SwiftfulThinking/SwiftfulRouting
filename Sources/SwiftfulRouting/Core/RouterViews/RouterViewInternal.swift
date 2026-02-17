@@ -376,7 +376,8 @@ extension View {
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
-                        destination.destination
+                        let _ = print("🟠 [RouterViewInternal] Presenting destination with selection: \(destination.presentationDetentSelection?.wrappedValue.title ?? "nil")")
+                        return destination.destination
                             .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
                     }
             )
@@ -391,7 +392,8 @@ extension View {
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
-                        destination.destination
+                        let _ = print("🟠 [RouterViewInternal] Presenting destination with selection: \(destination.presentationDetentSelection?.wrappedValue.title ?? "nil")")
+                        return destination.destination
                             .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
                     }
             )
@@ -406,7 +408,8 @@ extension View {
                         // Now we must update activeScreenStacks to match that behavior
                         viewModel.dismissScreens(toEnvironmentId: routerId, animates: true)
                     }), onDismiss: nil) { destination in
-                        destination.destination
+                        let _ = print("🟠 [RouterViewInternal] Presenting destination with selection: \(destination.presentationDetentSelection?.wrappedValue.title ?? "nil")")
+                        return destination.destination
                             .applyResizableSheetModifiersIfNeeded(segue: destination.segue, selection: destination.presentationDetentSelection)
                     }
             )

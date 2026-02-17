@@ -9,14 +9,21 @@ import SwiftUI
 extension View {
         
     @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption, selection: Binding<PresentationDetentTransformable>?) -> some View {
-        let _ = print("🔷 [ResizableSheetViewModifier] applyResizableSheetModifiersIfNeeded called with segue: \(segue.stringValue)")
+        let _ = print("🔷 [ResizableSheetViewModifier] applyResizableSheetModifiersIfNeeded called")
+        let _ = print("🔷 [ResizableSheetViewModifier]   - segue: \(segue.stringValue)")
+        let _ = print("🔷 [ResizableSheetViewModifier]   - selection binding is nil: \(selection == nil)")
 
         switch segue {
         case .push:
             self
         case .sheetConfig(config: let config):
             let currentSelectionValue = selection?.wrappedValue
-            let _ = print("🔷 [ResizableSheetViewModifier] Sheet config - detents: \(config.detents), selection: \(currentSelectionValue?.title ?? "nil")")
+            let _ = print("🔷 [ResizableSheetViewModifier] Sheet config - detents: \(config.detents)")
+            let _ = print("🔷 [ResizableSheetViewModifier]   - selection value from binding: \(currentSelectionValue?.title ?? "nil")")
+
+            if let sel = selection {
+                let _ = print("🔷 [ResizableSheetViewModifier]   - Re-reading selection.wrappedValue: \(sel.wrappedValue.title)")
+            }
 
             self
                 // If a selection is passed in, bind to it
