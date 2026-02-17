@@ -6,8 +6,32 @@
 //
 import SwiftUI
 
+// MARK: - Wrapper View with @Binding for Reactivity
+
+/// This view uses @Binding to maintain reactive connection to the selection binding.
+/// Based on the working implementation from commit bf0a8b4628b0e24d60f090b382c15b96329ab92c
+private struct ResizableSheetContentWrapper<Content: View>: View {
+    let content: Content
+    let config: ResizableSheetConfig
+    @Binding var selection: PresentationDetentTransformable
+
+    var body: some View {
+        let _ = print("🟢 [ResizableSheetContentWrapper] body evaluated with selection: \(selection.title)")
+
+        content
+            .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: $selection))
+            .presentationDragIndicator(config.dragIndicator)
+            .applyEnvironmentBackgroundIfAvailable(option: config.background)
+            .ifLetCondition(config.cornerRadius, transform: { content, value in
+                content.presentationCornerRadiusIfAvailable(value)
+            })
+            .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
+            .presentationContentInteractionIfAvailable(config.contentInteraction)
+    }
+}
+
 extension View {
-        
+
     @ViewBuilder func applyResizableSheetModifiersIfNeeded(segue: SegueOption, selection: Binding<PresentationDetentTransformable>?) -> some View {
         let _ = print("🔷 [ResizableSheetViewModifier] applyResizableSheetModifiersIfNeeded called")
         let _ = print("🔷 [ResizableSheetViewModifier]   - segue: \(segue.stringValue)")
@@ -17,50 +41,32 @@ extension View {
         case .push:
             self
         case .sheetConfig(config: let config):
-            let currentSelectionValue = selection?.wrappedValue
-            let _ = print("🔷 [ResizableSheetViewModifier] Sheet config - detents: \(config.detents)")
-            let _ = print("🔷 [ResizableSheetViewModifier]   - selection value from binding: \(currentSelectionValue?.title ?? "nil")")
+            if let selection = selection {
+                let _ = print("🔷 [ResizableSheetViewModifier] Using ResizableSheetContentWrapper with @Binding")
+                let _ = print("🔷 [ResizableSheetViewModifier]   - Initial selection value: \(selection.wrappedValue.title)")
 
-            if let sel = selection {
-                let _ = print("🔷 [ResizableSheetViewModifier]   - Re-reading selection.wrappedValue: \(sel.wrappedValue.title)")
+                // Use wrapper view with @Binding for reactive connection (based on old working implementation)
+                ResizableSheetContentWrapper(
+                    content: self,
+                    config: config,
+                    selection: selection
+                )
+            } else {
+                let _ = print("🔷 [ResizableSheetViewModifier] No selection binding - using standard modifiers")
+
+                // No selection binding - apply modifiers directly
+                self
+                    .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }))
+                    .presentationDragIndicator(config.dragIndicator)
+                    .applyEnvironmentBackgroundIfAvailable(option: config.background)
+                    .ifLetCondition(config.cornerRadius, transform: { content, value in
+                        content.presentationCornerRadiusIfAvailable(value)
+                    })
+                    .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
+                    .presentationContentInteractionIfAvailable(config.contentInteraction)
             }
-
-            self
-                // If a selection is passed in, bind to it
-                .ifLetCondition(selection) { content, value in
-                    let _ = print("🔷 [ResizableSheetViewModifier] Selection binding found")
-                    let _ = print("🔷 [ResizableSheetViewModifier]   - Reading value.wrappedValue: \(value.wrappedValue.title)")
-                    let _ = print("🔷 [ResizableSheetViewModifier]   - About to create Binding wrapper...")
-                    return content
-                        .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }), selection: Binding(selection: value))
-                }
-                // Otherwise, don't pass in anything for the selection
-                .ifSatisfiesCondition(selection == nil) { content in
-                    let _ = print("🔷 [ResizableSheetViewModifier] No selection binding")
-                    return content
-                        .presentationDetents(config.detents.setMap({ $0.asPresentationDetent }))
-                }
-            
-                // Value for showing drag indicator
-                .presentationDragIndicator(config.dragIndicator)
-            
-                // Add background color if needed
-                .applyEnvironmentBackgroundIfAvailable(option: config.background)
-            
-                // Value for background corner radius
-                .ifLetCondition(config.cornerRadius, transform: { content, value in
-                    content
-                        .presentationCornerRadiusIfAvailable(value)
-                })
-            
-                // Background interaction
-                .presentationBackgroundInteractionIfAvailable(config.backgroundInteraction)
-            
-                // Content interaction
-                .presentationContentInteractionIfAvailable(config.contentInteraction)
         case .fullScreenCoverConfig(config: let config):
             self
-                // Add background color if needed
                 .applyEnvironmentBackgroundIfAvailable(option: config.background)
         }
     }
