@@ -23,7 +23,7 @@ public struct AnyTransitionDestination: Identifiable, Equatable {
     ///   - destination: Destination screen.
     public init(
         id: String = UUID().uuidString,
-        transition: TransitionOption = .trailing,
+        transition: TransitionOption = .trailing(),
         allowsSwipeBack: Bool = false,
         onDismiss: (() -> Void)? = nil,
         destination: @escaping (AnyRouter) -> any View
@@ -36,7 +36,7 @@ public struct AnyTransitionDestination: Identifiable, Equatable {
     }
     
     static var root: AnyTransitionDestination {
-        AnyTransitionDestination(id: "root", transition: .trailing, destination: { _ in
+        AnyTransitionDestination(id: "root", transition: .trailing(), destination: { _ in
             EmptyView()
         })
     }
@@ -52,7 +52,7 @@ public struct AnyTransitionDestination: Identifiable, Equatable {
     public var eventParameters: [String: Any] {
         [
             "destination_id": id,
-            "destination_transition": transition.rawValue,
+            "destination_transition": transition.id,
             "destination_allow_swipe_back": allowsSwipeBack,
             "destination_has_on_dismiss": onDismiss != nil,
         ]
