@@ -4,6 +4,8 @@ Programmatic navigation library for SwiftUI. Replaces NavigationStack, sheets, f
 
 ## Setup
 
+IMPORTANT: `RouterView` automatically provides a `NavigationStack`. Screens rendered inside a `RouterView` must NEVER add their own `NavigationStack { }` wrapper — doing so creates a nested navigation hierarchy that breaks swipe-back, toolbar rendering, and title display. Apply `.navigationTitle`, `.toolbar`, and `.navigationBarTitleDisplayMode` directly to your root view; they bubble up to the nearest `NavigationStack` automatically.
+
 ```swift
 import SwiftfulRouting
 
@@ -445,6 +447,45 @@ router.showSafari {
 }
 ```
 
+## Native Swipe-Back Gesture
+
+SwiftUI overrides the `UINavigationController` interactive pop gesture recognizer delegate, which disables the native edge-swipe-back gesture. To re-enable it globally, add this extension once in `Extensions/UINavigationController+EXT.swift`:
+
+```swift
+import Foundation
+
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard UINavigationController.allowsSwipeBack else {
+            return false
+        }
+
+        return viewControllers.count > 1
+    }
+
+    static private(set) var allowsSwipeBack: Bool = true
+
+    static func setSwipeBack(enabled: Bool) {
+        allowsSwipeBack = enabled
+    }
+}
+```
+
+- Add this file once per project — it enables swipe-back on all push screens globally
+- Use `UINavigationController.setSwipeBack(enabled: false/true)` to toggle on screens where swipe-back conflicts with horizontal gestures (e.g. carousels, pagers)
+- The file belongs in `Extensions/UINavigationController+EXT.swift` and requires no other wiring
+
+```swift
+// Disable on a screen that has a conflicting horizontal gesture
+.onAppear { UINavigationController.setSwipeBack(enabled: false) }
+.onDisappear { UINavigationController.setSwipeBack(enabled: true) }
+```
+
 ## Usage Guide
 
 ### Always use router APIs over native SwiftUI
@@ -458,6 +499,7 @@ IMPORTANT: Any app using SwiftfulRouting MUST use the router for ALL navigation.
 | `.fullScreenCover` | `router.showScreen(.fullScreenCover)` |
 | `.alert` | `router.showAlert(.alert)` |
 | `.confirmationDialog` | `router.showAlert(.confirmationDialog)` |
+| `NavigationStack { }` (manual wrapper) | Nothing — `RouterView` provides it |
 
 ### Default navigation style
 
