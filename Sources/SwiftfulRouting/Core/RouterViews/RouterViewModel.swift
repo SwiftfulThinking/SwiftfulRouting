@@ -806,12 +806,7 @@ extension RouterViewModel {
     
     // Show modal on routerId
     func showModal(routerId: String, modal: AnyModal) {
-        // Every routerId needs an array if it doesn't have one already
-        if allModals[routerId] == nil {
-            allModals[routerId] = []
-        }
-        
-        allModals[routerId]!.append(modal)
+        allModals[routerId, default: []].append(modal)
         logger.trackEvent(event: Event.modalShow(modal: modal))
     }
     
