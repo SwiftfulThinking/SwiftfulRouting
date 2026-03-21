@@ -84,13 +84,18 @@ public struct RouterView<Content: View>: View {
 }
 
 struct RouterViewModelWrapper<Content: View>: View {
-    
+
     @StateObject private var viewModel = RouterViewModel()
+    @Environment(\.rootRouterViewModel) var inheritedRootViewModel
     @ViewBuilder var content: Content
 
     var body: some View {
         content
             .environmentObject(viewModel)
+            // Propagate the topmost RouterViewModel as a custom environment value.
+            // If no parent RouterView exists (inheritedRootViewModel is nil), we are the root — use self.
+            // If a parent RouterView exists, forward its root so all descendants can reach it.
+            .environment(\.rootRouterViewModel, inheritedRootViewModel ?? viewModel)
 
             #if DEBUG
             .onChange(of: viewModel.activeScreenStacks) { newValue in

@@ -9,6 +9,7 @@ import SwiftUI
 
 public struct AnyModal: Identifiable, Equatable {
     public private(set) var id: String
+    public private(set) var location: ModalLocation
     public private(set) var transition: AnyTransition
     public private(set) var animation: Animation
     public private(set) var alignment: Alignment
@@ -19,10 +20,11 @@ public struct AnyModal: Identifiable, Equatable {
     public private(set) var destination: AnyView
     public private(set) var onDismiss: (() -> Void)?
     public private(set) var isRemoved: Bool = false
-    
+
     /// Show a modal.
     /// - Parameters:
     ///   - id: Identifier for modal.
+    ///   - location: Which router to display modal on. Use .topRouter to show on the root RouterView, above all nested routers (e.g. above a tab bar).
     ///   - transition: Transition to show and hide modal.
     ///   - animation: Animation to show and hide modal.
     ///   - alignment: Alignment within the screen.
@@ -34,6 +36,7 @@ public struct AnyModal: Identifiable, Equatable {
     ///   - destination: The modal View.
     public init<T:View>(
         id: String = UUID().uuidString,
+        location: ModalLocation = .currentRouter,
         transition: AnyTransition = .identity,
         animation: Animation = .smooth,
         alignment: Alignment = .center,
@@ -45,6 +48,7 @@ public struct AnyModal: Identifiable, Equatable {
         onDismiss: (() -> Void)? = nil
     ) {
         self.id = id
+        self.location = location
         self.transition = transition
         self.animation = animation
         self.alignment = alignment
@@ -85,6 +89,7 @@ public struct AnyModal: Identifiable, Equatable {
     public var eventParameters: [String: Any] {
         [
             "modal_id": id,
+            "modal_location": location.rawValue,
             "modal_is_removed": isRemoved,
             "modal_dismiss_bg_tap": dismissOnBackgroundTap,
             "modal_has_background_color": backgroundColor != nil,

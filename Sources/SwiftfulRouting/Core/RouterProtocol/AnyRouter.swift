@@ -317,6 +317,7 @@ public struct AnyRouter: Sendable, Router {
     /// Show a modal.
     /// - Parameters:
     ///   - id: Identifier for modal.
+    ///   - location: Which router to display modal on. Use .topRouter to show on the root RouterView, above all nested routers (e.g. above a tab bar).
     ///   - transition: Transition to show and hide modal.
     ///   - animation: Animation to show and hide modal.
     ///   - alignment: Alignment within the screen.
@@ -328,6 +329,7 @@ public struct AnyRouter: Sendable, Router {
     ///   - destination: The modal View.
     @MainActor public func showModal<T>(
         id: String = UUID().uuidString,
+        location: ModalLocation = .currentRouter,
         transition: AnyTransition = .identity,
         animation: Animation = .smooth,
         alignment: Alignment = .center,
@@ -340,6 +342,7 @@ public struct AnyRouter: Sendable, Router {
     ) where T : View {
             let modal = AnyModal(
                 id: id,
+                location: location,
                 transition: transition,
                 animation: animation,
                 alignment: alignment,
@@ -397,28 +400,29 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Dismiss the last modal displayed on this screen.
-    @MainActor public func dismissModal() {
-        object.dismissModal()
+    /// - Parameter location: Which router's modal to dismiss. Use .topRouter to target the root RouterView.
+    @MainActor public func dismissModal(location: ModalLocation = .currentRouter) {
+        object.dismissModal(location: location)
     }
-    
+
     /// Dismiss the modal at id on this screen.
-    @MainActor public func dismissModal(id: String) {
-        object.dismissModal(id: id)
+    @MainActor public func dismissModal(id: String, location: ModalLocation = .currentRouter) {
+        object.dismissModal(id: id, location: location)
     }
-    
+
     /// Dismiss all modals in front of, but not including, modal id on this screen.
-    @MainActor public func dismissModals(upToId: String) {
-        object.dismissModals(upToId: upToId)
+    @MainActor public func dismissModals(upToId: String, location: ModalLocation = .currentRouter) {
+        object.dismissModals(upToId: upToId, location: location)
     }
-    
+
     /// Dismiss specific number modals on this screen.
-    @MainActor public func dismissModals(count: Int) {
-        object.dismissModals(count: count)
+    @MainActor public func dismissModals(count: Int, location: ModalLocation = .currentRouter) {
+        object.dismissModals(count: count, location: location)
     }
-    
+
     /// Dismiss all modals on this screen.
-    @MainActor public func dismissAllModals() {
-        object.dismissAllModals()
+    @MainActor public func dismissAllModals(location: ModalLocation = .currentRouter) {
+        object.dismissAllModals(location: location)
     }
     
     /// Transition current screen.
