@@ -124,23 +124,23 @@ struct MockRouter: Router {
         printError()
     }
     
-    func dismissModal() {
+    func dismissModal(location: ModalLocation = .currentRouter) {
         printError()
     }
     
-    func dismissModal(id: String) {
+    func dismissModal(id: String, location: ModalLocation = .currentRouter) {
         printError()
     }
-    
-    func dismissModals(upToId: String) {
+
+    func dismissModals(upToId: String, location: ModalLocation = .currentRouter) {
         printError()
     }
-    
-    func dismissModals(count: Int) {
+
+    func dismissModals(count: Int, location: ModalLocation = .currentRouter) {
         printError()
     }
-    
-    func dismissAllModals() {
+
+    func dismissAllModals(location: ModalLocation = .currentRouter) {
         printError()
     }
     

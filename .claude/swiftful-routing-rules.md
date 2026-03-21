@@ -279,6 +279,7 @@ router.showBottomModal {
 ```swift
 router.showModal(
     id: String = UUID().uuidString,
+    location: ModalLocation = .currentRouter,    // .currentRouter (default) or .topRouter
     transition: AnyTransition = .identity,       // .opacity, .move(edge:), .scale, .slide, .identity
     animation: Animation = .smooth,              // .smooth, .easeInOut, .spring(), etc.
     alignment: Alignment = .center,              // .center, .bottom, .top, .leading, .trailing
@@ -289,6 +290,27 @@ router.showModal(
     onDismiss: (() -> Void)? = nil,
     destination: @escaping () -> some View
 )
+```
+
+### Modal location
+
+**Default to `.currentRouter`.** Only use `.topRouter` when the user explicitly says the modal is appearing behind the tab bar or behind some other persistent UI layer. The typical symptom is: "the modal shows up but the tab bar is in front of it."
+
+`.topRouter` resolves to the root router of the current `RouterView` hierarchy (the first router in the stack), so the modal renders above everything within that hierarchy.
+
+```swift
+// Default — modal appears on the current screen (use this unless told otherwise)
+router.showModal {
+    MyModal()
+}
+
+// Only when user reports the tab bar is covering the modal
+router.showModal(location: .topRouter) {
+    MyModal()
+}
+
+// Match location on dismiss
+router.dismissModal(location: .topRouter)
 ```
 
 ### Background blur effect
@@ -312,12 +334,19 @@ router.showModal(
 
 ### Dismiss modals
 
+All dismiss methods accept an optional `location` parameter (default `.currentRouter`):
+
 ```swift
-router.dismissModal()                           // dismiss top modal
-router.dismissModal(id: "modal_id")             // dismiss specific modal
-router.dismissModals(count: 2)                  // dismiss last N modals
-router.dismissModals(upToId: "modal_id")        // dismiss down to specific modal
-router.dismissAllModals()                       // dismiss all modals
+router.dismissModal()                                        // dismiss top modal on current router
+router.dismissModal(location: .topRouter)                    // dismiss top modal on root router
+router.dismissModal(id: "modal_id")                          // dismiss specific modal on current router
+router.dismissModal(id: "modal_id", location: .topRouter)    // dismiss specific modal on root router
+router.dismissModals(count: 2)                               // dismiss last N modals on current router
+router.dismissModals(count: 2, location: .topRouter)         // dismiss last N modals on root router
+router.dismissModals(upToId: "modal_id")                     // dismiss down to specific modal
+router.dismissModals(upToId: "modal_id", location: .topRouter)
+router.dismissAllModals()                                    // dismiss all modals on current router
+router.dismissAllModals(location: .topRouter)                // dismiss all modals on root router
 ```
 
 ## Transitions (showTransition)

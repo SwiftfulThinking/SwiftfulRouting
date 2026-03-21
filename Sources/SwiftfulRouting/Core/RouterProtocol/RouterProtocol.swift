@@ -39,11 +39,11 @@ protocol Router: Sendable {
     @MainActor func dismissAllAlerts()
 
     @MainActor func showModal(modal: AnyModal)
-    @MainActor func dismissModal()
-    @MainActor func dismissModal(id: String)
-    @MainActor func dismissModals(upToId: String)
-    @MainActor func dismissModals(count: Int)
-    @MainActor func dismissAllModals()
+    @MainActor func dismissModal(location: ModalLocation)
+    @MainActor func dismissModal(id: String, location: ModalLocation)
+    @MainActor func dismissModals(upToId: String, location: ModalLocation)
+    @MainActor func dismissModals(count: Int, location: ModalLocation)
+    @MainActor func dismissAllModals(location: ModalLocation)
     
     @MainActor func showTransition(transition: AnyTransitionDestination)
     @MainActor func showTransitions(transitions: [AnyTransitionDestination])

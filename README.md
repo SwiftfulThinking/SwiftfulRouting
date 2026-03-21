@@ -604,6 +604,7 @@ Fully customize modal's display.
 ```swift
 router.showModal(
     id: "modal_1", // Id for modal
+    location: .currentRouter, // Which router to display modal on
     transition: .move(edge: .bottom), // AnyTransition
     animation: .smooth, // transition animation
     alignment: .center, // Alignment within screen
@@ -620,10 +621,18 @@ router.showModal(
 )
 ```
 
+Use `location: .topRouter` to display the modal on the root router — above all pushed screens within this `RouterView` hierarchy.
+
+```swift
+router.showModal(location: .topRouter) {
+    MyModal()
+}
+```
+
 Modal methods also accept `AnyModal` as a convenience.
 
 ```
-let modal = AnyModal {
+let modal = AnyModal(location: .topRouter) {
     MyModal()
 }
 
@@ -636,34 +645,23 @@ Trigger multiple modals at the same time.
 router.showModals(modals: [modal1, modal2])
 ```
 
-Dismiss the last modal displayed.
+All dismiss methods accept an optional `location` parameter (`.currentRouter` by default). Pass `location: .topRouter` to target the root router instead.
 
 ```swift
 router.dismissModal()
-```
+router.dismissModal(location: .topRouter)
 
-Dismiss modal by id.
-
-```swift
 router.dismissModal(id: "modal_1")
-```
+router.dismissModal(id: "modal_1", location: .topRouter)
 
-Dismiss modals above, but not including, id.
+router.dismissModals(upToId: "modal_1")
+router.dismissModals(upToId: "modal_1", location: .topRouter)
 
-```swift
-router.dismissModals(upToModalId: "modal_1")
-```
-
-Dismiss specific number of modals.
-
-```swift
 router.dismissModals(count: 2)
-```
+router.dismissModals(count: 2, location: .topRouter)
 
-Dismiss all modals.
-
-```swift
 router.dismissAllModals()
+router.dismissAllModals(location: .topRouter)
 ```
 
 Additional convenience methods:

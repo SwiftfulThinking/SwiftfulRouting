@@ -806,15 +806,17 @@ extension RouterViewModel {
     
     // Show modal on routerId
     func showModal(routerId: String, modal: AnyModal) {
-        // Every routerId needs an array if it doesn't have one already
-        if allModals[routerId] == nil {
-            allModals[routerId] = []
-        }
-        
-        allModals[routerId]!.append(modal)
+        let targetRouterId = modal.location == .topRouter ? RouterViewModel.rootId : routerId
+        allModals[targetRouterId, default: []].append(modal)
         logger.trackEvent(event: Event.modalShow(modal: modal))
     }
-    
+
+    // Dismiss the last modal on routerId, with optional location routing
+    func dismissLastModal(routerId: String, location: ModalLocation) {
+        let targetRouterId = location == .topRouter ? RouterViewModel.rootId : routerId
+        dismissLastModal(onRouterId: targetRouterId)
+    }
+
     // Dismiss the last modal on routerId
     func dismissLastModal(onRouterId routerId: String) {
         let allModals = (allModals[routerId] ?? []).filter({ !$0.isRemoved })
