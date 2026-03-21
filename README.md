@@ -414,6 +414,49 @@ Dismiss all screens in the screen heirarchy.
 ```swift
 router.dismissAllScreens()
 ```
+
+**Native Swipe-Back Gesture**
+
+SwiftfulRouting uses UIKit's `UINavigationController` under the hood. By default, the interactive pop gesture recognizer's delegate is overridden by SwiftUI, which disables the native swipe-back gesture on push screens. Add the following extension once anywhere in your app to re-enable it globally:
+
+```swift
+// Extensions/UINavigationController+EXT.swift
+import Foundation
+
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard UINavigationController.allowsSwipeBack else {
+            return false
+        }
+
+        return viewControllers.count > 1
+    }
+
+    static private(set) var allowsSwipeBack: Bool = true
+
+    static func setSwipeBack(enabled: Bool) {
+        allowsSwipeBack = enabled
+    }
+}
+```
+
+This extension:
+- Re-enables the native edge-swipe-back gesture on all push screens globally
+- Provides a global `UINavigationController.setSwipeBack(enabled:)` toggle — call it to temporarily disable swipe-back on screens where it conflicts with custom gestures (e.g. horizontal carousels, pagers)
+- Is safe to add once and forget — it does not break any existing SwiftfulRouting APIs
+
+**Disable swipe-back on a specific screen (e.g. from a Presenter):**
+
+```swift
+.onAppear { UINavigationController.setSwipeBack(enabled: false) }
+.onDisappear { UINavigationController.setSwipeBack(enabled: true) }
+```
+
 </details>
 
 ## Screen Queue
@@ -1008,48 +1051,6 @@ router.activeModules
 ```
 
 </details>
-
-## Native Swipe-Back Gesture
-
-SwiftfulRouting uses UIKit's `UINavigationController` under the hood. By default, the interactive pop gesture recognizer's delegate is overridden by SwiftUI, which disables the native swipe-back gesture on push screens. Add the following extension once anywhere in your app to re-enable it globally:
-
-```swift
-// Extensions/UINavigationController+EXT.swift
-import Foundation
-
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard UINavigationController.allowsSwipeBack else {
-            return false
-        }
-
-        return viewControllers.count > 1
-    }
-
-    static private(set) var allowsSwipeBack: Bool = true
-
-    static func setSwipeBack(enabled: Bool) {
-        allowsSwipeBack = enabled
-    }
-}
-```
-
-This extension:
-- Re-enables the native edge-swipe-back gesture on all push screens globally
-- Provides a global `UINavigationController.setSwipeBack(enabled:)` toggle — call it to temporarily disable swipe-back on screens where it conflicts with custom gestures (e.g. horizontal carousels, pagers)
-- Is safe to add once and forget — it does not break any existing SwiftfulRouting APIs
-
-**Disable swipe-back on a specific screen (e.g. from a Presenter):**
-
-```swift
-.onAppear { UINavigationController.setSwipeBack(enabled: false) }
-.onDisappear { UINavigationController.setSwipeBack(enabled: true) }
-```
 
 ## Tabbar & App Structure
 
