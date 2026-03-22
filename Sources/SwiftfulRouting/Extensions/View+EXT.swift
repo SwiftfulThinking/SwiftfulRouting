@@ -26,4 +26,8 @@ extension View {
         }
     }
 
+    func routerPreference(_ router: AnyRouter) -> some View {
+        modifier(RouterPreferenceModifier(router: router))
+    }
+
 }
