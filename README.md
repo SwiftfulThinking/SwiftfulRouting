@@ -621,10 +621,10 @@ router.showModal(
 )
 ```
 
-Use `location: .topRouter` to display the modal on the root `RouterView`, above all nested routers. This is useful in tab-based apps where each tab has its own `RouterView` and the modal should appear above the tab bar.
+Use `location: .rootRouter` to display the modal on the root `RouterView`, above all nested routers. This is useful in tab-based apps where each tab has its own `RouterView` and the modal should appear above the tab bar.
 
 ```swift
-router.showModal(location: .topRouter) {
+router.showModal(location: .rootRouter) {
     MyModal()
 }
 ```
@@ -632,7 +632,7 @@ router.showModal(location: .topRouter) {
 Modal methods also accept `AnyModal` as a convenience.
 
 ```
-let modal = AnyModal(location: .topRouter) {
+let modal = AnyModal(location: .rootRouter) {
     MyModal()
 }
 
@@ -649,19 +649,19 @@ All dismiss methods accept an optional `location` parameter (`.currentRouter` by
 
 ```swift
 router.dismissModal()
-router.dismissModal(location: .topRouter)
+router.dismissModal(location: .rootRouter)
 
 router.dismissModal(id: "modal_1")
-router.dismissModal(id: "modal_1", location: .topRouter)
+router.dismissModal(id: "modal_1", location: .rootRouter)
 
 router.dismissModals(upToId: "modal_1")
-router.dismissModals(upToId: "modal_1", location: .topRouter)
+router.dismissModals(upToId: "modal_1", location: .rootRouter)
 
 router.dismissModals(count: 2)
-router.dismissModals(count: 2, location: .topRouter)
+router.dismissModals(count: 2, location: .rootRouter)
 
 router.dismissAllModals()
-router.dismissAllModals(location: .topRouter)
+router.dismissAllModals(location: .rootRouter)
 ```
 
 Additional convenience methods:

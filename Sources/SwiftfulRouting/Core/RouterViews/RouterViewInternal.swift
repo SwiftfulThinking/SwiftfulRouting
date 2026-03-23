@@ -267,38 +267,38 @@ struct RouterViewInternal<Content: View>: View, Router {
     }
     
     func showModal(modal: AnyModal) {
-        let vm = modal.location == .topRouter ? (rootRouterViewModel ?? viewModel) : viewModel
-        let targetRouterId = modal.location == .topRouter ? RouterViewModel.rootId : routerId
+        let vm = modal.location == .rootRouter ? (rootRouterViewModel ?? viewModel) : viewModel
+        let targetRouterId = modal.location == .rootRouter ? RouterViewModel.rootId : routerId
         vm.showModal(routerId: targetRouterId, modal: modal)
     }
 
     func dismissModal(location: ModalLocation = .currentRouter) {
-        let vm = location == .topRouter ? (rootRouterViewModel ?? viewModel) : viewModel
-        let targetRouterId = location == .topRouter ? RouterViewModel.rootId : routerId
+        let vm = location == .rootRouter ? (rootRouterViewModel ?? viewModel) : viewModel
+        let targetRouterId = location == .rootRouter ? RouterViewModel.rootId : routerId
         vm.dismissLastModal(onRouterId: targetRouterId)
     }
 
     func dismissModal(id: String, location: ModalLocation = .currentRouter) {
-        let vm = location == .topRouter ? (rootRouterViewModel ?? viewModel) : viewModel
-        let targetRouterId = location == .topRouter ? RouterViewModel.rootId : routerId
+        let vm = location == .rootRouter ? (rootRouterViewModel ?? viewModel) : viewModel
+        let targetRouterId = location == .rootRouter ? RouterViewModel.rootId : routerId
         vm.dismissModal(routerId: targetRouterId, modalId: id)
     }
 
     func dismissModals(upToId: String, location: ModalLocation = .currentRouter) {
-        let vm = location == .topRouter ? (rootRouterViewModel ?? viewModel) : viewModel
-        let targetRouterId = location == .topRouter ? RouterViewModel.rootId : routerId
+        let vm = location == .rootRouter ? (rootRouterViewModel ?? viewModel) : viewModel
+        let targetRouterId = location == .rootRouter ? RouterViewModel.rootId : routerId
         vm.dismissModals(routerId: targetRouterId, to: upToId)
     }
 
     func dismissModals(count: Int, location: ModalLocation = .currentRouter) {
-        let vm = location == .topRouter ? (rootRouterViewModel ?? viewModel) : viewModel
-        let targetRouterId = location == .topRouter ? RouterViewModel.rootId : routerId
+        let vm = location == .rootRouter ? (rootRouterViewModel ?? viewModel) : viewModel
+        let targetRouterId = location == .rootRouter ? RouterViewModel.rootId : routerId
         vm.dismissModals(routerId: targetRouterId, count: count)
     }
 
     func dismissAllModals(location: ModalLocation = .currentRouter) {
-        let vm = location == .topRouter ? (rootRouterViewModel ?? viewModel) : viewModel
-        let targetRouterId = location == .topRouter ? RouterViewModel.rootId : routerId
+        let vm = location == .rootRouter ? (rootRouterViewModel ?? viewModel) : viewModel
+        let targetRouterId = location == .rootRouter ? RouterViewModel.rootId : routerId
         vm.dismissAllModals(routerId: targetRouterId)
     }
     

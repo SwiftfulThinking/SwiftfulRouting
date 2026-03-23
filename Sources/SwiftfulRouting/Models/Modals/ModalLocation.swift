@@ -7,5 +7,5 @@
 import Foundation
 
 public enum ModalLocation: String {
-    case currentRouter, topRouter
+    case currentRouter, rootRouter
 }

@@ -24,7 +24,7 @@ public struct AnyModal: Identifiable, Equatable {
     /// Show a modal.
     /// - Parameters:
     ///   - id: Identifier for modal.
-    ///   - location: Which router to display modal on. Use .topRouter to show on the root RouterView, above all nested routers (e.g. above a tab bar).
+    ///   - location: Which router to display modal on. Use .rootRouter to show on the root RouterView, above all nested routers (e.g. above a tab bar).
     ///   - transition: Transition to show and hide modal.
     ///   - animation: Animation to show and hide modal.
     ///   - alignment: Alignment within the screen.

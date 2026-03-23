@@ -317,7 +317,7 @@ public struct AnyRouter: Sendable, Router {
     /// Show a modal.
     /// - Parameters:
     ///   - id: Identifier for modal.
-    ///   - location: Which router to display modal on. Use .topRouter to show on the root RouterView, above all nested routers (e.g. above a tab bar).
+    ///   - location: Which router to display modal on. Use .rootRouter to show on the root RouterView, above all nested routers (e.g. above a tab bar).
     ///   - transition: Transition to show and hide modal.
     ///   - animation: Animation to show and hide modal.
     ///   - alignment: Alignment within the screen.
@@ -400,7 +400,7 @@ public struct AnyRouter: Sendable, Router {
     }
     
     /// Dismiss the last modal displayed on this screen.
-    /// - Parameter location: Which router's modal to dismiss. Use .topRouter to target the root RouterView.
+    /// - Parameter location: Which router's modal to dismiss. Use .rootRouter to target the root RouterView.
     @MainActor public func dismissModal(location: ModalLocation = .currentRouter) {
         object.dismissModal(location: location)
     }
