@@ -10,6 +10,7 @@ import SwiftUI
 struct RouterViewInternal<Content: View>: View, Router {
     
     @Environment(\.openURL) var openURL
+    @Environment(\.rootRouter) var inheritedRootRouter
 
     @EnvironmentObject var viewModel: RouterViewModel
     @EnvironmentObject var moduleViewModel: ModuleViewModel
@@ -115,6 +116,8 @@ struct RouterViewInternal<Content: View>: View, Router {
         
         // Add to environment for convenience
         .environment(\.router, currentRouter)
+        // Propagate the root AnyRouter. If no parent RouterView exists, we are the root — use self.
+        .environment(\.rootRouter, inheritedRootRouter ?? currentRouter)
     }
     
     private var parentDestination: AnyDestination? {
@@ -365,6 +368,10 @@ struct RouterViewInternal<Content: View>: View, Router {
         let url = url()
         openURL(url)
         logger.trackEvent(event: RouterViewModel.Event.showSafari(url: url))
+    }
+
+    func getRootRouter() -> AnyRouter {
+        inheritedRootRouter ?? currentRouter
     }
 }
 
