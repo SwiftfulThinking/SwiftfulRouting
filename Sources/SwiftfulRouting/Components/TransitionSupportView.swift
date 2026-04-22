@@ -53,10 +53,11 @@ struct TransitionSupportView<Content:View>: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .transactionAnimationIfAvailable(
-            value: (transitions.last?.id ?? "") + currentTransition.id,
-            transition: currentTransition
-        )
+        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
+//        .transactionAnimationIfAvailable(
+//            value: (transitions.last?.id ?? "") + currentTransition.id,
+//            transition: currentTransition
+//        )
 //        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
 //        .ifSatisfiesCondition(viewFrame == .zero, transform: { content in
 //            content
