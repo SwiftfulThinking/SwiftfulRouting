@@ -20,11 +20,15 @@ struct TransitionSupportView<Content:View>: View {
     @State private var viewFrame: CGRect = UIScreen.main.bounds
 
     var body: some View {
-        ZStack {
+        let _ = Self._printChanges()
+        let _ = print("[SR-TSV] body router=\(router.id) txCount=\(transitions.count) lastTxId=\(transitions.last?.id ?? "-") currentTx=\(currentTransition.id) behavior=\(behavior)")
+        return ZStack {
             LazyZStack(allowSimultaneous: behavior.allowSimultaneous, selection: transitions.last, items: transitions) { data in
                 let dataIndex: Double = Double(transitions.firstIndex(where: { $0.id == data.id }) ?? 99)
                 let allowsSwipeBack: Bool = data.transition.canSwipeBack && data.allowsSwipeBack
-                
+
+                let _ = print("[SR-TSV] LazyZStack item router=\(router.id) dataId=\(data.id) isFirst=\(data == transitions.first) dataIndex=\(dataIndex)")
+
                 return Group {
                     if data == transitions.first {
                         content(router)
@@ -77,7 +81,9 @@ extension View {
         if #available(iOS 17.0, *) {
             self
                 .transaction(value: value) { transaction in
+                    let prior = transaction.animation
                     transaction.animation = transition.animation
+                    print("[SR-TXN] transaction fired value=\(value) priorAnim=\(String(describing: prior)) newAnim=\(String(describing: transition.animation)) transitionId=\(transition.id)")
                 }
         } else {
             self.animation(transition.animation, value: value)

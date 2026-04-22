@@ -908,15 +908,17 @@ extension RouterViewModel {
     func showTransition(routerId: String, transition: AnyTransitionDestination) {
         // Set the current transition before triggering the UI update
         // This can change the existing screen's "removal" transition, based on the incomign screens transition
+        print("[SR-VM] showTransition START router=\(routerId) txId=\(transition.id) txType=\(transition.transition.id) existingAllTxCount=\(allTransitions[routerId]?.count ?? -1)")
         self.currentTransitions[routerId] = transition.transition
-        
+
         Task { @MainActor in
             // The OS needs a slight delay to update the existing screen's transition
             try? await Task.sleep(nanoseconds: 1_000_000)
-            
+
             // Trigger the UI update
             // allTransitions[routerId] should never be nil since it's added in showScreen
             self.allTransitions[routerId]?.append(transition)
+            print("[SR-VM] showTransition APPENDED router=\(routerId) txId=\(transition.id) newAllTxCount=\(allTransitions[routerId]?.count ?? -1)")
             logger.trackEvent(event: Event.transitionShow(transition: transition))
         }
     }
