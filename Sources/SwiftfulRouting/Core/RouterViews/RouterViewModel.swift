@@ -917,7 +917,18 @@ extension RouterViewModel {
 
             // Trigger the UI update
             // allTransitions[routerId] should never be nil since it's added in showScreen
-            self.allTransitions[routerId]?.append(transition)
+            //
+            // Wrap the state change in `withAnimation` so SwiftUI treats the
+            // diff of the new transition as animated with the caller's
+            // preferred animation. Prior to iOS 26.x this was handled via the
+            // `.transaction(value:)` modifier on TransitionSupportView, but
+            // newer iOS versions became unreliable at picking up transactions
+            // across complex view trees (e.g. when presented from inside a
+            // TabView / nested sheet). `withAnimation` is SwiftUI's canonical
+            // contract and propagates reliably.
+            withAnimation(transition.transition.animation) {
+                self.allTransitions[routerId]?.append(transition)
+            }
             print("[SR-VM] showTransition APPENDED router=\(routerId) txId=\(transition.id) newAllTxCount=\(allTransitions[routerId]?.count ?? -1)")
             logger.trackEvent(event: Event.transitionShow(transition: transition))
         }
@@ -927,14 +938,16 @@ extension RouterViewModel {
     func showTransitions(routerId: String, transitions: [AnyTransitionDestination]) {
         // Removal of existing screen is based on the last transition requested (ie. the top-most transition)
         guard let lastTransition = transitions.last else { return }
-        
+
         // Same as above (showTransition)
-        
+
         self.currentTransitions[routerId] = lastTransition.transition
-        
+
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_000_000)
-            self.allTransitions[routerId]?.append(contentsOf: transitions)
+            withAnimation(lastTransition.transition.animation) {
+                self.allTransitions[routerId]?.append(contentsOf: transitions)
+            }
             logger.trackEvent(event: Event.transitionShow(transition: lastTransition))
         }
     }
@@ -1003,12 +1016,12 @@ extension RouterViewModel {
     private func triggerAndRemoveTransitions(routerId: String, newCurrentTransition: TransitionOption, screensToDismiss: [AnyTransitionDestination], removeTransitionsAtRange: Range<Int>) {
         // Set current transition
         self.currentTransitions[routerId] = newCurrentTransition
-        
+
         // Task is needed for UI
         Task { @MainActor in
             // Not required but doesn't hurt?
             try? await Task.sleep(nanoseconds: 1_000_000)
-            
+
             defer {
                 for screen in screensToDismiss.reversed() {
                     // Trigger onDismiss for screens
@@ -1016,9 +1029,14 @@ extension RouterViewModel {
                     logger.trackEvent(event: Event.transitionDismiss(transition: screen))
                 }
             }
-            
-            // Trigger UI update
-            self.allTransitions[routerId]?.removeSubrange(removeTransitionsAtRange)
+
+            // Trigger UI update. Wrap in `withAnimation` for the same reason
+            // as showTransition — iOS 26.x onward doesn't reliably pick up
+            // animations via `.transaction(value:)` in complex view trees,
+            // whereas `withAnimation` is SwiftUI's canonical contract.
+            withAnimation(newCurrentTransition.animation) {
+                self.allTransitions[routerId]?.removeSubrange(removeTransitionsAtRange)
+            }
         }
     }
     
