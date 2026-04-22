@@ -21,7 +21,7 @@ struct TransitionSupportView<Content:View>: View {
 
     var body: some View {
         ZStack {
-            LazyZStack(allowSimultaneous: behavior.allowSimultaneous, selection: transitions.last, items: transitions) { data in
+            LazyZStack(allowSimultaneous: true, selection: transitions.last, items: transitions) { data in
                 let dataIndex: Double = Double(transitions.firstIndex(where: { $0.id == data.id }) ?? 99)
                 let allowsSwipeBack: Bool = data.transition.canSwipeBack && data.allowsSwipeBack
                 
@@ -29,24 +29,24 @@ struct TransitionSupportView<Content:View>: View {
                     if data == transitions.first {
                         content(router)
                     } else {
-                        if allowsSwipeBack {
-                            SwipeBackSupportContainer(
-                                insertionTransition: data.transition,
-                                swipeThreshold: 30,
-                                content: {
-                                    AnyView(data.destination(router))
-                                },
-                                onDidSwipeBack: onDidSwipeBack
-                            )
-                        } else {
+//                        if allowsSwipeBack {
+//                            SwipeBackSupportContainer(
+//                                insertionTransition: data.transition,
+//                                swipeThreshold: 30,
+//                                content: {
+//                                    AnyView(data.destination(router))
+//                                },
+//                                onDidSwipeBack: onDidSwipeBack
+//                            )
+//                        } else {
                             AnyView(data.destination(router))
-                        }
+//                        }
                     }
                 }
                 .transition(
                     .asymmetric(
-                        insertion: currentTransition.insertion,
-                        removal: .customRemoval(behavior: behavior, direction: currentTransition.reversed, frame: viewFrame)
+                        insertion: .move(edge: .trailing).animation(.easeInOut),
+                        removal: .move(edge: .leading).animation(.easeInOut)
                     )
                 )
                 .zIndex(dataIndex)
