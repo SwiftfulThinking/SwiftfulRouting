@@ -924,7 +924,7 @@ extension RouterViewModel {
                 self.allTransitions[routerId]?.append(transition)
             }
             print("[SR-VM] showTransition APPENDED router=\(routerId) txId=\(transition.id) newAllTxCount=\(self.allTransitions[routerId]?.count ?? -1)")
-            self.logger.trackEvent(event: Event.transitionShow(transition: transition))
+            logger.trackEvent(event: Event.transitionShow(transition: transition))
         }
     }
     
@@ -942,7 +942,7 @@ extension RouterViewModel {
             withAnimation(lastTransition.transition.animation) {
                 self.allTransitions[routerId]?.append(contentsOf: transitions)
             }
-            self.logger.trackEvent(event: Event.transitionShow(transition: lastTransition))
+            logger.trackEvent(event: Event.transitionShow(transition: lastTransition))
         }
     }
     
@@ -1019,7 +1019,7 @@ extension RouterViewModel {
                 for screen in screensToDismiss.reversed() {
                     // Trigger onDismiss for screens
                     screen.onDismiss?()
-                    self.logger.trackEvent(event: Event.transitionDismiss(transition: screen))
+                    logger.trackEvent(event: Event.transitionDismiss(transition: screen))
                 }
             }
 
