@@ -55,6 +55,13 @@ struct TransitionSupportView<Content:View>: View {
                 )
                 .zIndex(dataIndex)
             }
+            // Explicit `.animation(_:value:)` on the LazyZStack. Needed because
+            // in complex view trees on iOS 26.x, SwiftUI doesn't reliably apply
+            // transaction-based animations (`withAnimation` / `.transaction`)
+            // to view insertions inside recursive AnyConditionalView structures.
+            // Binding the animation to `transitions.last?.id` gives SwiftUI an
+            // explicit diff value to animate against.
+            .animation(currentTransition.animation, value: transitions.last?.id)
         }
         // Sniffer BEFORE package's transaction modifier — sees what SwiftUI
         // inherited from the parent view tree. If animation is nil here,
