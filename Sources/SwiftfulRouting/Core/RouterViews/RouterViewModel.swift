@@ -911,26 +911,20 @@ extension RouterViewModel {
         print("[SR-VM] showTransition START router=\(routerId) txId=\(transition.id) txType=\(transition.transition.id) existingAllTxCount=\(allTransitions[routerId]?.count ?? -1)")
         self.currentTransitions[routerId] = transition.transition
 
-        Task { @MainActor in
-            // The OS needs a slight delay to update the existing screen's transition
-            try? await Task.sleep(nanoseconds: 1_000_000)
-
+        // Use DispatchQueue.main.asyncAfter (NOT Task + Task.sleep). Task-based
+        // scheduling can resume on the same run-loop tick as the calling code,
+        // which causes SwiftUI to coalesce the transaction and skip the
+        // animation. asyncAfter guarantees a fresh run-loop iteration so
+        // SwiftUI sees the state change as its own transaction with the
+        // animation context applied via `withAnimation`.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
             // Trigger the UI update
             // allTransitions[routerId] should never be nil since it's added in showScreen
-            //
-            // Wrap the state change in `withAnimation` so SwiftUI treats the
-            // diff of the new transition as animated with the caller's
-            // preferred animation. Prior to iOS 26.x this was handled via the
-            // `.transaction(value:)` modifier on TransitionSupportView, but
-            // newer iOS versions became unreliable at picking up transactions
-            // across complex view trees (e.g. when presented from inside a
-            // TabView / nested sheet). `withAnimation` is SwiftUI's canonical
-            // contract and propagates reliably.
             withAnimation(transition.transition.animation) {
                 self.allTransitions[routerId]?.append(transition)
             }
-            print("[SR-VM] showTransition APPENDED router=\(routerId) txId=\(transition.id) newAllTxCount=\(allTransitions[routerId]?.count ?? -1)")
-            logger.trackEvent(event: Event.transitionShow(transition: transition))
+            print("[SR-VM] showTransition APPENDED router=\(routerId) txId=\(transition.id) newAllTxCount=\(self.allTransitions[routerId]?.count ?? -1)")
+            self.logger.trackEvent(event: Event.transitionShow(transition: transition))
         }
     }
     
@@ -943,12 +937,12 @@ extension RouterViewModel {
 
         self.currentTransitions[routerId] = lastTransition.transition
 
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 1_000_000)
+        // See showTransition for why asyncAfter (not Task.sleep).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
             withAnimation(lastTransition.transition.animation) {
                 self.allTransitions[routerId]?.append(contentsOf: transitions)
             }
-            logger.trackEvent(event: Event.transitionShow(transition: lastTransition))
+            self.logger.trackEvent(event: Event.transitionShow(transition: lastTransition))
         }
     }
     
@@ -1017,23 +1011,18 @@ extension RouterViewModel {
         // Set current transition
         self.currentTransitions[routerId] = newCurrentTransition
 
-        // Task is needed for UI
-        Task { @MainActor in
-            // Not required but doesn't hurt?
-            try? await Task.sleep(nanoseconds: 1_000_000)
-
+        // See showTransition for why asyncAfter (not Task.sleep) — Task-based
+        // scheduling can resume on the same run-loop tick and cause SwiftUI
+        // to coalesce the state change without animation.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
             defer {
                 for screen in screensToDismiss.reversed() {
                     // Trigger onDismiss for screens
                     screen.onDismiss?()
-                    logger.trackEvent(event: Event.transitionDismiss(transition: screen))
+                    self.logger.trackEvent(event: Event.transitionDismiss(transition: screen))
                 }
             }
 
-            // Trigger UI update. Wrap in `withAnimation` for the same reason
-            // as showTransition — iOS 26.x onward doesn't reliably pick up
-            // animations via `.transaction(value:)` in complex view trees,
-            // whereas `withAnimation` is SwiftUI's canonical contract.
             withAnimation(newCurrentTransition.animation) {
                 self.allTransitions[routerId]?.removeSubrange(removeTransitionsAtRange)
             }
