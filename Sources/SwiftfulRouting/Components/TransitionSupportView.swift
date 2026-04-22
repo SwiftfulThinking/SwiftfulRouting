@@ -25,18 +25,10 @@ struct TransitionSupportView<Content:View>: View {
                 let dataIndex: Double = Double(transitions.firstIndex(where: { $0.id == data.id }) ?? 99)
                 let allowsSwipeBack: Bool = data.transition.canSwipeBack && data.allowsSwipeBack
                 
-                if data == transitions.first {
-                    return content(router)
-                        .transition(
-                            .asymmetric(
-                                insertion: .move(edge: .trailing).animation(.easeInOut),
-                                removal: .move(edge: .leading).animation(.easeInOut)
-                            )
-                        )
-                        .zIndex(dataIndex)
-                        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
-
-                } else {
+                return Group {
+                    if data == transitions.first {
+                        content(router)
+                    } else {
 //                        if allowsSwipeBack {
 //                            SwipeBackSupportContainer(
 //                                insertionTransition: data.transition,
@@ -47,26 +39,27 @@ struct TransitionSupportView<Content:View>: View {
 //                                onDidSwipeBack: onDidSwipeBack
 //                            )
 //                        } else {
-                    return AnyView(data.destination(router))
-                        .transition(
-                            .asymmetric(
-                                insertion: .move(edge: .trailing).animation(.easeInOut),
-                                removal: .move(edge: .leading).animation(.easeInOut)
-                            )
-                        )
-                        .zIndex(dataIndex)
-                        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
-
+                            AnyView(data.destination(router))
+                                .id(data.id)
 //                        }
+                    }
                 }
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: .trailing).animation(.easeInOut),
+                        removal: .move(edge: .leading).animation(.easeInOut)
+                    )
+                )
+                .zIndex(dataIndex)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
-//        .transactionAnimationIfAvailable(
-//            value: (transitions.last?.id ?? "") + currentTransition.id,
-//            transition: currentTransition
-//        )
+        .transactionAnimationIfAvailable(
+            value: (transitions.last?.id ?? "") + currentTransition.id,
+            transition: currentTransition
+        )
+        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
 //        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
 //        .ifSatisfiesCondition(viewFrame == .zero, transform: { content in
 //            content
