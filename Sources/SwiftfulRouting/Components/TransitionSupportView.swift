@@ -25,10 +25,18 @@ struct TransitionSupportView<Content:View>: View {
                 let dataIndex: Double = Double(transitions.firstIndex(where: { $0.id == data.id }) ?? 99)
                 let allowsSwipeBack: Bool = data.transition.canSwipeBack && data.allowsSwipeBack
                 
-                return Group {
-                    if data == transitions.first {
-                        content(router)
-                    } else {
+                if data == transitions.first {
+                    return content(router)
+                        .transition(
+                            .asymmetric(
+                                insertion: .move(edge: .trailing).animation(.easeInOut),
+                                removal: .move(edge: .leading).animation(.easeInOut)
+                            )
+                        )
+                        .zIndex(dataIndex)
+                        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
+
+                } else {
 //                        if allowsSwipeBack {
 //                            SwipeBackSupportContainer(
 //                                insertionTransition: data.transition,
@@ -39,17 +47,18 @@ struct TransitionSupportView<Content:View>: View {
 //                                onDidSwipeBack: onDidSwipeBack
 //                            )
 //                        } else {
-                            AnyView(data.destination(router))
+                    return AnyView(data.destination(router))
+                        .transition(
+                            .asymmetric(
+                                insertion: .move(edge: .trailing).animation(.easeInOut),
+                                removal: .move(edge: .leading).animation(.easeInOut)
+                            )
+                        )
+                        .zIndex(dataIndex)
+                        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
+
 //                        }
-                    }
                 }
-                .transition(
-                    .asymmetric(
-                        insertion: .move(edge: .trailing).animation(.easeInOut),
-                        removal: .move(edge: .leading).animation(.easeInOut)
-                    )
-                )
-                .zIndex(dataIndex)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
