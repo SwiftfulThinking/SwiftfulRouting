@@ -56,11 +56,24 @@ struct TransitionSupportView<Content:View>: View {
                 .zIndex(dataIndex)
             }
         }
+        // Sniffer BEFORE package's transaction modifier — sees what SwiftUI
+        // inherited from the parent view tree. If animation is nil here,
+        // SwiftUI already stripped it before reaching our code.
+        .transaction { t in
+            let router = self.router
+            print("[SR-SNIFF-IN] router=\(router.id) parentInheritedAnim=\(String(describing: t.animation)) disables=\(t.disablesAnimations)")
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .transactionAnimationIfAvailable(
             value: (transitions.last?.id ?? "") + currentTransition.id,
             transition: currentTransition
         )
+        // Sniffer AFTER package's transaction modifier — confirms the animation
+        // is present on the transaction SwiftUI will actually use to render.
+        .transaction { t in
+            let router = self.router
+            print("[SR-SNIFF-OUT] router=\(router.id) finalAnim=\(String(describing: t.animation)) disables=\(t.disablesAnimations)")
+        }
 //        .animation(currentTransition.animation, value: (transitions.last?.id ?? "") + currentTransition.id)
 //        .ifSatisfiesCondition(viewFrame == .zero, transform: { content in
 //            content
