@@ -45,7 +45,7 @@ struct TransitionSupportView<Content:View>: View {
                 }
                 .transition(
                     .asymmetric(
-                        insertion: currentTransition.insertion,
+                        insertion: .customRemoval(behavior: behavior, direction: currentTransition, frame: viewFrame),
                         removal: .customRemoval(behavior: behavior, direction: currentTransition.reversed, frame: viewFrame)
                     )
                 )
