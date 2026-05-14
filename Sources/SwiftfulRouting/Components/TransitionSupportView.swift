@@ -29,23 +29,29 @@ struct TransitionSupportView<Content:View>: View {
                     if data == transitions.first {
                         content(router)
                     } else {
-                        if allowsSwipeBack {
-                            SwipeBackSupportContainer(
-                                insertionTransition: data.transition,
-                                swipeThreshold: 30,
-                                content: {
-                                    AnyView(data.destination(router))
-                                },
-                                onDidSwipeBack: onDidSwipeBack
-                            )
-                        } else {
-                            AnyView(data.destination(router))
+                        ManualInsertionSlide(
+                            option: currentTransition,
+                            frame: viewFrame,
+                            animation: currentTransition.animation
+                        ) {
+                            if allowsSwipeBack {
+                                SwipeBackSupportContainer(
+                                    insertionTransition: data.transition,
+                                    swipeThreshold: 30,
+                                    content: {
+                                        AnyView(data.destination(router))
+                                    },
+                                    onDidSwipeBack: onDidSwipeBack
+                                )
+                            } else {
+                                AnyView(data.destination(router))
+                            }
                         }
                     }
                 }
                 .transition(
                     .asymmetric(
-                        insertion: currentTransition.insertion,
+                        insertion: .identity,
                         removal: .customRemoval(behavior: behavior, direction: currentTransition.reversed, frame: viewFrame)
                     )
                 )
@@ -71,7 +77,7 @@ struct TransitionSupportView<Content:View>: View {
 }
 
 extension View {
-    
+
     @ViewBuilder
     func transactionAnimationIfAvailable<T: Equatable>(value: T, transition: TransitionOption) -> some View {
         if #available(iOS 17.0, *) {
@@ -83,5 +89,46 @@ extension View {
             self.animation(transition.animation, value: value)
         }
     }
-    
+
+}
+
+// Workaround: on iOS 26, SwiftUI at the root host skips applying the active state
+// of an inserted view's `.transition`. Drive the slide-in via @State + .onAppear
+// + withAnimation so SwiftUI just animates a state change on an already-rendered
+// view, bypassing the broken insertion-transition pipeline.
+private struct ManualInsertionSlide<Content: View>: View {
+    let option: TransitionOption
+    let frame: CGRect
+    let animation: Animation?
+    @ViewBuilder let content: () -> Content
+
+    @State private var hasSlidIn: Bool = false
+
+    var body: some View {
+        content()
+            .offset(
+                x: hasSlidIn ? 0 : initialXOffset,
+                y: hasSlidIn ? 0 : initialYOffset
+            )
+            .animation(animation, value: hasSlidIn)
+            .onAppear {
+                hasSlidIn = true
+            }
+    }
+
+    private var initialXOffset: CGFloat {
+        switch option {
+        case .trailing: return frame.width
+        case .leading:  return -frame.width
+        default:        return 0
+        }
+    }
+
+    private var initialYOffset: CGFloat {
+        switch option {
+        case .top:    return -frame.height
+        case .bottom: return frame.height
+        default:      return 0
+        }
+    }
 }
