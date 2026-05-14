@@ -110,10 +110,9 @@ private struct ManualInsertionSlide<Content: View>: View {
                 x: hasSlidIn ? 0 : initialXOffset,
                 y: hasSlidIn ? 0 : initialYOffset
             )
+            .animation(animation, value: hasSlidIn)
             .onAppear {
-                withAnimation(animation) {
-                    hasSlidIn = true
-                }
+                hasSlidIn = true
             }
     }
 
