@@ -13,9 +13,16 @@ final class StableAnyDestinationArray: ObservableObject, Equatable {
         self.destinations = destinations
     }
     
-    func setNewValueIfNeeded(newValue: [AnyDestination]) {
-        if destinations != newValue {
+    func setNewValueIfNeeded(newValue: [AnyDestination], animates: Bool = true) {
+        guard destinations != newValue else { return }
+        if animates {
             destinations = newValue
+        } else {
+            var transaction = Transaction(animation: .none)
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                destinations = newValue
+            }
         }
     }
 

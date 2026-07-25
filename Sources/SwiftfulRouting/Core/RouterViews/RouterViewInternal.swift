@@ -150,12 +150,15 @@ struct RouterViewInternal<Content: View>: View, Router {
             return subStack.screens.contains(where: { $0.id == routerId })
         }
         guard let index, newStack.indices.contains(index + 1) else {
-            stableScreenStack.setNewValueIfNeeded(newValue: [])
+            stableScreenStack.setNewValueIfNeeded(newValue: [], animates: false)
             return
         }
         
         let activeStack = newStack[index + 1].screens
-        stableScreenStack.setNewValueIfNeeded(newValue: activeStack)
+        // Forward the animates flag from the last destination so the NavigationStack path
+        // update stays within the same withTransaction context that RouterViewModel set.
+        let animates = activeStack.last?.animates ?? true
+        stableScreenStack.setNewValueIfNeeded(newValue: activeStack, animates: animates)
     }
             
     var activeScreens: [AnyDestinationStack] {
