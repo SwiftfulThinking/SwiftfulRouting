@@ -13,7 +13,7 @@ final class StableAnyDestinationArray: ObservableObject, Equatable {
         self.destinations = destinations
     }
     
-    func setNewValueIfNeeded(newValue: [AnyDestination], animates: Bool = true) {
+    func setNewValueIfNeeded(newValue: [AnyDestination], animates: Bool) {
         guard destinations != newValue else { return }
         if animates {
             destinations = newValue

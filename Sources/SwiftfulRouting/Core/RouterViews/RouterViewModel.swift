@@ -38,6 +38,13 @@ final class RouterViewModel: ObservableObject {
     
     // Available transitions in queue, accessible via .showNextTransition()
     @Published private(set) var availableTransitionQueue: [String: [AnyTransitionDestination]] = [:]
+
+    // The animates value of the most recent activeScreenStacks action.
+    // The handlers that forward activeScreenStacks changes into each NavigationStack's
+    // path run on SwiftUI's schedule, outside the withTransaction context set in
+    // triggerAction, so the flag must travel with the data and be re-applied at the
+    // point the path is mutated (see StableAnyDestinationArray.setNewValueIfNeeded).
+    private(set) var lastActionAnimates: Bool = true
         
     // Only called once onFirstAppear in the root router.
     // This replaces starting activeScreenStacks value.
@@ -393,6 +400,7 @@ extension RouterViewModel {
     
     // Utility functino to trigger action with or without SwiftUI animation
     private func triggerAction(withAnimation: Bool, action: @escaping () -> Void) {
+        lastActionAnimates = withAnimation
         if withAnimation {
             action()
         } else {

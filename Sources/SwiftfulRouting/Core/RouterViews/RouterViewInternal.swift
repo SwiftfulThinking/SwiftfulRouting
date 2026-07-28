@@ -149,15 +149,19 @@ struct RouterViewInternal<Content: View>: View, Router {
         let index = newStack.firstIndex { subStack in
             return subStack.screens.contains(where: { $0.id == routerId })
         }
+        // This handler runs on SwiftUI's schedule, outside the withTransaction context
+        // that RouterViewModel.triggerAction set for this change (onChange actions are
+        // always deferred, and even .onReceive delivery is not reliably synchronous).
+        // The action's animates flag therefore travels via viewModel.lastActionAnimates
+        // and is re-applied as a transaction inside setNewValueIfNeeded.
+        let animates = viewModel.lastActionAnimates
+
         guard let index, newStack.indices.contains(index + 1) else {
-            stableScreenStack.setNewValueIfNeeded(newValue: [], animates: false)
+            stableScreenStack.setNewValueIfNeeded(newValue: [], animates: animates)
             return
         }
-        
+
         let activeStack = newStack[index + 1].screens
-        // Forward the animates flag from the last destination so the NavigationStack path
-        // update stays within the same withTransaction context that RouterViewModel set.
-        let animates = activeStack.last?.animates ?? true
         stableScreenStack.setNewValueIfNeeded(newValue: activeStack, animates: animates)
     }
             
