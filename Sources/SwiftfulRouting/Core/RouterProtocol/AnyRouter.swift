@@ -107,6 +107,48 @@ public struct AnyRouter: Sendable, Router {
         object.showScreens(destinations: [destination])
     }
 
+    /// Shows a screen with an optional zoom transition.
+    /// - Parameters:
+    ///   - style: The presentation style (e.g., .sheet, .fullScreenCover)
+    ///   - transitionID: Optional transition ID. If provided, a zoom transition will be used from a button with matching ID.
+    ///   - namespace: The namespace to use for the transition
+    ///   - content: The view builder for the destination content
+    @MainActor public func showScreenWithZoomTransition<T>(
+        _ segue: SegueOption,
+        id: String = UUID().uuidString,
+        location: SegueLocation = .insert,
+        animates: Bool = true,
+        transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
+        onDismiss: (() -> Void)? = nil,
+        transitionID: String? = nil,
+        namespace: Namespace.ID,
+        destination: @escaping (AnyRouter) -> T
+    ) where T : View {
+        guard let transitionID = transitionID else {
+            let destination = AnyDestination(id: id, segue: segue, location: location, animates: animates, transitionBehavior: transitionBehavior, onDismiss: onDismiss, destination: destination)
+            object.showScreens(destinations: [destination])
+
+            return
+        }
+
+        let wrappedDestination: (AnyRouter) -> ZoomTransitionWrapper<T> = { router in
+            ZoomTransitionWrapper(transitionID: transitionID, namespace: namespace) {
+                destination(router)
+            }
+        }
+
+        let destination = AnyDestination(
+            id: id,
+            segue: segue,
+            location: location,
+            animates: animates,
+            transitionBehavior: transitionBehavior,
+            onDismiss: onDismiss,
+            destination: wrappedDestination
+        )
+        object.showScreens(destinations: [destination])
+    }
+
     /// Add one screen to the screen heirarchy.
     @MainActor public func showScreen(destination: AnyDestination) {
         object.showScreens(destinations: [destination])
@@ -622,5 +664,20 @@ extension AnyRouter: Identifiable, Hashable, Equatable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id + rootRouterId)
+    }
+}
+
+// MARK: - Zoom Transition Support Views
+
+/// A view that applies zoom transition to destination content.
+private struct ZoomTransitionDestinationView<Content: View>: View {
+    let transitionID: String
+    let namespace: Namespace.ID
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        ZoomTransitionWrapper(transitionID: transitionID, namespace: namespace) {
+            content()
+        }
     }
 }

@@ -10,6 +10,7 @@
 - ✅ Modals
 - ✅ Transitions
 - ✅ Modules
+- ✅ Zoom transitions (iOS 18+)
 
 ### How to use this package:
 
@@ -75,6 +76,7 @@ Examples:
 
 ```swift
 router.showScreen()
+router.showScreenWithZoomTransition(.sheet, transitionID: "detail", namespace: namespace)
 router.showAlert()
 router.showModal()
 router.showTransition()
@@ -340,6 +342,48 @@ router.showSafari {
      URL(string: "https://www.apple.com")
 }
 ```
+</details>
+
+## Zoom Transitions (iOS 18+)
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+Present sheets or fullscreen covers with a zoom animation that expands from a source view. Uses SwiftUI's `matchedTransitionSource` and `navigationTransition(.zoom)`. On iOS 16–17, the zoom APIs are unavailable and the framework falls back to standard presentation.
+
+**1. Mark the source view** with `.zoomTransitionSource(id:namespace:)`. The `id` must match the `transitionID` you pass when presenting.
+
+```swift
+struct ContentView: View {
+    @Namespace private var namespace
+
+    var body: some View {
+        Button("Show Detail") {
+            router.showScreenWithZoomTransition(.sheet, transitionID: "detail", namespace: namespace) { _ in
+                DetailView()
+            }
+        }
+        .zoomTransitionSource(id: "detail", namespace: namespace)
+    }
+}
+```
+
+**2. Present with `showScreenWithZoomTransition`** and pass the same `transitionID` and `namespace`. Omit `transitionID` to use normal presentation (no zoom).
+
+```swift
+router.showScreenWithZoomTransition(.sheet, transitionID: "detail", namespace: namespace) { router in
+    DetailView()
+}
+
+// No zoom—standard presentation
+router.showScreenWithZoomTransition(.sheet, namespace: namespace) { router in
+    DetailView()
+}
+```
+
+Supported styles: `.sheet`, `.fullScreenCover`, and their config variants (e.g. `.sheetConfig`, `.fullScreenCoverConfig`).
+
 </details>
 
 
@@ -1137,6 +1181,59 @@ TabView {
     }
 }
 ```
+
+### Capturing Routers from Tabs
+
+When using individual `RouterView`s within a `TabView`, you may want to access the router from a parent view. You can use the `routerPreference` modifier to capture routers from tabs and read them in a parent view.
+
+To capture routers from tabs, create a PreferenceKey and use it with the `.routerPreference()` modifier. Here's a complete example:
+
+```swift
+// PreferenceKey to capture router from tabs
+private struct RouterPreferenceKey: PreferenceKey {
+    static var defaultValue: AnyRouter? {
+        nil
+    }
+
+    static func reduce(value: inout AnyRouter?, nextValue: () -> AnyRouter?) {
+        // Use the first non-nil router we encounter
+        if value == nil {
+            value = nextValue()
+        }
+    }
+}
+
+struct AppTabbarView: View {
+    @State private var currentTabRouter: AnyRouter?
+    
+    var body: some View {
+        TabView {
+            RouterView { router in
+                Text("Screen1")
+                    .tabItem { Label("Home", systemImage: "house.fill") }
+                    .routerPreference(router)
+            }
+              
+            RouterView { router in
+                Text("Screen2")
+                    .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                    .routerPreference(router)
+            }
+            
+            RouterView { router in
+                Text("Screen3")
+                    .tabItem { Label("Profile", systemImage: "person.fill") }
+                    .routerPreference(router)
+            }
+        }
+        .onPreferenceChange(RouterPreferenceKey.self) { router in
+            currentTabRouter = router
+        }
+    }
+}
+```
+
+This pattern is useful when you need to coordinate navigation across tabs or perform actions on the currently active tab's router from a parent view.
 
 Regardless of your choice, you may want to add a parent `RouterView` to `addModuleSupport` that has `addNavigationStack` set to `false`.
 
