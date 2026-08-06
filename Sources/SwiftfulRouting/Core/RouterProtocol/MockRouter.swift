@@ -143,7 +143,11 @@ struct MockRouter: Router {
     func dismissAllModals() {
         printError()
     }
-    
+
+    func getRootRouter() -> AnyRouter {
+        AnyRouter(id: "mock", rootRouterId: "mock", object: self)
+    }
+
     func showTransition(transition: AnyTransitionDestination) {
         printError()
     }

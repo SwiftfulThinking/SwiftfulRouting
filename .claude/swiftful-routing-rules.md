@@ -320,6 +320,25 @@ router.dismissModals(upToId: "modal_id")        // dismiss down to specific moda
 router.dismissAllModals()                       // dismiss all modals
 ```
 
+### getRootRouter
+
+`router.getRootRouter()` returns the outermost `RouterView`'s router. **Only needed when `RouterView`s are nested** (e.g. a root `RouterView` wrapping a `TabView`, each tab also having its own `RouterView`). In that case, a modal shown on a child router renders behind the tab bar. Use `getRootRouter()` to show it on the root instead.
+
+**Default to using `router` directly.** Only reach for `getRootRouter()` when the user reports the modal appears behind a tab bar or other persistent UI layer.
+
+```swift
+// Default — show modal on the current router
+router.showModal { MyModal() }
+
+// Nested RouterView setup — show modal above the tab bar
+let rootRouter = router.getRootRouter()
+rootRouter.showModal(transition: .move(edge: .bottom), alignment: .bottom) {
+    MyModal(router: rootRouter)  // pass rootRouter so the modal can dismiss itself
+}
+```
+
+The returned router is a fully functional `AnyRouter` — all show/dismiss methods work normally on it.
+
 ## Transitions (showTransition)
 
 Replaces the current screen content with a new view using a SwiftUI transition. This is NOT a segue — it swaps what's displayed. Use only when explicitly asked.

@@ -420,7 +420,13 @@ public struct AnyRouter: Sendable, Router {
     @MainActor public func dismissAllModals() {
         object.dismissAllModals()
     }
-    
+
+    /// Returns the root AnyRouter — the outermost RouterView in the hierarchy.
+    /// Use this when you need to show a modal above all nested routers (e.g. above a tab bar).
+    @MainActor public func getRootRouter() -> AnyRouter {
+        object.getRootRouter()
+    }
+
     /// Transition current screen.
     /// - Parameters:
     ///   - transition: Transition animation option.

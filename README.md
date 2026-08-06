@@ -666,6 +666,19 @@ Dismiss all modals.
 router.dismissAllModals()
 ```
 
+#### Nested RouterViews — showing a modal above a tab bar
+
+When `RouterView`s are nested (e.g. a root `RouterView` wrapping a `TabView`, each tab also having its own `RouterView`), a modal shown on a child router will render behind the tab bar. Use `getRootRouter()` to target the outermost `RouterView` instead.
+
+```swift
+let rootRouter = router.getRootRouter()
+rootRouter.showModal(transition: .move(edge: .bottom), alignment: .bottom) {
+    MyModal(router: rootRouter)
+}
+```
+
+Pass `rootRouter` into the destination so the modal can dismiss itself correctly. If your app does not nest `RouterView`s, `getRootRouter()` simply returns the current router.
+
 Additional convenience methods:
 
 ```swift
