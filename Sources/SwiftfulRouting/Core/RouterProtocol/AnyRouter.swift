@@ -91,6 +91,8 @@ public struct AnyRouter: Sendable, Router {
     ///   - id: Identifier for the screen
     ///   - location: Where to insert the new screen in the heirarchy (default = .insert)
     ///   - onDismiss: Trigger closure when screen gets dismissed (note: dismiss != disappear)
+    ///   - onDidDismiss: Trigger closure once the dismissal has completed and the router has
+    ///   finished updating its stacks. Use this, not `onDismiss`, to present another screen.
     ///   - animates: If the segue should animate or not (default = true)
     ///   - transitionBehavior: Determines the behavior of "transition" methods on the destination screen.
     ///   - destination: The destination screen.
@@ -101,9 +103,54 @@ public struct AnyRouter: Sendable, Router {
         animates: Bool = true,
         transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
         onDismiss: (() -> Void)? = nil,
+        onDidDismiss: (() -> Void)? = nil,
         destination: @escaping (AnyRouter) -> T
     ) where T : View {
-        let destination = AnyDestination(id: id, segue: segue, location: location, animates: animates, transitionBehavior: transitionBehavior, onDismiss: onDismiss, destination: destination)
+        let destination = AnyDestination(id: id, segue: segue, location: location, animates: animates, transitionBehavior: transitionBehavior, onDismiss: onDismiss, onDidDismiss: onDidDismiss, destination: destination)
+        object.showScreens(destinations: [destination])
+    }
+
+    /// Shows a screen with an optional zoom transition.
+    /// - Parameters:
+    ///   - style: The presentation style (e.g., .sheet, .fullScreenCover)
+    ///   - transitionID: Optional transition ID. If provided, a zoom transition will be used from a button with matching ID.
+    ///   - namespace: The namespace to use for the transition
+    ///   - content: The view builder for the destination content
+    @MainActor public func showScreenWithZoomTransition<T>(
+        _ segue: SegueOption,
+        id: String = UUID().uuidString,
+        location: SegueLocation = .insert,
+        animates: Bool = true,
+        transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
+        onDismiss: (() -> Void)? = nil,
+        onDidDismiss: (() -> Void)? = nil,
+        transitionID: String? = nil,
+        namespace: Namespace.ID,
+        destination: @escaping (AnyRouter) -> T
+    ) where T : View {
+        guard let transitionID = transitionID else {
+            let destination = AnyDestination(id: id, segue: segue, location: location, animates: animates, transitionBehavior: transitionBehavior, onDismiss: onDismiss, onDidDismiss: onDidDismiss, destination: destination)
+            object.showScreens(destinations: [destination])
+
+            return
+        }
+
+        let wrappedDestination: (AnyRouter) -> ZoomTransitionWrapper<T> = { router in
+            ZoomTransitionWrapper(transitionID: transitionID, namespace: namespace) {
+                destination(router)
+            }
+        }
+
+        let destination = AnyDestination(
+            id: id,
+            segue: segue,
+            location: location,
+            animates: animates,
+            transitionBehavior: transitionBehavior,
+            onDismiss: onDismiss,
+            onDidDismiss: onDidDismiss,
+            destination: wrappedDestination
+        )
         object.showScreens(destinations: [destination])
     }
 
@@ -622,5 +669,20 @@ extension AnyRouter: Identifiable, Hashable, Equatable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id + rootRouterId)
+    }
+}
+
+// MARK: - Zoom Transition Support Views
+
+/// A view that applies zoom transition to destination content.
+private struct ZoomTransitionDestinationView<Content: View>: View {
+    let transitionID: String
+    let namespace: Namespace.ID
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        ZoomTransitionWrapper(transitionID: transitionID, namespace: namespace) {
+            content()
+        }
     }
 }

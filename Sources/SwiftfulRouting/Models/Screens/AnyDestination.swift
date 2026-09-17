@@ -15,6 +15,17 @@ public struct AnyDestination: Identifiable, Hashable {
     public let animates: Bool
     public let destination: AnyView
     public let onDismiss: (() -> Void)?
+
+    /// Called once the screen's dismissal has fully completed, after the router has finished
+    /// updating its stacks.
+    ///
+    /// `onDismiss` fires as the dismissal *begins* — the stacks are updated straight away, but
+    /// SwiftUI is still animating, and it writes back to the presentation binding only when it
+    /// has finished. That write triggers the router's catch-up pass, which dismisses everything
+    /// in front of the presenting screen. A screen presented between those two moments is
+    /// therefore swept away again, so anything that presents in response to a dismissal has to
+    /// wait for this callback rather than `onDismiss`.
+    public let onDidDismiss: (() -> Void)?
     public let transitionBehavior: TransitionMemoryBehavior
     
     /// - Parameters:
@@ -24,6 +35,8 @@ public struct AnyDestination: Identifiable, Hashable {
     ///   - animates: If the segue should animate or not (default = true)
     ///   - transitionBehavior: Determines the behavior of "transition" methods on the destination screen.
     ///   - onDismiss: Trigger closure when screen gets dismissed (note: dismiss != disappear)
+    ///   - onDidDismiss: Trigger closure once the dismissal has completed and the router has
+    ///   finished updating its stacks. Use this, not `onDismiss`, to present another screen.
     ///   - destination: The destination screen.
     public init<T:View>(
         id: String = UUID().uuidString,
@@ -32,6 +45,7 @@ public struct AnyDestination: Identifiable, Hashable {
         animates: Bool = true,
         transitionBehavior: TransitionMemoryBehavior = .keepPrevious,
         onDismiss: (() -> Void)? = nil,
+        onDidDismiss: (() -> Void)? = nil,
         destination: @escaping (AnyRouter) -> T
     ) {
         self.id = id
@@ -48,6 +62,7 @@ public struct AnyDestination: Identifiable, Hashable {
             )
         )
         self.onDismiss = onDismiss
+        self.onDidDismiss = onDidDismiss
     }
     
     nonisolated public func hash(into hasher: inout Hasher) {
@@ -69,6 +84,7 @@ public struct AnyDestination: Identifiable, Hashable {
             "destination_location": location.stringValue,
             "destination_animates": animates,
             "destination_has_on_dismiss": onDismiss != nil,
+            "destination_has_on_did_dismiss": onDidDismiss != nil,
             "destination_transition_behavior": transitionBehavior.rawValue,
         ]
     }

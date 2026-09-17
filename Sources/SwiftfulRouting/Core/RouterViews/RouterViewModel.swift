@@ -17,6 +17,12 @@ final class RouterViewModel: ObservableObject {
     
     // Available screens in queue, accessible via .showNextScreen()
     @Published private(set) var availableScreenQueue: [AnyDestination] = []
+
+    // onDidDismiss closures for screens that have been removed from the stacks but whose
+    // environment is still animating away. SwiftUI writes back to the presentation binding when
+    // that animation finishes, which runs dismissScreens(toEnvironmentId:) — these fire after it,
+    // so a screen presented from one of them is not swept up by that pass.
+    private var pendingDidDismissActions: [() -> Void] = []
     
     // Active alerts for all child screens. Each screen can have only one active alert.
     // [routerId : Alert]
@@ -589,6 +595,9 @@ extension RouterViewModel {
                 // Trigger screen onDismiss closures, if available
                 for screen in screensToDismiss.reversed() {
                     screen.onDismiss?()
+                    if let onDidDismiss = screen.onDidDismiss {
+                        pendingDidDismissActions.append(onDidDismiss)
+                    }
                     logger.trackEvent(event: Event.screenDismiss(screen: screen, rootRouterId: rootRouterIdFromDeveloper))
                 }
                 
@@ -605,8 +614,25 @@ extension RouterViewModel {
         logger.trackEvent(event: Event.dismissScreen_routerIdNotFound(id: routeId))
     }
     
+    /// Run the onDidDismiss closures of screens whose environment has finished dismissing.
+    ///
+    /// Called after the catch-up pass below, which is the last thing to touch the stacks for
+    /// that dismissal — so a screen presented from one of these closures survives.
+    private func flushPendingDidDismissActions() {
+        guard !pendingDidDismissActions.isEmpty else { return }
+        let actions = pendingDidDismissActions
+        pendingDidDismissActions.removeAll()
+        for action in actions {
+            action()
+        }
+    }
+
     // Dismiss all screens in front of routeId
     func dismissScreens(toEnvironmentId routeId: String, animates: Bool) {
+        // Every path out of this method has finished updating the stacks, including the nested
+        // dismissScreens(to:) calls that collect further closures.
+        defer { flushPendingDidDismissActions() }
+
         // This is called "onDismiss" of a .sheet or .fullScreenCover (dismissing the environment in front of routeId)
         // It is called internally and not by the user
         // When an environment dismisses, everthing in front of it should be dismissed
